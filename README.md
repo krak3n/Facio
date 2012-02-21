@@ -24,7 +24,7 @@ For `skeletor` to be available system wide you must install as root:
 * **Pip:**
 
     ```
-    $ sudo pip install -e git@github.com:krak3n/Skeletor.git#egg=skeletor
+    $ sudo pip install -e git+git@github.com:krak3n/Skeletor.git#egg=skeletor
     ```
 
 * **Manual:**
