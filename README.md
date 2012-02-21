@@ -4,7 +4,7 @@ Skeletor is a tool for building project skeleton templates. Primarily based on D
 
 ## Status ##
 
-Skeletor is currently at Alpha and should be considered as a stable piece of software, please use at your own risk :)
+Skeletor is currently at Alpha and should be considered as a unstable piece of software, please use at your own risk :)
 
 **Version:** 1.0 Alpha
 
