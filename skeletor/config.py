@@ -3,9 +3,9 @@
 
 import ConfigParser
 import os
-import urllib2
 from random import choice
 from skeletor.opts import Option, OptionParser
+
 
 class Config(object):
 
@@ -15,7 +15,7 @@ class Config(object):
                                    '.skeletor.cfg')
 
     valid_config_sections = {
-        'misc': ['install',],
+        'misc': ['install', ],
         'template': ['template_path', 'template_settings_dir'],
         'database': ['db_create', 'db_root_user', 'db_root_pass'],
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
@@ -154,7 +154,8 @@ class Config(object):
         ''' Validate virtualenv settings.'''
 
         path = getattr(self, 'venv_path', None)
-        if self.venv_create:
+        venv_create = getattr(self, 'venv_create', None)
+        if venv_create:
             if not path:
                 self.cli_opts.error('You need to provide a virtualenv path '\
                                    'where the venv will be created')
