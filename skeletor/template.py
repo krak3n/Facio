@@ -95,7 +95,7 @@ class Template(object):
         if self.is_git:
             rmtree(self.config.template_path)
 
-    def rename(self, root, name, keep_ext=False):
+    def rename(self, root, name):
         '''Rename a file or directory.'''
 
         e = re.compile(r'{{(.*?)}}')
@@ -105,10 +105,7 @@ class Template(object):
                 place_holder_val = getattr(self.config,
                                            self.place_holders[plain])
                 origin = os.path.join(root, name)
-                new_name = place_holder_val
-                if keep_ext:
-                    old_name, old_ext = os.path.splitext(name)
-                    new_name = place_holder_val + old_ext
+                new_name = name.replace('{{%s}}' % plain, place_holder_val)
                 new = os.path.join(root, new_name)
                 move(origin, new)
         except IndexError:
