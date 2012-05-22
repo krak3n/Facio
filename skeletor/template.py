@@ -124,7 +124,7 @@ class Template(object):
 
         for root, dirs, files in os.walk(self.project_root):
             for f in files:
-                self.rename(root, f, True)
+                self.rename(root, f)
         return False
 
     def replace_line(self, f, line, placeholder):
