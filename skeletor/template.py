@@ -13,6 +13,7 @@ except ImportError:
     sys.exit()
 from shutil import copytree, move, rmtree, copy
 
+
 class Template(object):
 
     is_git = False
@@ -99,15 +100,18 @@ class Template(object):
 
         for root, dirs, files in os.walk(self.project_root):
             for d in dirs:
-                plain = re.sub('[{/}]', '', d)
-                if plain in self.place_holders:
-                    place_holder_val = getattr(self.config,
-                                               self.place_holders[plain])
-                    origin = os.path.join(root, d)
-                    new = os.path.join(root, place_holder_val)
-                    move(origin, new)
-                    return True
-
+                e = re.compile(r'{{(.*?)}}')
+                try:
+                    plain = e.findall(d)[0]
+                    if plain in self.place_holders:
+                        place_holder_val = getattr(self.config,
+                                                   self.place_holders[plain])
+                        origin = os.path.join(root, d)
+                        new = os.path.join(root, place_holder_val)
+                        move(origin, new)
+                        return True
+                except IndexError:
+                    return False
         return False
 
     def replace_line(self, f, line, placeholder):
@@ -129,15 +133,15 @@ class Template(object):
             for file in files:
                 filepath = os.path.join(root, file)
                 with open(filepath, 'r+') as f:
-                   lines =  f.readlines()
-                   f.seek(0)
-                   f.truncate()
-                   for line in lines:
-                       has_placeholder = False
-                       for placeholder in self.place_holders:
-                           if '{{%s}}' % placeholder in line:
-                               has_placeholder = True
-                               self.replace_line(f, line, placeholder)
-                       if not has_placeholder:
-                           f.write(line)
-                   f.close()
+                    lines = f.readlines()
+                    f.seek(0)
+                    f.truncate()
+                    for line in lines:
+                        has_placeholder = False
+                        for placeholder in self.place_holders:
+                            if '{{%s}}' % placeholder in line:
+                                has_placeholder = True
+                                self.replace_line(f, line, placeholder)
+                        if not has_placeholder:
+                            f.write(line)
+                    f.close()
