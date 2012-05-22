@@ -9,6 +9,7 @@ from skeletor.opts import Option, OptionParser
 
 class Config(object):
 
+    venv_create = False
     has_config = False
     template_path = 'git+git@github.com:krak3n/Skeletor-Default-Template.git'
     config_path = os.path.join(os.path.expanduser('~'),
