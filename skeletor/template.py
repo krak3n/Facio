@@ -119,7 +119,6 @@ class Template(object):
 
         for root, dirs, files in os.walk(self.project_root):
             for d in dirs:
-                print d
                 self.rename(root, d)
         return False
 
