@@ -95,23 +95,40 @@ class Template(object):
         if self.is_git:
             rmtree(self.config.template_path)
 
+    def rename(self, root, name, keep_ext=False):
+        '''Rename a file or directory.'''
+
+        e = re.compile(r'{{(.*?)}}')
+        try:
+            plain = e.findall(name)[0]
+            if plain in self.place_holders:
+                place_holder_val = getattr(self.config,
+                                           self.place_holders[plain])
+                origin = os.path.join(root, name)
+                new_name = place_holder_val
+                if keep_ext:
+                    old_name, old_ext = os.path.splitext(name)
+                    new_name = place_holder_val + old_ext
+                new = os.path.join(root, new_name)
+                move(origin, new)
+        except IndexError:
+            pass
+
     def rename_directories(self):
         '''Move directories with placeholder names.'''
 
         for root, dirs, files in os.walk(self.project_root):
             for d in dirs:
-                e = re.compile(r'{{(.*?)}}')
-                try:
-                    plain = e.findall(d)[0]
-                    if plain in self.place_holders:
-                        place_holder_val = getattr(self.config,
-                                                   self.place_holders[plain])
-                        origin = os.path.join(root, d)
-                        new = os.path.join(root, place_holder_val)
-                        move(origin, new)
-                        return True
-                except IndexError:
-                    return False
+                print d
+                self.rename(root, d)
+        return False
+
+    def rename_files(self):
+        '''Move files with placeholder names.'''
+
+        for root, dirs, files in os.walk(self.project_root):
+            for f in files:
+                self.rename(root, f, True)
         return False
 
     def replace_line(self, f, line, placeholder):
@@ -127,6 +144,9 @@ class Template(object):
         '''Swap placeholders for real values.'''
 
         while self.rename_directories():
+            continue
+
+        while self.rename_files():
             continue
 
         for root, dirs, files in os.walk(self.project_root):
