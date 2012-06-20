@@ -11,18 +11,18 @@ class Config(object):
 
     venv_create = False
     has_config = False
-    template_path = 'git+git@github.com:krak3n/Skeletor-Default-Template.git'
-    config_path = os.path.join(os.path.expanduser('~'),
-                                   '.skeletor.cfg')
+    templates = {
+        'default': 'git+git@github.com:krak3n/Skeletor-Default-Template.git', }
+    config_path = os.path.join(os.path.expanduser('~'), '.skeletor.cfg')
 
     valid_config_sections = {
         'misc': ['install', ],
-        'template': ['template_path', 'template_settings_dir'],
+        'template': [],
         'database': ['db_create', 'db_root_user', 'db_root_pass'],
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
-    valid_cl_options = ['project_name', 'install', 'template_path',
+    valid_cl_options = ['project_name', 'install', 'template',
                         'template_settings_dir', 'db_create', 'db_user',
                         'db_pass', 'db_name', 'venv_create', 'venv_path',
                         'venv_use_site_packages', 'venv_prefix']
@@ -46,7 +46,7 @@ class Config(object):
                    help='Install the project onto your path, e.g '\
                         'python setup.py develop'),
             # Template Options
-            Option('-t', '--template', dest='template_path', action='store',
+            Option('-t', '--template', dest='template', action='store',
                    help='Path to your custom template', type="string"),
             Option('-s', '--template_settings_dir', action='store',
                    help='Template settings directory name', type="string"),
@@ -83,7 +83,10 @@ class Config(object):
         for option in self.valid_cl_options:
             value = getattr(cl_options, option, None)
             if value:
-                setattr(self, option, value)
+                if option == 'template':
+                    self.templates['default'] = value
+                else:
+                    setattr(self, option, value)
 
     def load_config(self):
         '''Load users skeletor.cfg if exists.'''
@@ -99,10 +102,26 @@ class Config(object):
 
         for section in self.config_parser.sections():
             if section in self.valid_config_sections:
-                self.set_attributes(
-                    self.valid_config_sections[section],
-                    self.config_parser.items(section)
-                )
+                if section == 'template':
+                    self.set_template_options(self.config_parser.items(
+                                              'template'))
+                else:
+                    self.set_attributes(
+                        self.valid_config_sections[section],
+                        self.config_parser.items(section)
+                    )
+
+    def set_template_options(self, items):
+        '''Set template options for template choices
+        @arg1 list: a list of tuples containing config option name / value
+        '''
+
+        if not type(items) == list:
+            raise Exception
+        else:
+            for item in items:
+                name, value = item
+                self.templates[name] = value
 
     def set_attributes(self, valid_settings, items):
         '''Set class attributes based on valid settings and parsed
@@ -126,7 +145,7 @@ class Config(object):
     def validate(self):
         '''Valid provided configuration options.'''
 
-        self.validate_db_options()
+        self.validate_template_options()
         self.validate_virtualenv()
 
     def validate_db_options(self):
@@ -161,21 +180,19 @@ class Config(object):
                 self.cli_opts.error('You need to provide a virtualenv path '\
                                    'where the venv will be created')
 
-# TODO: Databse creation not yet working
     def validate_template_options(self):
         '''Validate template options.'''
 
-        print 'Warning: Database creation is not yet supported'
+        self.template = self.templates['default']
 
-        template_path = getattr(self, 'template_path', None)
-
-        if not template_path:
-            self.cli_options.error('You must specify a path to your '\
-                                   'template path')
+        if not self.template:
+            self.cli_opts.error('You must specify a path to your '\
+                                'template path')
         else:
-            if not os.path.isfile(template_path):
-                self.cli_options.error('The path to your template does not '\
-                                       'exist.')
+            if (not self.template.startswith('git+') and
+                not os.path.isfile(self.template)):
+                self.cli_opts.error('The path to your template does not '\
+                                    'exist.')
 
     @property
     def django_secret_key(self):

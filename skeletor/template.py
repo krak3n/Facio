@@ -52,14 +52,14 @@ class Template(object):
             self.config.cli_opts.error('%s already exists' % (
                 self.project_root))
 
-# TODO: git stuff should live in its on class
+# TODO: git stuff should live in its own class
     def is_git(self):
         '''Detect if the user wants to use a git repository.'''
 
-        if self.config.template_path.startswith('git+'):
+        if self.config.template.startswith('git+'):
             self.is_git = True
-            self.git_repo_path = self.config.template_path.replace('git+', '')
-            self.config.template_path = tempfile.mkdtemp(suffix='skeletor')
+            self.git_repo_path = self.config.template.replace('git+', '')
+            self.config.template = tempfile.mkdtemp(suffix='skeletor')
             print 'Using git to clone template from %s' % self.git_repo_path
             self.git_clone()
 
@@ -67,7 +67,7 @@ class Template(object):
         '''Clone git repository into tmp directory.'''
 
         try:
-            repo = Repo.init(self.config.template_path)
+            repo = Repo.init(self.config.template)
             repo.create_remote('origin', self.git_repo_path)
             origin = repo.remotes.origin
             origin.fetch()
@@ -75,15 +75,15 @@ class Template(object):
         except:
             self.config.cli_opts.error('Error cloning repository')
         else:
-            rmtree(os.path.join(self.config.template_path, '.git'))
+            rmtree(os.path.join(self.config.template, '.git'))
 
     def copy_template(self):
-        '''Moves template_path into current working dir.'''
+        '''Moves template into current working dir.'''
 
-        if os.path.isdir(self.config.template_path):
+        if os.path.isdir(self.config.template):
             self.make_project_dir()
-            for file in os.listdir(self.config.template_path):
-                path = os.path.join(self.config.template_path, file)
+            for file in os.listdir(self.config.template):
+                path = os.path.join(self.config.template, file)
                 if os.path.isdir(path):
                     copytree(path, os.path.join(self.project_root, file))
                 else:
@@ -93,7 +93,7 @@ class Template(object):
             self.config.cli_opts.error('Unable to copy template, directory '\
                                        'does not exist')
         if self.is_git:
-            rmtree(self.config.template_path)
+            rmtree(self.config.template)
 
     def rename(self, root, name):
         '''Rename a file or directory.'''
