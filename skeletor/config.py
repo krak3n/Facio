@@ -3,6 +3,8 @@
 
 import ConfigParser
 import os
+import sys
+
 from random import choice
 from skeletor.opts import Option, OptionParser
 
@@ -11,6 +13,7 @@ class Config(object):
 
     venv_create = False
     has_config = False
+    force_defaut_template = False
     templates = {
         'default': 'git+git@github.com:krak3n/Skeletor-Default-Template.git', }
     config_path = os.path.join(os.path.expanduser('~'), '.skeletor.cfg')
@@ -23,9 +26,10 @@ class Config(object):
     }
 
     valid_cl_options = ['project_name', 'install', 'template',
-                        'template_settings_dir', 'db_create', 'db_user',
-                        'db_pass', 'db_name', 'venv_create', 'venv_path',
-                        'venv_use_site_packages', 'venv_prefix']
+                        'template_settings_dir', 'choose_template',
+                        'db_create', 'db_user', 'db_pass', 'db_name',
+                        'venv_create', 'venv_path', 'venv_use_site_packages',
+                        'venv_prefix']
 
     def __init__(self):
         '''Constructor, setup default properties.'''
@@ -47,9 +51,17 @@ class Config(object):
                         'python setup.py develop'),
             # Template Options
             Option('-t', '--template', dest='template', action='store',
-                   help='Path to your custom template', type="string"),
+                   help='Path to your custom template, absolute paths only '\
+                        ', git repositories can also be specified by '\
+                        'prefixing with git+ for example: git+git@gitbub.com'\
+                        '/path/to/repo.git', type="string"),
             Option('-s', '--template_settings_dir', action='store',
                    help='Template settings directory name', type="string"),
+            Option('-c', '--choose_template', dest='choose_template',
+                   help="If you have more than 1 template defined use this "\
+                        "flag to override the default template, Note: "\
+                        "specifying -t (--template) will mean this "\
+                        "flag is ignored.", action='store_true', default=None),
             # Database Option
             Option('-d', '--db_create', action="store_true", default=None,
                    help='Create database'),
@@ -85,6 +97,7 @@ class Config(object):
             if value:
                 if option == 'template':
                     self.templates['default'] = value
+                    self.force_defaut_template = True
                 else:
                     setattr(self, option, value)
 
@@ -180,10 +193,34 @@ class Config(object):
                 self.cli_opts.error('You need to provide a virtualenv path '\
                                    'where the venv will be created')
 
+    def prompt_template_choice(self):
+        sys.stdout.write("Please choose a template:\n\n")
+        i = 0
+        for name in self.templates:
+            template = self.templates[name]
+            sys.stdout.write("%d) %s: %s\n" % ((i + 1), name, template))
+            i += 1
+        template_list = list(self.templates)
+        while True:
+            sys.stdout.write('\nEnter the number for the template: ')
+            try:
+                num = int(raw_input())
+                if num == 0:
+                    raise ValueError
+                template = self.templates[template_list[num - 1]]
+            except (ValueError, IndexError):
+                sys.stdout.write('\nPlease choose a number between 1 and '\
+                                 '%d\n' % len(template_list))
+            else:
+                return template
+
     def validate_template_options(self):
         '''Validate template options.'''
 
-        self.template = self.templates['default']
+        if self.force_defaut_template or len(self.templates) == 1:
+            self.template = self.templates['default']
+        else:
+            self.template = self.prompt_template_choice()
 
         if not self.template:
             self.cli_opts.error('You must specify a path to your '\
