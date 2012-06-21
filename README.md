@@ -74,7 +74,7 @@ Skeletor is flexible, and you can hopefully tailor it how you build out project 
  * **-n / --name**: Your projects name.
  * **-i / --install**: If the project template includes a setup.py file this command will attempt to run `python setup.py develop` to install your new project to the python path, if you are creating a virtual environment along with your project it will install it here instead of to the root.
  * **-t / --template**: Path to a custom template, use `git+` to denote the path is to a git repository.
- * **-c / --choose_template: If you define multiple templates in the .skeletor.cfg use this flag to trigger a selection prompt instead of using the default template
+ * **-c / --choose_template**: If you define multiple templates in the .skeletor.cfg use this flag to trigger a selection prompt instead of using the default template
  * **-s / --template_settings_dir**: Custom settings directory name, see more info about this in the skeletor.cfg section.
  * **-E / --venv_create**: Create a python virtual environment for this project.
  * **-P / --venv_path**: Path to virtual environments home e.g `/home/me/.virtualenvs`.
@@ -116,8 +116,8 @@ Above is an example `.skeletor.cfg` file and contains a `[misc]`, `[virtualenv]`
     * **venv_create**: 0 or 1 - Create python virtual environment
     * **venv_path**: Path to python virtual environments home, e.g `/home/me/.virtualenvs/
 * `[template]`
-    * **template_path**: Path to your custom project template, prefix with `git+` to define git repository path.
-    * **template_settings_dir**: This is oreintated around Django but if you have a settings directory for each environment the project runs on yor can set this to be your name or something more meaningfull, take a look at the default template. e.g `template_settings_dir=chris`.
+    * **default**: Path to your custom template, prefix with `git+` to define git repository path.
+    * **other_template**: Path to other template
 * `[database]` **(coming soon)**
     * **db_create**: 0 or 1 - Auto create database
     * **db_root_user**: Your local dev database root user name
