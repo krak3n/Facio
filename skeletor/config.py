@@ -14,8 +14,11 @@ class Config(object):
     venv_create = False
     has_config = False
     force_defaut_template = False
+    choose_template = False
+
     templates = {
         'default': 'git+git@github.com:krak3n/Skeletor-Default-Template.git', }
+
     config_path = os.path.join(os.path.expanduser('~'), '.skeletor.cfg')
 
     valid_config_sections = {
@@ -194,6 +197,8 @@ class Config(object):
                                    'where the venv will be created')
 
     def prompt_template_choice(self):
+        '''If the user has multiple templates, prompt them to pick'''
+
         sys.stdout.write("Please choose a template:\n\n")
         i = 0
         for name in self.templates:
@@ -217,7 +222,9 @@ class Config(object):
     def validate_template_options(self):
         '''Validate template options.'''
 
-        if self.force_defaut_template or len(self.templates) == 1:
+        if (self.force_defaut_template
+            or len(self.templates) == 1
+            or not self.choose_template):
             self.template = self.templates['default']
         else:
             self.template = self.prompt_template_choice()

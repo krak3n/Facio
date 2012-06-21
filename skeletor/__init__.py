@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-VERSION = '1.0a'
+VERSION = '1.0a2'
 
 from .config import Config
 from .install  import Install
 from .template import Template
 from .virtualenv import Virtualenv
+
 
 class Skeletor(object):
 
