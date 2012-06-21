@@ -11,7 +11,8 @@ Skeletor is currently at Alpha and should be considered as a unstable piece of s
 ## Features ##
 
 * Custom templates
-* Git support for remote templates 
+* Git support for remote templates
+* Multiple templates
 * Template place holders
 * Python virtualenv creation
 * Automatic develop installation to python path
@@ -73,6 +74,7 @@ Skeletor is flexible, and you can hopefully tailor it how you build out project 
  * **-n / --name**: Your projects name.
  * **-i / --install**: If the project template includes a setup.py file this command will attempt to run `python setup.py develop` to install your new project to the python path, if you are creating a virtual environment along with your project it will install it here instead of to the root.
  * **-t / --template**: Path to a custom template, use `git+` to denote the path is to a git repository.
+ * **-c / --choose_template: If you define multiple templates in the .skeletor.cfg use this flag to trigger a selection prompt instead of using the default template
  * **-s / --template_settings_dir**: Custom settings directory name, see more info about this in the skeletor.cfg section.
  * **-E / --venv_create**: Create a python virtual environment for this project.
  * **-P / --venv_path**: Path to virtual environments home e.g `/home/me/.virtualenvs`.
@@ -98,7 +100,11 @@ Most things you can specify as command line options are also configurable in a `
     venv_path=/home/me/.virtualenvs/
 
     [template]
-    template_path=/home/me/my_custom_template/
+    # The Default Template to user (can be a git repp, prefix with git+url_to_repo
+    default=/home/me/my_custom_template/
+    # Add other templates here, for example:
+    experimental_template: /my/new/template/
+    flask: git+git@github.com/my_flask_template.git
 
 Above is an example `.skeletor.cfg` file and contains a `[misc]`, `[virtualenv]`, and `[template]` sections. These sections and their allowed options allow you set defaults so when you run Skeletor form the command line you need to keep specifying things like template path and virtual environment creation.
 
