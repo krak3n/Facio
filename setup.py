@@ -9,7 +9,7 @@ setup(
     version=VERSION,
     url='https://github.com/krak3n/Skeletor',
     author='Christopher Reeves',
-    author_email='me@chris-reeves.com',
+    author_email='hello@chris.reeves.io',
     description='A django project skeleton generator similar to django '
                 'startproject',
     packages=['skeletor', ],
