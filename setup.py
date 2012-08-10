@@ -14,6 +14,6 @@ setup(
     description='A django project skeleton generator similar to django '\
                 'startproject',
     packages=['skeletor',],
-    install_requires=['GitPython==0.3.2.RC1',],
+    install_requires=['GitPython==0.3.2.RC1', 'Jinja2==2.6'],
     scripts=['skeletor/bin/skeletor'],
 )
