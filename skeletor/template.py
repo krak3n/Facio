@@ -11,6 +11,11 @@ try:
 except ImportError:
     print 'GitPython module missing, please install it.'
     sys.exit()
+try:
+    import jinja2
+except ImportError:
+    print 'Jinja2 is required for tempalte processing, please install it.'
+    sys.exit()
 from shutil import copytree, move, rmtree, copy
 
 
