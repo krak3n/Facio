@@ -46,7 +46,7 @@ class Template(object):
         if not os.path.isdir(self.project_root):
             os.mkdir(self.project_root)
             if not os.path.isdir(self.project_root):
-                self.config.cli_opts.error('Error creating project '\
+                self.config.cli_opts.error('Error creating project '
                                            'directory')
         else:
             self.config.cli_opts.error('%s already exists' % (
@@ -90,7 +90,7 @@ class Template(object):
                     copy(path, self.project_root)
             self.swap_placeholders()
         else:
-            self.config.cli_opts.error('Unable to copy template, directory '\
+            self.config.cli_opts.error('Unable to copy template, directory '
                                        'does not exist')
         if self.is_git:
             rmtree(self.config.template)
