@@ -151,18 +151,17 @@ class Template(object):
             continue
 
         for root, dirs, files in os.walk(self.project_root):
+
+            jinja_tpl_loader = FileSystemLoader(root)
+            jinja_env = Environment(loader=jinja_tpl_loader)
+
             for file in files:
+
+                tpl = jinja_env.get_template(file)
+                file_contents = tpl.render(self.place_holders)
+
                 filepath = os.path.join(root, file)
-                with open(filepath, 'r+') as f:
-                    lines = f.readlines()
-                    f.seek(0)
-                    f.truncate()
-                    for line in lines:
-                        has_placeholder = False
-                        for placeholder in self.place_holders:
-                            if '{{%s}}' % placeholder in line:
-                                has_placeholder = True
-                                self.replace_line(f, line, placeholder)
-                        if not has_placeholder:
-                            f.write(line)
-                    f.close()
+                os.remove(filepath)
+
+                with open(filepath, 'w') as f:
+                    f.write(file_contents)
