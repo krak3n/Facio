@@ -4,7 +4,7 @@
 VERSION = '1.0a2'
 
 from .config import Config
-from .install  import Install
+from .install import Install
 from .template import Template
 from .virtualenv import Virtualenv
 
@@ -22,7 +22,9 @@ class Skeletor(object):
         if self.config.venv_create:
             self.venv = Virtualenv(self.config)
 
-        if self.config.install:
-            self.install = Install(self.config,
-                                   self.template,
-                                   getattr(self, 'venv', None))
+        # Install the project to python path
+        if hasattr(self.config, 'install'):
+            if self.config.install:
+                self.install = Install(self.config,
+                        self.template,
+                        getattr(self, 'venv', None))
