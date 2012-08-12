@@ -12,7 +12,7 @@ except ImportError:
     print 'GitPython module missing, please install it.'
     sys.exit()
 try:
-    import jinja2
+    from jinja2 import Environment, FileSystemLoader
 except ImportError:
     print 'Jinja2 is required for tempalte processing, please install it.'
     sys.exit()
