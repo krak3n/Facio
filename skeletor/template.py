@@ -151,17 +151,12 @@ class Template(object):
             continue
 
         for root, dirs, files in os.walk(self.project_root):
-
             jinja_tpl_loader = FileSystemLoader(root)
             jinja_env = Environment(loader=jinja_tpl_loader)
-
             for file in files:
-
                 tpl = jinja_env.get_template(file)
                 file_contents = tpl.render(self.place_holders)
-
                 filepath = os.path.join(root, file)
                 os.remove(filepath)
-
                 with open(filepath, 'w') as f:
                     f.write(file_contents)
