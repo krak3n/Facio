@@ -36,6 +36,7 @@ class Template(object):
         self.config = config
         self.working_dir = os.popen('pwd').read().split()[0]
         self.set_project_root()
+        self.set_template_variables()
         self.is_git()
         self.copy_template()
 
@@ -56,6 +57,15 @@ class Template(object):
         else:
             self.config.cli_opts.error('%s already exists' % (
                 self.project_root))
+
+    def set_template_variables(self):
+        ''' Replace self.place_holders defaults w/ config values. '''
+
+        for place_holder in self.place_holders:
+            config_value = getattr(self.config,
+                    self.place_holders[place_holder], None)
+            if config_value:
+                self.place_holders[place_holder] = config_value
 
 # TODO: git stuff should live in its own class
     def is_git(self):
@@ -107,8 +117,7 @@ class Template(object):
         try:
             plain = e.findall(name)[0]
             if plain in self.place_holders:
-                place_holder_val = getattr(self.config,
-                                           self.place_holders[plain])
+                place_holder_val = self.place_holders[plain]
                 origin = os.path.join(root, name)
                 new_name = name.replace('{{%s}}' % plain, place_holder_val)
                 new = os.path.join(root, new_name)
@@ -131,15 +140,6 @@ class Template(object):
             for f in files:
                 self.rename(root, f)
         return False
-
-    def replace_line(self, f, line, placeholder):
-        '''Replace placeholder with value.'''
-
-        attr = self.place_holders[placeholder]
-        val = getattr(self.config, attr, None)
-        if val:
-            line = line.replace('{{%s}}' % placeholder, val)
-            f.write(line)
 
     def swap_placeholders(self):
         '''Swap placeholders for real values.'''
