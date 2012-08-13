@@ -13,7 +13,7 @@ Skeletor is currently at Alpha and should be considered as a unstable piece of s
 * Custom templates
 * Git support for remote templates
 * Multiple templates
-* Template place holders
+* Jinja2 used for processing templates
 * Python virtualenv creation
 * Automatic develop installation to python path
 * Configurables using ~/.skeletor.cfg
@@ -79,6 +79,7 @@ Skeletor is flexible, and you can hopefully tailor it how you build out project 
  * **-E / --venv_create**: Create a python virtual environment for this project.
  * **-P / --venv_path**: Path to virtual environments home e.g `/home/me/.virtualenvs`.
  * **-S / --venv_use_site_packages**: By default Skeletor creates the virtual environment with the `--no-site-packages` argument to make a clean virtual environment, but if you don't want it do that use this argument and it will be omitted.
+ * **--vars**: Custom variables for your templates, comma seperated var=value pairs, e.g: --vars var1=x,var2=y, would be accessed in teplates as {{ var1 }} and in dirs / file names as __var1__ / __var1__.ext
  * **-x / --venv_prefix**: If you want to prefix your virtual environments name with something then use this option, e.g `skeletor -n world -E -x hello-` will create a virtual environment called hello-world.
  * **-h / --help**: Show help
 
@@ -128,7 +129,6 @@ Above is an example `.skeletor.cfg` file and contains a `[misc]`, `[virtualenv]`
 Skeletor is still in early development and there is still a lot to do, this list is in order or priority:
 
  * Write Tests
- * Customisable Template Placeholders
  * Database Creation Support
  * Support for mercural and svn template repositories
 
@@ -139,7 +139,7 @@ This project uses git flow, if you are not familiar please see [Git Flow](https:
 
 ## Thanks To ##
 
-The Tech Team at [Poke London](http://www.pokelondon.com/) and the awesome [GitPython library](https://github.com/gitpython-developers/GitPython).
+The Tech Team at [Poke London](http://www.pokelondon.com/) and the awesome [GitPython library](https://github.com/gitpython-developers/GitPython) and [Jinja2](http://jinja.pocoo.org/docs/) libraries.
 
 ## License ##
 
