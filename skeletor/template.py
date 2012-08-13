@@ -35,11 +35,21 @@ class Template(object):
     def __init__(self, config):
 
         self.config = config
+        if hasattr(self.config, 'variables'):
+            self.add_custom_vars()
         self.working_dir = os.popen('pwd').read().split()[0]
         self.set_project_root()
         self.set_template_variables()
-        self.is_git()
+        self._is_git()
         self.copy_template()
+
+    def add_custom_vars(self):
+        ''' Add custom variables to place holders. '''
+
+        pairs = self.config.variables.split(',')
+        for pair in pairs:
+            place_holder, value = pair.split('=')
+            self.place_holders[place_holder] = value
 
     def set_project_root(self):
         '''Set project root, based on working dir and project name.'''
@@ -69,7 +79,7 @@ class Template(object):
                 self.place_holders[place_holder] = config_value
 
 # TODO: git stuff should live in its own class
-    def is_git(self):
+    def _is_git(self):
         '''Detect if the user wants to use a git repository.'''
 
         if self.config.template.startswith('git+'):
@@ -100,14 +110,21 @@ class Template(object):
             self.make_project_dir()
             for file in os.listdir(self.config.template):
                 path = os.path.join(self.config.template, file)
-                if os.path.isdir(path):
-                    copytree(path, os.path.join(self.project_root, file))
-                else:
-                    copy(path, self.project_root)
+                dirs = path.split('/')
+                exclude = False
+                for dir in dirs:
+                    if dir in self.exclude_dirs:
+                        exclude = True
+                if not exclude:
+                    if os.path.isdir(path):
+                        copytree(path, os.path.join(self.project_root, file))
+                    else:
+                        copy(path, self.project_root)
             self.swap_placeholders()
         else:
             self.config.cli_opts.error('Unable to copy template, directory '
                                        'does not exist')
+
         if self.is_git:
             rmtree(self.config.template)
 
@@ -135,12 +152,8 @@ class Template(object):
         for root, dirs, files in os.walk(self.project_root):
             for d in dirs:
                 filepath = os.path.join(root, d)
-                dirs = filepath.split('/')
-                exclude = False
-                for dir in dirs:
-                    if dir in self.exclude_dirs:
-                        exclude = True
-                if not exclude:
+                if os.path.isdir(filepath):
+                    print root, d
                     if self.rename(root, d):
                         self.rename_directories()
         return False
@@ -151,12 +164,7 @@ class Template(object):
         for root, dirs, files in os.walk(self.project_root):
             for f in files:
                 filepath = os.path.join(root, f)
-                dirs = filepath.split('/')
-                exclude = False
-                for dir in dirs:
-                    if dir in self.exclude_dirs:
-                        exclude = True
-                if not exclude:
+                if os.path.isfile(filepath):
                     if self.rename(root, f):
                         self.rename_files()
         return False
@@ -183,6 +191,6 @@ class Template(object):
                 if not exclude:
                     tpl = jinja_env.get_template(file)
                     file_contents = tpl.render(self.place_holders)
-                    os.remove(filepath)
+                    # os.remove(filepath)
                     with open(filepath, 'w') as f:
                         f.write(file_contents)
