@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# encoding: utf-8
-
+# -*- coding: utf-8 -*-
 
 import os
 import re
@@ -30,6 +29,8 @@ class Template(object):
         'DB_USER': 'db_user',
         'DB_PASS': 'db_pass',
         'DJANGO_SECRET_KEY': 'django_secret_key'}
+    exclude_dirs = ['.git', '.hg']
+    directory_map = {}
 
     def __init__(self, config):
 
@@ -113,15 +114,18 @@ class Template(object):
     def rename(self, root, name):
         '''Rename a file or directory.'''
 
-        e = re.compile(r'{{(.*?)}}')
+        e = re.compile(r'__(.*?)__')
         try:
             plain = e.findall(name)[0]
             if plain in self.place_holders:
                 place_holder_val = self.place_holders[plain]
                 origin = os.path.join(root, name)
-                new_name = name.replace('{{%s}}' % plain, place_holder_val)
+                new_name = name.replace('__%s__' % plain, place_holder_val)
                 new = os.path.join(root, new_name)
                 move(origin, new)
+                return True
+            else:
+                return False
         except IndexError:
             pass
 
@@ -130,7 +134,15 @@ class Template(object):
 
         for root, dirs, files in os.walk(self.project_root):
             for d in dirs:
-                self.rename(root, d)
+                filepath = os.path.join(root, d)
+                dirs = filepath.split('/')
+                exclude = False
+                for dir in dirs:
+                    if dir in self.exclude_dirs:
+                        exclude = True
+                if not exclude:
+                    if self.rename(root, d):
+                        self.rename_directories()
         return False
 
     def rename_files(self):
@@ -138,7 +150,15 @@ class Template(object):
 
         for root, dirs, files in os.walk(self.project_root):
             for f in files:
-                self.rename(root, f)
+                filepath = os.path.join(root, f)
+                dirs = filepath.split('/')
+                exclude = False
+                for dir in dirs:
+                    if dir in self.exclude_dirs:
+                        exclude = True
+                if not exclude:
+                    if self.rename(root, f):
+                        self.rename_files()
         return False
 
     def swap_placeholders(self):
@@ -154,9 +174,15 @@ class Template(object):
             jinja_tpl_loader = FileSystemLoader(root)
             jinja_env = Environment(loader=jinja_tpl_loader)
             for file in files:
-                tpl = jinja_env.get_template(file)
-                file_contents = tpl.render(self.place_holders)
                 filepath = os.path.join(root, file)
-                os.remove(filepath)
-                with open(filepath, 'w') as f:
-                    f.write(file_contents)
+                exclude = False
+                dirs = filepath.split('/')
+                for dir in dirs:
+                    if dir in self.exclude_dirs:
+                        exclude = True
+                if not exclude:
+                    tpl = jinja_env.get_template(file)
+                    file_contents = tpl.render(self.place_holders)
+                    os.remove(filepath)
+                    with open(filepath, 'w') as f:
+                        f.write(file_contents)
