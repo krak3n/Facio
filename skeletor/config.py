@@ -32,7 +32,7 @@ class Config(object):
                         'template_settings_dir', 'choose_template',
                         'db_create', 'db_user', 'db_pass', 'db_name',
                         'venv_create', 'venv_path', 'venv_use_site_packages',
-                        'venv_prefix']
+                        'venv_prefix', 'variables']
 
     def __init__(self):
         '''Constructor, setup default properties.'''
@@ -50,20 +50,20 @@ class Config(object):
                    help='Your project name', required=True, type="string"),
             # Install the new project onto the path
             Option('-i', '--install', action='store_true', default=False,
-                   help='Install the project onto your path, e.g '\
+                   help='Install the project onto your path, e.g '
                         'python setup.py develop'),
             # Template Options
             Option('-t', '--template', dest='template', action='store',
-                   help='Path to your custom template, absolute paths only '\
-                        ', git repositories can also be specified by '\
-                        'prefixing with git+ for example: git+git@gitbub.com'\
+                   help='Path to your custom template, absolute paths only '
+                        ', git repositories can also be specified by '
+                        'prefixing with git+ for example: git+git@gitbub.com'
                         '/path/to/repo.git', type="string"),
             Option('-s', '--template_settings_dir', action='store',
                    help='Template settings directory name', type="string"),
             Option('-c', '--choose_template', dest='choose_template',
-                   help="If you have more than 1 template defined use this "\
-                        "flag to override the default template, Note: "\
-                        "specifying -t (--template) will mean this "\
+                   help="If you have more than 1 template defined use this "
+                        "flag to override the default template, Note: "
+                        "specifying -t (--template) will mean this "
                         "flag is ignored.", action='store_true', default=None),
             # Database Option
             Option('-d', '--db_create', action="store_true", default=None,
@@ -82,8 +82,10 @@ class Config(object):
                    help='Python Virtualenv home directory', type='string'),
             Option('-S', '--venv_use_site_packages',
                    dest='venv_use_site_packages', action='store_true',
-                   default=None, help='Create python vittual environment '\
+                   default=None, help='Create python vittual environment '
                                       'without --no-site-packages'),
+            Option('--vars', dest='variables', action='store', default=None,
+                   help='Custom variables, e.g --vars hello=world,sky=blue'),
             Option('-x', '--venv_prefix', dest='venv_prefix', action='store',
                    help='Virtual environment prefix', type='string')]
 
@@ -178,12 +180,12 @@ class Config(object):
 
         if db_create:
             if not db_root_user or not db_root_pass:
-                self.cli_opts.error('You need to provide dataase root '\
+                self.cli_opts.error('You need to provide dataase root '
                                     'user and password in your .skeletor.cfg')
             else:
                 if not db_name or not db_user or not db_pass:
-                    self.cli_opts.error('You need to provide a database '\
-                                        'user, password & name for creating '\
+                    self.cli_opts.error('You need to provide a database '
+                                        'user, password & name for creating '
                                         'databases')
 
     def validate_virtualenv(self):
@@ -193,7 +195,7 @@ class Config(object):
         venv_create = getattr(self, 'venv_create', None)
         if venv_create:
             if not path:
-                self.cli_opts.error('You need to provide a virtualenv path '\
+                self.cli_opts.error('You need to provide a virtualenv path '
                                    'where the venv will be created')
 
     def prompt_template_choice(self):
@@ -214,7 +216,7 @@ class Config(object):
                     raise ValueError
                 template = self.templates[template_list[num - 1]]
             except (ValueError, IndexError):
-                sys.stdout.write('\nPlease choose a number between 1 and '\
+                sys.stdout.write('\nPlease choose a number between 1 and '
                                  '%d\n' % len(template_list))
             else:
                 return template
@@ -230,12 +232,12 @@ class Config(object):
             self.template = self.prompt_template_choice()
 
         if not self.template:
-            self.cli_opts.error('You must specify a path to your '\
+            self.cli_opts.error('You must specify a path to your '
                                 'template path')
         else:
             if (not self.template.startswith('git+') and
-                not os.path.isfile(self.template)):
-                self.cli_opts.error('The path to your template does not '\
+                not os.path.isdir(self.template)):
+                self.cli_opts.error('The path to your template does not '
                                     'exist.')
 
     @property
