@@ -153,7 +153,6 @@ class Template(object):
             for d in dirs:
                 filepath = os.path.join(root, d)
                 if os.path.isdir(filepath):
-                    print root, d
                     if self.rename(root, d):
                         self.rename_directories()
         return False
