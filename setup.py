@@ -15,4 +15,5 @@ setup(
     packages=find_packages(exclude=['examples', 'tests']),
     install_requires=['GitPython==0.3.2.RC1', 'Jinja2==2.6'],
     scripts=['skeletor/bin/skeletor'],
+    zip_safe=False
 )

@@ -2,3 +2,4 @@ GitPython==0.3.2.RC1
 Jinja2==2.6
 flake8==1.4
 tox==1.4.2
+nose==1.1.2
