@@ -1,0 +1,21 @@
+actionid=tox
+msg=packaging
+cmdargs=['/home/vagrant/.virtualenvs/chris-Skeletor/bin/python', local('/home/vagrant/www/chris/Skeletor/Skeletor/setup.py'), 'sdist', '--formats=zip', '--dist-dir', local('/home/vagrant/www/chris/Skeletor/Skeletor/.tox/dist')]
+env=None
+running sdist
+running egg_info
+writing requirements to Skeletor.egg-info/requires.txt
+writing Skeletor.egg-info/PKG-INFO
+writing top-level names to Skeletor.egg-info/top_level.txt
+writing dependency_links to Skeletor.egg-info/dependency_links.txt
+reading manifest file 'Skeletor.egg-info/SOURCES.txt'
+writing manifest file 'Skeletor.egg-info/SOURCES.txt'
+warning: sdist: standard file not found: should have one of README, README.txt
+
+creating Skeletor-1.0rc1
+creating Skeletor-1.0rc1/Skeletor.egg-info
+creating Skeletor-1.0rc1/skeletor
+creating Skeletor-1.0rc1/skeletor/bin
+making hard links in Skeletor-1.0rc1...
+hard linking setup.py -> Skeletor-1.0rc1
+error: Operation not permitted
