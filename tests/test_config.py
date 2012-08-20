@@ -22,3 +22,9 @@ class ConfigTests(unittest.TestCase):
                 Config()
         except SystemExit:
             assert True
+
+    def test_name_gets_set(self):
+        with nostdout():
+            sys.argv = ['', '-n', 'hello_world']
+            c = Config()
+        self.assertEquals(c.project_name, 'hello_world')
