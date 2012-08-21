@@ -3,6 +3,7 @@
 
 import ConfigParser
 import os
+import re
 import sys
 
 from random import choice
@@ -163,6 +164,7 @@ class Config(object):
     def validate(self):
         '''Valid provided configuration options.'''
 
+        self.validate_project_name()
         self.validate_template_options()
         self.validate_virtualenv()
 
@@ -187,6 +189,13 @@ class Config(object):
                     self.cli_opts.error('You need to provide a database '
                                         'user, password & name for creating '
                                         'databases')
+    def validate_project_name(self):
+        ''' Ensure the project name is alpha numeric and only allows
+        userscores. '''
+
+        if not re.match('^\w+$', self.project_name):
+            self.cli_opts.error('Project names can only contain numbers'
+                    'letters and underscores')
 
     def validate_virtualenv(self):
         ''' Validate virtualenv settings.'''
