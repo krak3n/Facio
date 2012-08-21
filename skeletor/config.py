@@ -168,27 +168,6 @@ class Config(object):
         self.validate_template_options()
         self.validate_virtualenv()
 
-    def validate_db_options(self):
-        '''Validate provided database options.'''
-
-        db_create = getattr(self, 'db_create', None)
-        # New DB setitngs - set by command line
-        db_name = getattr(self, 'db_name', None)
-        db_user = getattr(self, 'db_user', None)
-        db_pass = getattr(self, 'db_pass', None)
-        # DB Root settings, set in skeletor.cfg
-        db_root_user = getattr(self, 'db_root_user', None)
-        db_root_pass = getattr(self, 'db_root_pass', None)
-
-        if db_create:
-            if not db_root_user or not db_root_pass:
-                self.cli_opts.error('You need to provide dataase root '
-                                    'user and password in your .skeletor.cfg')
-            else:
-                if not db_name or not db_user or not db_pass:
-                    self.cli_opts.error('You need to provide a database '
-                                        'user, password & name for creating '
-                                        'databases')
     def validate_project_name(self):
         ''' Ensure the project name is alpha numeric and only allows
         userscores. '''
