@@ -23,8 +23,32 @@ class ConfigTests(unittest.TestCase):
         except SystemExit:
             assert True
 
-    def test_name_gets_set(self):
+    def ensure_valid_project_name(self):
         with nostdout():
-            sys.argv = ['', '-n', 'hello_world']
+            sys.argv = ['', '-n', 'this_is_valid']
             c = Config()
-        self.assertEquals(c.project_name, 'hello_world')
+        self.assertEquals(c.project_name, 'this_is_valid')
+        with nostdout():
+            sys.argv = ['', '-n', 'Thisisvalid']
+            c = Config()
+        self.assertEquals(c.project_name, 'Thisisvalid')
+
+    def should_exit_on_invalid_name(self):
+        try:
+            with nostdout():
+                sys.argv = ['', '-n', 'not-valid']
+                Config()
+        except SystemExit:
+            assert True
+        try:
+            with nostdout():
+                sys.argv = ['', '-n', 'not valid']
+                Config()
+        except SystemExit:
+            assert True
+        try:
+            with nostdout():
+                sys.argv = ['', '-n', 'not_valid-*']
+                Config()
+        except SystemExit:
+            assert True
