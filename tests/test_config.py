@@ -1,3 +1,4 @@
+import os
 import sys
 import unittest
 
@@ -8,6 +9,8 @@ from .helpers import nostdout
 
 class ConfigTests(unittest.TestCase):
     """ Argument Passing & Config Tests. """
+
+    base_args = ['-n', 'test_skeleton']
 
     def setUp(self):
         self._old_sys_argv = sys.argv
@@ -47,3 +50,8 @@ class ConfigTests(unittest.TestCase):
             self._set_cli_args(['-n', '*this_is_not_valid'])
         except SystemExit:
             assert True
+
+    def ensure_template_var_is_set_from_cli(self):
+        path = os.path.join(os.path.dirname(__file__), 'test_template')
+        self._set_cli_args(self.base_args + ['--template', path])
+        self.assertEquals(self.config.template, path)
