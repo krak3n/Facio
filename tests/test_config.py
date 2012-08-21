@@ -16,6 +16,11 @@ class ConfigTests(unittest.TestCase):
     def tearDown(self):
         sys.argv = self._old_sys_argv
 
+    def _set_project_name(self, name):
+        with nostdout():
+            sys.argv = ['', '-n', name]
+            self.config = Config()
+
     def should_exit_with_no_arguments(self):
         try:
             with nostdout():
@@ -24,31 +29,21 @@ class ConfigTests(unittest.TestCase):
             assert True
 
     def ensure_valid_project_name(self):
-        with nostdout():
-            sys.argv = ['', '-n', 'this_is_valid']
-            c = Config()
-        self.assertEquals(c.project_name, 'this_is_valid')
-        with nostdout():
-            sys.argv = ['', '-n', 'Thisisvalid']
-            c = Config()
-        self.assertEquals(c.project_name, 'Thisisvalid')
+        self._set_project_name('this_is_valid')
+        self.assertEquals(self.config.project_name, 'this_is_valid')
+        self._set_project_name('Thisisvalid')
+        self.assertEquals(self.config.project_name, 'Thisisvalid')
 
     def should_exit_on_invalid_name(self):
         try:
-            with nostdout():
-                sys.argv = ['', '-n', 'not-valid']
-                Config()
+            self._set_project_name('this_is_not-valid')
         except SystemExit:
             assert True
         try:
-            with nostdout():
-                sys.argv = ['', '-n', 'not valid']
-                Config()
+            self._set_project_name('this_is not_valid')
         except SystemExit:
             assert True
         try:
-            with nostdout():
-                sys.argv = ['', '-n', 'not_valid-*']
-                Config()
+            self._set_project_name('*this_is_not_valid')
         except SystemExit:
             assert True
