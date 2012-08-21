@@ -1,23 +1,15 @@
-import os
 import sys
-import unittest
 
 from skeletor.config import Config
 
+from .base import BaseTestCase
 from .helpers import nostdout
 
 
-class ConfigTests(unittest.TestCase):
+class ConfigTests(BaseTestCase):
     """ Argument Passing & Config Tests. """
 
     base_args = ['-n', 'test_skeleton']
-
-    def setUp(self):
-        self._old_sys_argv = sys.argv
-        sys.argv = [self._old_sys_argv[0].replace('nosetests', 'skeletor')]
-
-    def tearDown(self):
-        sys.argv = self._old_sys_argv
 
     def _set_cli_args(self, args):
         with nostdout():
@@ -52,6 +44,5 @@ class ConfigTests(unittest.TestCase):
             assert True
 
     def ensure_template_var_is_set_from_cli(self):
-        path = os.path.join(os.path.dirname(__file__), 'test_template')
-        self._set_cli_args(self.base_args + ['--template', path])
-        self.assertEquals(self.config.template, path)
+        self._set_cli_args(self.base_args + ['--template', self.test_tpl_path])
+        self.assertEquals(self.config.template, self.test_tpl_path)
