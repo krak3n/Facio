@@ -46,3 +46,10 @@ class ConfigTests(BaseTestCase):
     def ensure_template_var_is_set_from_cli(self):
         self._set_cli_args(self.base_args + ['--template', self.test_tpl_path])
         self.assertEquals(self.config.template, self.test_tpl_path)
+
+    def should_raise_exit_if_template_section_is_not_list(self):
+        self._set_cli_args(self.base_args)
+        try:
+            self.config.set_template_options('this is not a list')
+        except SystemExit:
+            assert True
