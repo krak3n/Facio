@@ -48,8 +48,20 @@ class ConfigTests(BaseTestCase):
         self.assertEquals(self.config.template, self.test_tpl_path)
 
     def should_raise_exit_if_template_section_is_not_list(self):
-        self._set_cli_args(self.base_args)
         try:
+            self._set_cli_args(self.base_args)
             self.config.set_template_options('this is not a list')
         except SystemExit:
             assert True
+        else:
+            assert False
+
+    def should_exit_if_skeletor_cfg_is_miss_configured(self):
+        try:
+            with nostdout():
+                self._set_cli_args(self.base_args)
+                self.config.set_attributes('not valid', {'not': 'valid'})
+        except SystemExit:
+            assert True
+        else:
+            assert False
