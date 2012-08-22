@@ -153,7 +153,8 @@ class Config(object):
         '''
 
         if not type(valid_settings) == list and not type(items) == list:
-            raise Exception
+            self.cli_opts.error('It appears the your .skeletor.cfg is not '
+                    'configured correctly')
         else:
             for item in items:
                 setting, value = item
