@@ -36,10 +36,12 @@ class Config(object):
                         'venv_create', 'venv_path', 'venv_use_site_packages',
                         'venv_prefix', 'variables']
 
-    def __init__(self, use_cfg=True):
+    def __init__(self, use_cfg=True, config_path=None):
         '''Constructor, setup default properties.'''
 
         self.use_cfg = use_cfg  # Use ~/.skeletor.cfg for config
+        if self.use_cfg and config_path:
+            self.config_path = config_path  # Override config_path for tests
 
         self.load_config()
         self.set_command_line_options()
