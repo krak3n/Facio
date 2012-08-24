@@ -115,7 +115,7 @@ class Config(object):
     def load_config(self):
         '''Load users skeletor.cfg if exists.'''
 
-        if os.path.isfile(self.config_path) and self.user_cfg:
+        if os.path.isfile(self.config_path) and self.use_cfg:
             self.config_parser = ConfigParser.ConfigParser()
             self.config_parser.read(self.config_path)
             self.read_config()
