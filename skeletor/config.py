@@ -25,7 +25,8 @@ class Config(object):
     valid_config_sections = {
         'misc': ['install', ],
         'template': [],
-        'database': ['db_create', 'db_root_user', 'db_root_pass'],
+        'database': ['db_create', 'db_root_user',
+            'db_root_pass'],  # TODO: Remove This - Depreciated
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
@@ -35,8 +36,10 @@ class Config(object):
                         'venv_create', 'venv_path', 'venv_use_site_packages',
                         'venv_prefix', 'variables']
 
-    def __init__(self):
+    def __init__(self, use_cfg=True):
         '''Constructor, setup default properties.'''
+
+        self.use_cfg = use_cfg  # Use ~/.skeletor.cfg for config
 
         self.load_config()
         self.set_command_line_options()
@@ -110,7 +113,7 @@ class Config(object):
     def load_config(self):
         '''Load users skeletor.cfg if exists.'''
 
-        if os.path.isfile(self.config_path):
+        if os.path.isfile(self.config_path) and self.user_cfg:
             self.config_parser = ConfigParser.ConfigParser()
             self.config_parser.read(self.config_path)
             self.read_config()
