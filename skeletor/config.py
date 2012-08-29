@@ -188,10 +188,9 @@ class Config(object):
 
         path = getattr(self, 'venv_path', None)
         venv_create = getattr(self, 'venv_create', None)
-        if venv_create:
-            if not path:
-                self.cli_opts.error('You need to provide a virtualenv path '
-                                   'where the venv will be created')
+        if venv_create and not path:
+            self.cli_opts.error('You need to provide a virtualenv path '
+                               'where the venv will be created')
 
     def prompt_template_choice(self):
         '''If the user has multiple templates, prompt them to pick'''
