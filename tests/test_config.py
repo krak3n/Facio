@@ -14,14 +14,32 @@ class ConfigTests(BaseTestCase):
     def _set_cli_args(self, args):
         with nostdout():
             sys.argv = sys.argv + args
-            self.config = Config()
+            self.config = Config(use_cfg=False)
 
     def should_exit_with_no_arguments(self):
         try:
             with nostdout():
-                Config()
+                Config(use_cfg=False)
         except SystemExit:
             assert True
+
+    def test_cfg_is_not_loaded(self):
+        with nostdout():
+            sys.argv = sys.argv + self.base_args
+            self.config = Config(use_cfg=False)
+            self.assertEquals(self.config.use_cfg, False)
+
+    def test_cfg_is_loaded(self):
+        with nostdout():
+            sys.argv = sys.argv + self.base_args
+            self.config = Config()
+            self.assertEquals(self.config.use_cfg, True)
+
+    def test_custom_cfg_path_is_set(self):
+        with nostdout():
+            sys.argv = sys.argv + self.base_args
+            self.config = Config(config_path=self.empty_cfg)
+            self.assertEquals(self.config.config_path, self.empty_cfg)
 
     def ensure_valid_project_name(self):
         valid_names = ['this_is_valid', 'this_is_valid', 'Thisisvalid']
