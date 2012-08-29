@@ -80,3 +80,22 @@ class ConfigTests(BaseTestCase):
             assert True
         else:
             assert False
+
+    def should_exit_when_venv_create_set_no_venv_path_set(self):
+        try:
+            with nostdout():
+                self._set_cli_args(self.base_args + ['--venv_create', ])
+        except SystemExit:
+            assert True
+        else:
+            assert False
+
+    def should_not_exit_when_venv_create_set_venv_path_set(self):
+        try:
+            with nostdout():
+                self._set_cli_args(self.base_args + ['--venv_create',
+                    '--venv_path', '/some/path'])
+        except SystemExit:
+            assert False
+        else:
+            assert True
