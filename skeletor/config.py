@@ -202,16 +202,22 @@ class Config(object):
             sys.stdout.write("%d) %s: %s\n" % ((i + 1), name, template))
             i += 1
         template_list = list(self.templates)
+        max_tries = 5
+        i = 1
         while True:
-            sys.stdout.write('\nEnter the number for the template: ')
+            if i > max_tries:
+                self.cli_opts.error('You failed to enter a valid template '
+                        'number.')
             try:
-                num = int(raw_input())
+                num = int(raw_input('\nEnter the number for the template '
+                    '(%d of %d tries): ' % (i, max_tries)))
                 if num == 0:
                     raise ValueError
                 template = self.templates[template_list[num - 1]]
             except (ValueError, IndexError):
                 sys.stdout.write('\nPlease choose a number between 1 and '
                                  '%d\n' % len(template_list))
+                i += 1
             else:
                 return template
 
