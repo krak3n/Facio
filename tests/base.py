@@ -22,3 +22,7 @@ class BaseTestCase(unittest.TestCase):
     @property
     def empty_cfg(self):
         return self._test_cfg_path('empty.cfg')
+
+    @property
+    def multiple_templates_cfg(self):
+        return self._test_cfg_path('multiple_templates.cfg')
