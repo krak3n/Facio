@@ -1,5 +1,6 @@
 import sys
 
+from skeletor import config
 from skeletor.config import Config
 
 from .base import BaseTestCase
@@ -99,3 +100,13 @@ class ConfigTests(BaseTestCase):
             assert False
         else:
             assert True
+
+    def ensure_valid_template_is_chosen_from_config(self):
+        config.raw_input = lambda: '2'
+        try:
+            with nostdout():
+                self._set_cli_args(self.base_args + ['-c', ])
+                self.config = Config(config_path=self.multiple_templates_cfg)
+                self.assertEquals(self.config.template, '/path/to/template')
+        except SystemExit:
+            pass  # We allow a pass here because the template path is invalid
