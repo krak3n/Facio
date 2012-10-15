@@ -119,3 +119,12 @@ class ConfigTests(BaseTestCase):
                 self.config = Config(config_path=self.multiple_templates_cfg)
         except SystemExit:
             assert True
+
+    def ensure_value_error_raised_on_zero_template_choice(self):
+        config.raw_input = lambda _: '0'
+        try:
+            with nostdout():
+                self._set_cli_args(self.base_args + ['-c', ])
+                self.config = Config(config_path=self.multiple_templates_cfg)
+        except SystemExit:
+            assert True
