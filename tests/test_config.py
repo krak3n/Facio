@@ -110,3 +110,12 @@ class ConfigTests(BaseTestCase):
                 self.assertEquals(self.config.template, '/path/to/template')
         except SystemExit:
             pass  # We allow a pass here because the template path is invalid
+
+    def should_fail_if_invalid_template_choice(self):
+        config.raw_input = lambda _: '8'
+        try:
+            with nostdout():
+                self._set_cli_args(self.base_args + ['-c', ])
+                self.config = Config(config_path=self.multiple_templates_cfg)
+        except SystemExit:
+            assert True
