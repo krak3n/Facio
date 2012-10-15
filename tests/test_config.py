@@ -102,7 +102,7 @@ class ConfigTests(BaseTestCase):
             assert True
 
     def ensure_valid_template_is_chosen_from_config(self):
-        config.raw_input = lambda: '2'
+        config.raw_input = lambda _: '2'
         try:
             with nostdout():
                 self._set_cli_args(self.base_args + ['-c', ])
