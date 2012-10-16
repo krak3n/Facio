@@ -13,7 +13,7 @@ class Option(optparse.Option):
 
     def _check_required (self):
         if self.required and not self.takes_value():
-            raise OptionError(
+            raise optparse.OptionError(
                 "required flag set for option that doesn't take a value",
                  self)
 
