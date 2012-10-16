@@ -231,14 +231,10 @@ class Config(object):
         else:
             self.template = self.prompt_template_choice()
 
-        if not self.template:
-            self.cli_opts.error('You must specify a path to your '
-                                'template path')
-        else:
-            if (not self.template.startswith('git+') and
-                not os.path.isdir(self.template)):
-                self.cli_opts.error('The path to your template does not '
-                                    'exist.')
+        if (not self.template.startswith('git+') and
+            not os.path.isdir(self.template)):
+            self.cli_opts.error('The path to your template does not '
+                                'exist.')
 
     @property
     def django_secret_key(self):
