@@ -128,3 +128,17 @@ class ConfigTests(BaseTestCase):
                 self.config = Config(config_path=self.multiple_templates_cfg)
         except SystemExit:
             assert True
+
+    def should_cache_django_secret_key(self):
+        with nostdout():
+            sys.argv = sys.argv + self.base_args
+            self.config = Config(config_path=self.empty_cfg)
+            key = self.config.django_secret_key
+            self.assertEquals(key, self.config.generated_django_secret_key)
+
+    def should_return_cached_version_of_secret_key(self):
+        with nostdout():
+            sys.argv = sys.argv + self.base_args
+            self.config = Config(config_path=self.empty_cfg)
+            self.config.generated_django_secret_key = 'this_is_cached'
+            self.assertEquals(self.config.django_secret_key, 'this_is_cached')
