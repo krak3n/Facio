@@ -6,6 +6,7 @@ from .base import BaseTestCase
 
 
 class OptsTests(BaseTestCase):
+    """ Option Tests. """
 
     def should_raise_exception_when_require_used_incorrectly(self):
         try:
