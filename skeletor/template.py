@@ -49,8 +49,12 @@ class Template(object):
         # TODO: Needs validation
         pairs = self.config.variables.split(',')
         for pair in pairs:
-            place_holder, value = pair.split('=')
-            self.place_holders[place_holder] = value
+            try:
+                place_holder, value = pair.split('=')
+            except ValueError:
+                pass  # If its not formatted correctly, we ignore it
+            else:
+                self.place_holders[place_holder] = value
 
     def set_project_root(self):
         '''Set project root, based on working dir and project name.'''
