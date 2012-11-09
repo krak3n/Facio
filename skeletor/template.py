@@ -7,12 +7,12 @@ import sys
 import tempfile
 try:
     from git import Repo
-except ImportError:
+except ImportError:  # pragma: no cover
     print 'GitPython module missing, please install it.'
     sys.exit()
 try:
     from jinja2 import Environment, FileSystemLoader
-except ImportError:
+except ImportError:  # pragma: no cover
     print 'Jinja2 is required for tempalte processing, please install it.'
     sys.exit()
 from shutil import copytree, move, rmtree, copy
