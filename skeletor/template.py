@@ -75,7 +75,7 @@ class Template(object):
 
         for place_holder in self.place_holders:
             config_value = getattr(self.config,
-                    self.place_holders[place_holder], None)
+                                   self.place_holders[place_holder], None)
             if config_value:
                 self.place_holders[place_holder] = config_value
 
