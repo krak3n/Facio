@@ -46,6 +46,7 @@ class Template(object):
     def add_custom_vars(self):
         ''' Add custom variables to place holders. '''
 
+        # TODO: Needs validation
         pairs = self.config.variables.split(',')
         for pair in pairs:
             place_holder, value = pair.split('=')
