@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os
 import re
 import sys
 import tempfile
+
 try:
     from git import Repo
 except ImportError:  # pragma: no cover
@@ -20,27 +20,29 @@ from shutil import copytree, move, rmtree, copy
 
 class Template(object):
 
-    is_git = False
-    complete = False
-    place_holders = {
-        'PROJECT_NAME': 'project_name',
-        'SETTINGS_DIR': 'template_settings_dir',
-        'DB_NAME': 'db_name',
-        'DB_USER': 'db_user',
-        'DB_PASS': 'db_pass',
-        'DJANGO_SECRET_KEY': 'django_secret_key'}
-    exclude_dirs = ['.git', '.hg']
-    directory_map = {}
-
     def __init__(self, config):
+        # Setting defults
+        self.is_git = False
+        self.complete = False
+        self.exclude_dirs = ['.git', '.hg']
+        self.place_holders = {
+            'PROJECT_NAME': 'project_name',
+            'SETTINGS_DIR': 'template_settings_dir',
+            'DJANGO_SECRET_KEY': 'django_secret_key'}
+        self.working_dir = os.popen('pwd').read().split()[0]
 
+        # Load Config
         self.config = config
+        # Set place holder vars from config
+        self.set_template_variables()
+        # Add custom varibles if provided
         if hasattr(self.config, 'variables'):
             self.add_custom_vars()
-        self.working_dir = os.popen('pwd').read().split()[0]
+        # Set the project root
         self.set_project_root()
-        self.set_template_variables()
+        # Git detection
         self._is_git()
+        # Copy the template
         self.copy_template()
 
     def add_custom_vars(self):
