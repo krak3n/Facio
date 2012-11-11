@@ -29,7 +29,6 @@ class Template(object):
             'PROJECT_NAME': 'project_name',
             'SETTINGS_DIR': 'template_settings_dir',
             'DJANGO_SECRET_KEY': 'django_secret_key'}
-        self.working_dir = os.popen('pwd').read().split()[0]
 
         # Load Config
         self.config = config
@@ -42,8 +41,10 @@ class Template(object):
         self.set_project_root()
         # Git detection
         self._is_git()
-        # Copy the template
-        self.copy_template()
+
+    @property
+    def working_dir(self):
+        return os.popen('pwd').read().split()[0]
 
     def add_custom_vars(self):
         ''' Add custom variables to place holders. '''
