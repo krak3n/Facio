@@ -188,16 +188,15 @@ class Template(object):
         for root, dirs, files in os.walk(self.project_root):
             jinja_tpl_loader = FileSystemLoader(root)
             jinja_env = Environment(loader=jinja_tpl_loader)
-            for file in files:
-                filepath = os.path.join(root, file)
+            for f in files:
+                filepath = os.path.join(root, f)
                 exclude = False
                 dirs = filepath.split('/')
-                for dir in dirs:
-                    if dir in self.exclude_dirs:
+                for d in dirs:
+                    if d in self.exclude_dirs:
                         exclude = True
                 if not exclude:
-                    tpl = jinja_env.get_template(file)
+                    tpl = jinja_env.get_template(f)
                     file_contents = tpl.render(self.place_holders)
-                    # os.remove(filepath)
                     with open(filepath, 'w') as f:
                         f.write(file_contents)
