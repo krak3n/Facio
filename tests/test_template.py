@@ -2,7 +2,7 @@ import os
 import unittest
 import uuid
 
-from mock import MagicMock
+from mock import MagicMock, PropertyMock, patch
 from skeletor.template import Template
 
 
@@ -35,9 +35,13 @@ class TemplateTests(unittest.TestCase):
         self.assertEquals(t.place_holders['baz'], '1')
 
     def ensure_project_cannot_be_created_if_already_exists(self):
-        try:
-            Template(self.config)
-        except Exception:
-            assert True
-        else:
-            assert False
+        with patch('skeletor.template.Template.working_dir',
+                   new_callable=PropertyMock) as mock_working_dir:
+            mock_working_dir.return_value = '/tmp/'
+            t = Template(self.config)
+            try:
+                t.copy_template()
+            except Exception:
+                assert True
+            else:
+                assert False
