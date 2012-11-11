@@ -34,14 +34,17 @@ class TemplateTests(unittest.TestCase):
         self.assertTrue('baz' in t.place_holders)
         self.assertEquals(t.place_holders['baz'], '1')
 
-    def ensure_project_cannot_be_created_if_already_exists(self):
+    def ensure_dir_cannot_be_created_if_already_exists(self):
         with patch('skeletor.template.Template.working_dir',
                    new_callable=PropertyMock) as mock_working_dir:
             mock_working_dir.return_value = '/tmp/'
-            t = Template(self.config)
+            tmp_dir = os.path.join('/', 'tmp', self.config.project_name)
+            os.mkdir(tmp_dir)
             try:
+                t = Template(self.config)
                 t.copy_template()
             except Exception:
                 assert True
             else:
                 assert False
+            os.rmdir(tmp_dir)
