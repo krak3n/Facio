@@ -48,3 +48,15 @@ class TemplateTests(unittest.TestCase):
             else:
                 assert False
             os.rmdir(tmp_dir)
+
+    @patch('os.mkdir', return_value=True)
+    def ensure_exception_if_directory_creation_fails(self, mock_os_mkdir):
+        try:
+            t = Template(self.config)
+            t.copy_template()
+        except Exception:
+            assert True
+        else:
+            assert False
+        mock_os_mkdir.assert_called_with(os.path.join(
+            t.working_dir, self.config.project_name))
