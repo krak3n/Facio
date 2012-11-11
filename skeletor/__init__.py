@@ -17,6 +17,7 @@ class Skeletor(object):
         # Basic Skeleton Generation
         self.config = Config()
         self.template = Template(self.config)
+        self.template.copy_template()
 
         # Create python virtual environment
         if self.config.venv_create:
@@ -26,5 +27,5 @@ class Skeletor(object):
         if hasattr(self.config, 'install'):
             if self.config.install:
                 self.install = Install(self.config,
-                        self.template,
-                        getattr(self, 'venv', None))
+                                       self.template,
+                                       getattr(self, 'venv', None))
