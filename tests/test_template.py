@@ -33,3 +33,11 @@ class TemplateTests(unittest.TestCase):
         self.assertEquals(t.place_holders['foo'], 'bar')
         self.assertTrue('baz' in t.place_holders)
         self.assertEquals(t.place_holders['baz'], '1')
+
+    def ensure_project_cannot_be_created_if_already_exists(self):
+        try:
+            Template(self.config)
+        except Exception:
+            assert True
+        else:
+            assert False
