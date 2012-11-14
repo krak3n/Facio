@@ -1,4 +1,5 @@
 import os
+import tempfile
 import unittest
 import uuid
 
@@ -37,8 +38,9 @@ class TemplateTests(unittest.TestCase):
     @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
     def ensure_dir_cannot_be_created_if_already_exists(self, mock_working_dir):
         mock_working_dir.return_value = '/tmp/'
-        tmp_dir = os.path.join('/', 'tmp', self.config.project_name)
-        os.mkdir(tmp_dir)
+        tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
+        tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
+        self.config.project_name = tmp_dir_name
         try:
             t = Template(self.config)
             t.copy_template()
