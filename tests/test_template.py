@@ -5,6 +5,7 @@ import uuid
 
 from mock import MagicMock, PropertyMock, patch
 from skeletor.template import Template
+from StringIO import StringIO
 
 
 class TemplateTests(unittest.TestCase):
@@ -61,3 +62,17 @@ class TemplateTests(unittest.TestCase):
             assert False
         mock_os_mkdir.assert_called_with(os.path.join(
             t.working_dir, self.config.project_name))
+
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('tempfile.mkdtemp', return_value=True)
+    @patch('skeletor.Template.git_clone', return_value=True)
+    def should_detect_git_repo(self, mock_git_clone, mock_tempfile,
+                               mock_stdout):
+        t = Template(self.config)
+        assert not t.is_git
+        self.config.template = 'git+git@somewhere.com:repo.git'
+        t = Template(self.config)
+        self.assertEquals('Using git to clone template from '
+                          'git@somewhere.com:repo.git\n',
+                          mock_stdout.getvalue())
+        assert t.is_git
