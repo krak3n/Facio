@@ -1,3 +1,11 @@
+# Files
 *.DS_Store
 *.pyc
+*.vagrant
+*.coverage
+
+# Dirs
+logs/
+media/
 *.egg-info/
+.tox/

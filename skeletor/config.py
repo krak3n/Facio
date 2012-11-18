@@ -3,6 +3,7 @@
 
 import ConfigParser
 import os
+import re
 import sys
 
 from random import choice
@@ -24,7 +25,8 @@ class Config(object):
     valid_config_sections = {
         'misc': ['install', ],
         'template': [],
-        'database': ['db_create', 'db_root_user', 'db_root_pass'],
+        'database': ['db_create', 'db_root_user',
+            'db_root_pass'],  # TODO: Remove This - Depreciated
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
@@ -34,8 +36,12 @@ class Config(object):
                         'venv_create', 'venv_path', 'venv_use_site_packages',
                         'venv_prefix', 'variables']
 
-    def __init__(self):
+    def __init__(self, use_cfg=True, config_path=None):
         '''Constructor, setup default properties.'''
+
+        self.use_cfg = use_cfg  # Use ~/.skeletor.cfg for config
+        if self.use_cfg and config_path:
+            self.config_path = config_path  # Override config_path for tests
 
         self.load_config()
         self.set_command_line_options()
@@ -109,7 +115,7 @@ class Config(object):
     def load_config(self):
         '''Load users skeletor.cfg if exists.'''
 
-        if os.path.isfile(self.config_path):
+        if os.path.isfile(self.config_path) and self.use_cfg:
             self.config_parser = ConfigParser.ConfigParser()
             self.config_parser.read(self.config_path)
             self.read_config()
@@ -135,7 +141,8 @@ class Config(object):
         '''
 
         if not type(items) == list:
-            raise Exception
+            self.cli_opts.error('It appears the template section in your '
+                    '.skeletor.cfg is not configured correctly')
         else:
             for item in items:
                 name, value = item
@@ -151,7 +158,8 @@ class Config(object):
         '''
 
         if not type(valid_settings) == list and not type(items) == list:
-            raise Exception
+            self.cli_opts.error('It appears the your .skeletor.cfg is not '
+                    'configured correctly')
         else:
             for item in items:
                 setting, value = item
@@ -163,40 +171,26 @@ class Config(object):
     def validate(self):
         '''Valid provided configuration options.'''
 
+        self.validate_project_name()
         self.validate_template_options()
         self.validate_virtualenv()
 
-    def validate_db_options(self):
-        '''Validate provided database options.'''
+    def validate_project_name(self):
+        ''' Ensure the project name is alpha numeric and only allows
+        userscores. '''
 
-        db_create = getattr(self, 'db_create', None)
-        # New DB setitngs - set by command line
-        db_name = getattr(self, 'db_name', None)
-        db_user = getattr(self, 'db_user', None)
-        db_pass = getattr(self, 'db_pass', None)
-        # DB Root settings, set in skeletor.cfg
-        db_root_user = getattr(self, 'db_root_user', None)
-        db_root_pass = getattr(self, 'db_root_pass', None)
-
-        if db_create:
-            if not db_root_user or not db_root_pass:
-                self.cli_opts.error('You need to provide dataase root '
-                                    'user and password in your .skeletor.cfg')
-            else:
-                if not db_name or not db_user or not db_pass:
-                    self.cli_opts.error('You need to provide a database '
-                                        'user, password & name for creating '
-                                        'databases')
+        if not re.match('^\w+$', self.project_name):
+            self.cli_opts.error('Project names can only contain numbers'
+                    'letters and underscores')
 
     def validate_virtualenv(self):
         ''' Validate virtualenv settings.'''
 
         path = getattr(self, 'venv_path', None)
         venv_create = getattr(self, 'venv_create', None)
-        if venv_create:
-            if not path:
-                self.cli_opts.error('You need to provide a virtualenv path '
-                                   'where the venv will be created')
+        if venv_create and not path:
+            self.cli_opts.error('You need to provide a virtualenv path '
+                               'where the venv will be created')
 
     def prompt_template_choice(self):
         '''If the user has multiple templates, prompt them to pick'''
@@ -208,16 +202,22 @@ class Config(object):
             sys.stdout.write("%d) %s: %s\n" % ((i + 1), name, template))
             i += 1
         template_list = list(self.templates)
+        max_tries = 5
+        i = 1
         while True:
-            sys.stdout.write('\nEnter the number for the template: ')
+            if i > max_tries:
+                self.cli_opts.error('You failed to enter a valid template '
+                        'number.')
             try:
-                num = int(raw_input())
+                num = int(raw_input('\nEnter the number for the template '
+                    '(%d of %d tries): ' % (i, max_tries)))
                 if num == 0:
                     raise ValueError
                 template = self.templates[template_list[num - 1]]
             except (ValueError, IndexError):
                 sys.stdout.write('\nPlease choose a number between 1 and '
                                  '%d\n' % len(template_list))
+                i += 1
             else:
                 return template
 
@@ -231,14 +231,10 @@ class Config(object):
         else:
             self.template = self.prompt_template_choice()
 
-        if not self.template:
-            self.cli_opts.error('You must specify a path to your '
-                                'template path')
-        else:
-            if (not self.template.startswith('git+') and
-                not os.path.isdir(self.template)):
-                self.cli_opts.error('The path to your template does not '
-                                    'exist.')
+        if (not self.template.startswith('git+') and
+            not os.path.isdir(self.template)):
+            self.cli_opts.error('The path to your template does not '
+                                'exist.')
 
     @property
     def django_secret_key(self):

@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os
 import re
 import sys
 import tempfile
+
 try:
     from git import Repo
-except ImportError:
+except ImportError:  # pragma: no cover
     print 'GitPython module missing, please install it.'
     sys.exit()
 try:
     from jinja2 import Environment, FileSystemLoader
-except ImportError:
+except ImportError:  # pragma: no cover
     print 'Jinja2 is required for tempalte processing, please install it.'
     sys.exit()
 from shutil import copytree, move, rmtree, copy
@@ -20,36 +20,44 @@ from shutil import copytree, move, rmtree, copy
 
 class Template(object):
 
-    is_git = False
-    complete = False
-    place_holders = {
-        'PROJECT_NAME': 'project_name',
-        'SETTINGS_DIR': 'template_settings_dir',
-        'DB_NAME': 'db_name',
-        'DB_USER': 'db_user',
-        'DB_PASS': 'db_pass',
-        'DJANGO_SECRET_KEY': 'django_secret_key'}
-    exclude_dirs = ['.git', '.hg']
-    directory_map = {}
-
     def __init__(self, config):
+        # Setting defults
+        self.is_git = False
+        self.complete = False
+        self.exclude_dirs = ['.git', '.hg']
+        self.place_holders = {
+            'PROJECT_NAME': 'project_name',
+            'SETTINGS_DIR': 'template_settings_dir',
+            'DJANGO_SECRET_KEY': 'django_secret_key'}
 
+        # Load Config
         self.config = config
+        # Set place holder vars from config
+        self.set_template_variables()
+        # Add custom varibles if provided
         if hasattr(self.config, 'variables'):
             self.add_custom_vars()
-        self.working_dir = os.popen('pwd').read().split()[0]
+        # Set the project root
         self.set_project_root()
-        self.set_template_variables()
+        # Git detection
         self._is_git()
-        self.copy_template()
+
+    @property
+    def working_dir(self):
+        return os.popen('pwd').read().split()[0]
 
     def add_custom_vars(self):
         ''' Add custom variables to place holders. '''
 
+        # TODO: Needs validation
         pairs = self.config.variables.split(',')
         for pair in pairs:
-            place_holder, value = pair.split('=')
-            self.place_holders[place_holder] = value
+            try:
+                place_holder, value = pair.split('=')
+            except ValueError:
+                pass  # If its not formatted correctly, we ignore it
+            else:
+                self.place_holders[place_holder] = value
 
     def set_project_root(self):
         '''Set project root, based on working dir and project name.'''
@@ -74,7 +82,7 @@ class Template(object):
 
         for place_holder in self.place_holders:
             config_value = getattr(self.config,
-                    self.place_holders[place_holder], None)
+                                   self.place_holders[place_holder], None)
             if config_value:
                 self.place_holders[place_holder] = config_value
 
@@ -180,16 +188,15 @@ class Template(object):
         for root, dirs, files in os.walk(self.project_root):
             jinja_tpl_loader = FileSystemLoader(root)
             jinja_env = Environment(loader=jinja_tpl_loader)
-            for file in files:
-                filepath = os.path.join(root, file)
+            for f in files:
+                filepath = os.path.join(root, f)
                 exclude = False
                 dirs = filepath.split('/')
-                for dir in dirs:
-                    if dir in self.exclude_dirs:
+                for d in dirs:
+                    if d in self.exclude_dirs:
                         exclude = True
                 if not exclude:
-                    tpl = jinja_env.get_template(file)
+                    tpl = jinja_env.get_template(f)
                     file_contents = tpl.render(self.place_holders)
-                    # os.remove(filepath)
                     with open(filepath, 'w') as f:
                         f.write(file_contents)
