@@ -119,3 +119,15 @@ class TemplateTests(unittest.TestCase):
         rmtree(tmp_dir)
 
         self.assertFalse(self.config.cli_opts.error.called)
+
+    @patch('git.Repo.init', side_effect=Exception)
+    def ensure_error_on_clone_exception(self, mock_repo_init):
+        self.config.template = 'git+this/wont/work'
+        try:
+            Template(self.config)
+        except:
+            self.config.cli_opts.error.assert_called_with(
+                'Error cloning repository')
+            assert True
+        else:
+            assert False
