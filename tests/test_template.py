@@ -131,3 +131,24 @@ class TemplateTests(unittest.TestCase):
             assert True
         else:
             assert False
+
+    @patch('os.path.isdir', return_value=False)
+    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    def ensure_copy_template_failes_if_dir_does_not_exist(
+            self, mock_working_dir, mock_isdir):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
+        tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
+        self.config.project_name = tmp_dir_name
+        try:
+            t = Template(self.config)
+            t.copy_template()
+        except:
+            self.config.cli_opts.error.assert_called_with(
+                'Unable to copy template, directory does not exist')
+            assert True
+        else:
+            assert False
+
+    def should_remove_template_dir_if_is_git(self):
+        assert True
