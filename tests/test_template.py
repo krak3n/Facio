@@ -106,18 +106,16 @@ class TemplateTests(unittest.TestCase):
 
         # Fake Template Path
         mock_working_dir.return_value = tempfile.gettempdir()
-        tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
-        tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
 
         # Now attempt to clone but patch for Exception throw
-        self.config.project_name = tmp_dir_name
         self.config.template = 'git+' + git_dir
-        Template(self.config)
+        t = Template(self.config)
+        t.copy_template()
 
         # Clean up
-        rmtree(git_dir)
-        rmtree(tmp_dir)
+        rmtree(t.project_root)
 
+        self.assertFalse(os.path.isdir(t.config.template))
         self.assertFalse(self.config.cli_opts.error.called)
 
     @patch('git.Repo.init', side_effect=Exception)
@@ -149,6 +147,3 @@ class TemplateTests(unittest.TestCase):
             assert True
         else:
             assert False
-
-    def should_remove_template_dir_if_is_git(self):
-        assert True
