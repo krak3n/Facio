@@ -3,8 +3,10 @@ import tempfile
 import unittest
 import uuid
 
+from git import Repo
 from mock import MagicMock, PropertyMock, patch
 from skeletor.template import Template
+from shutil import rmtree
 from StringIO import StringIO
 
 
@@ -38,18 +40,21 @@ class TemplateTests(unittest.TestCase):
 
     @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
     def ensure_dir_cannot_be_created_if_already_exists(self, mock_working_dir):
-        mock_working_dir.return_value = '/tmp/'
+        mock_working_dir.return_value = tempfile.gettempdir()
         tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
         tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
         self.config.project_name = tmp_dir_name
         try:
             t = Template(self.config)
             t.copy_template()
+            rmtree(tmp_dir)
         except Exception:
             assert True
         else:
             assert False
-        os.rmdir(tmp_dir)
+
+        self.config.cli_opts.error.assert_called_with('%s already exists' % (
+            tmp_dir))
 
     @patch('os.mkdir', return_value=True)
     def ensure_exception_if_directory_creation_fails(self, mock_os_mkdir):
@@ -60,6 +65,9 @@ class TemplateTests(unittest.TestCase):
             assert True
         else:
             assert False
+
+        self.config.cli_opts.error.assert_called_with(
+            'Error creating project directory')
         mock_os_mkdir.assert_called_with(os.path.join(
             t.working_dir, self.config.project_name))
 
@@ -76,3 +84,38 @@ class TemplateTests(unittest.TestCase):
                           'git@somewhere.com:repo.git\n',
                           mock_stdout.getvalue())
         assert t.is_git
+
+    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    def should_clone_git_repo(self, mock_working_dir):
+
+        # Create a fake temp repo w/ commit
+        git_dir = tempfile.mkdtemp(prefix='git')
+        git_repo = Repo.init(git_dir)
+        try:
+            f = open(os.path.join(git_dir, 'foo.txt'), 'w')
+            f.write('blah')
+        except IOError:
+            assert False
+        finally:
+            f.close()
+        cwd = os.getcwd()
+        os.chdir(git_dir)
+        git_repo.index.add(['foo.txt'])
+        git_repo.index.commit("Added foo.txt")
+        os.chdir(cwd)
+
+        # Fake Template Path
+        mock_working_dir.return_value = tempfile.gettempdir()
+        tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
+        tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
+
+        # Now attempt to clone but patch for Exception throw
+        self.config.project_name = tmp_dir_name
+        self.config.template = 'git+' + git_dir
+        Template(self.config)
+
+        # Clean up
+        rmtree(git_dir)
+        rmtree(tmp_dir)
+
+        self.assertFalse(self.config.cli_opts.error.called)
