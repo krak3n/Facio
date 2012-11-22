@@ -157,3 +157,13 @@ class TemplateTests(unittest.TestCase):
         self.assertFalse(os.path.isdir(os.path.join(t.project_root,
                                                     '.exclude_this')))
         rmtree(t.project_root)
+
+    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    def should_copy_directory_tree_if_is_dir(self, mock_working_dir):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        t = Template(self.config)
+        t.exclude_dirs.append('.exclude_this')
+        t.copy_template()
+        self.assertTrue(os.path.isdir(os.path.join(t.project_root,
+                                                   'should_copy_this')))
+        rmtree(t.project_root)
