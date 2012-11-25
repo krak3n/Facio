@@ -6,4 +6,5 @@ install: "pip install -r requirements.txt --use-mirrors"
 script: nosetests --include='^(can|it|ensure|must|should|specs?|examples?)' --with-spec --spec-color -s --with-coverage --cover-erase --cover-package=skeletor
 branches:
     only:
-        - feature/tests
+        - master
+        - develop

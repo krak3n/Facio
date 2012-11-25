@@ -180,10 +180,10 @@ class Template(object):
         '''Swap placeholders for real values.'''
 
         while self.rename_directories():
-            continue
+            continue  # pragma: no cover
 
         while self.rename_files():
-            continue
+            continue  # pragma: no cover
 
         for root, dirs, files in os.walk(self.project_root):
             jinja_tpl_loader = FileSystemLoader(root)
@@ -194,7 +194,7 @@ class Template(object):
                 dirs = filepath.split('/')
                 for d in dirs:
                     if d in self.exclude_dirs:
-                        exclude = True
+                        exclude = True  # pragma: no cover
                 if not exclude:
                     tpl = jinja_env.get_template(f)
                     file_contents = tpl.render(self.place_holders)
