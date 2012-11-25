@@ -194,7 +194,7 @@ class Template(object):
                 dirs = filepath.split('/')
                 for d in dirs:
                     if d in self.exclude_dirs:
-                        exclude = True
+                        exclude = True  # pragma: no cover
                 if not exclude:
                     tpl = jinja_env.get_template(f)
                     file_contents = tpl.render(self.place_holders)
