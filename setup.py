@@ -33,7 +33,7 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Intended Audience :: Developers',
-        'Operating System :: Unix'
+        'Operating System :: Unix',
         'License :: OSI Approved :: Apache Software License',
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries :: Python Modules',
