@@ -2,19 +2,8 @@
 
 import os
 import re
-import sys
 import tempfile
 
-try:
-    from git import Repo
-except ImportError:  # pragma: no cover
-    print 'GitPython module missing, please install it.'
-    sys.exit()
-try:
-    from jinja2 import Environment, FileSystemLoader
-except ImportError:  # pragma: no cover
-    print 'Jinja2 is required for tempalte processing, please install it.'
-    sys.exit()
 from shutil import copytree, move, rmtree, copy
 
 
@@ -99,6 +88,11 @@ class Template(object):
 
     def git_clone(self):
         '''Clone git repository into tmp directory.'''
+        try:
+            from git import Repo
+        except ImportError:  # pragma: no cover
+            self.config.cli_opts.error('GitPython module missing, '
+                                       'please install it.')
 
         try:
             repo = Repo.init(self.config.template)
@@ -178,6 +172,12 @@ class Template(object):
 
     def swap_placeholders(self):
         '''Swap placeholders for real values.'''
+
+        try:
+            from jinja2 import Environment, FileSystemLoader
+        except ImportError:  # pragma: no cover
+            self.config.cli_opts.error('Jinja2 is required for tempalte '
+                                       'processing, please install it.')
 
         while self.rename_directories():
             continue  # pragma: no cover
