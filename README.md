@@ -16,6 +16,8 @@ Skeletor is currently at Beta and should be considered as an unstable piece of s
 
 **Version:** 1.0 Beta
 
+**Supported Python Versions:** 2.6 and 2.7
+
 ### Build Status ###
 
 Skeletor is on the excellent [Travis CI](https://travis-ci.org/krak3n/Skeletor) service.
@@ -218,6 +220,7 @@ Skeletor is still in early development and there is still a lot to do, this list
  * Support for Mercurial and SVN repositories
  * Write more tests
  * Read the Docs Documentation
+ * Python 3 Support
  
 ## License ##
 
