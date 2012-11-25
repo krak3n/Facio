@@ -207,13 +207,7 @@ Skeletor is still in early development and there is still a lot to do, this list
  * Support for Mercurial and SVN repositories
  * Write more tests
  * Read the Docs Documentation
-
-## Contributing ##
-
-Fancy helping out? Fork, commit, issue pull request :) Also please write some tests to prove your new bit of code works.
-
-This project uses git flow, if you are not familiar please see [Git Flow](https://github.com/nvie/gitflow). Under Git Flow master is the most stable brach, develop is where active development occures so please contribute using the develop branch.
-
+ 
 ## License ##
 
 See LICENSE file.
@@ -225,3 +219,9 @@ See AUTHORS file.
 ## Special Thanks ##
 
 To the Tech Team at [Poke London](http://www.pokelondon.com/) and the awesome [GitPython library](https://github.com/gitpython-developers/GitPython) and [Jinja2](http://jinja.pocoo.org/docs/) libraries.
+
+## Contributing ##
+
+Fancy helping out? Fork, commit, issue pull request :) Also please write some tests to prove your new bit of code works.
+
+This project uses git flow, if you are not familiar please see [Git Flow](https://github.com/nvie/gitflow). Under Git Flow master is the most stable brach, develop is where active development occurs so please contribute using the develop branch.
