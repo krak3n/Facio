@@ -9,7 +9,7 @@ any sort of project.
 """
 
 from setuptools import setup, find_packages
-from skeletor import __version__
+from skeletor.version import __version__
 
 
 install_requires = ['GitPython==0.3.2.RC1', 'Jinja2==2.6']
