@@ -25,8 +25,6 @@ class Config(object):
     valid_config_sections = {
         'misc': ['install', ],
         'template': [],
-        'database': ['db_create', 'db_root_user',
-            'db_root_pass'],  # TODO: Remove This - Depreciated
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
@@ -71,15 +69,6 @@ class Config(object):
                         "flag to override the default template, Note: "
                         "specifying -t (--template) will mean this "
                         "flag is ignored.", action='store_true', default=None),
-            # Database Option
-            Option('-d', '--db_create', action="store_true", default=None,
-                   help='Create database'),
-            Option('-N', '--db_name', dest='db_name', action='store',
-                   help='Database name', type='string'),
-            Option('-u', '--db_user', dest='db_user', action='store',
-                   help='Database user name', type='string'),
-            Option('-p', '--db_pass', dest='db_pass', action='store',
-                   help='Database user password', type='string'),
             # Virtual Env Options
             Option('-E', '--venv_create', dest='venv_create',
                    action='store_true', default=None,
