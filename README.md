@@ -195,7 +195,18 @@ You can even rename a directory and/or file by using double underscores around t
 - /path/to/template/
   - __foo__/
     - another.txt
-  - foo.txt
+  - __foo__.txt
+  - some_file.txt
+  - some_other_file.tx
+```
+
+The resulting structure would be:
+
+```
+- /path/to/template/
+  - bar/
+    - another.txt
+  - bar.txt
   - some_file.txt
   - some_other_file.tx
 ```
