@@ -169,11 +169,21 @@ class TemplateTests(unittest.TestCase):
         rmtree(t.project_root)
 
     @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
-    def ensure_directory_not_renames_if_not_in_placeholders(self,
+    def ensure_directory_not_renamed_if_not_in_placeholders(self,
                                                             mock_working_dir):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
         t.copy_template()
         self.assertTrue(os.path.isdir(os.path.join(t.project_root,
                                                    '__NOT_IN_PLACEHOLDERS__')))
+        rmtree(t.project_root)
+
+    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    def should_rename_files_in_placeholders(self, mock_working_dir):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        t = Template(self.config)
+        t.copy_template()
+        self.assertTrue(os.path.isfile(os.path.join(
+            t.project_root, '__NOT_IN_PLACEHOLDERS__',
+            '%s.txt' % self.config.project_name)))
         rmtree(t.project_root)
