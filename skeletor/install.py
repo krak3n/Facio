@@ -5,6 +5,7 @@ import os
 from shutil import rmtree
 from subprocess import Popen, PIPE, STDOUT
 
+
 class Install(object):
 
     def __init__(self, config, template, venv):
@@ -45,14 +46,14 @@ class Install(object):
                       close_fds=True)
             output = p.stdout.read()
             if output == '':
-                self.config.cli_opts.error('Unable to locate python '\
+                self.config.cli_opts.error('Unable to locate python '
                                            'executable')
                 return False
             self.executable = output.rstrip()
 
         if not os.path.exists(self.executable):
-            self.config.cli_opts.error('Unable to find python executable at '\
-                                       '%s, not able to install %s to the '\
+            self.config.cli_opts.error('Unable to find python executable at '
+                                       '%s, not able to install %s to the '
                                        'virtual env' % (self.executable,
                                                         project))
 
@@ -68,7 +69,7 @@ class Install(object):
                 import_error = True
 
         if not import_error:
-            self.config.cli_opts.error('A package with %s name already '\
+            self.config.cli_opts.error('A package with %s name already '
                                        'exists, cannot install' % (project))
             return False
 
@@ -81,18 +82,11 @@ class Install(object):
                 has_setup = True
 
         if not has_setup:
-            self.config.cli_opts.error('There is no setup.py in the project '\
+            self.config.cli_opts.error('There is no setup.py in the project '
                                        'root, cannot install project.')
             return False
 
         return True
-
-    def install_to_venv(self):
-        '''Install package to venv.'''
-
-        virtualenv_path = self.venv.path
-        executable = os.path.join(virtualenv_path, 'bin', 'python')
-        project = self.config.project_name
 
     def install(self):
         '''Install the new project onto the path.'''
@@ -100,9 +94,6 @@ class Install(object):
         if self.validate():
             os.chdir(self.template.project_root)
             cmd = '%s %s develop' % (self.executable, self.setup_path)
-            venv_use_site_packages = getattr(self.config,
-                                             'venv_use_site_packages',
-                                             None)
             os.system(cmd)
             rmtree(os.path.join(self.template.project_root,
                                 '%s.egg-info' % self.config.project_name))
@@ -120,7 +111,7 @@ class Install(object):
 
             f = open(postactivate_file, 'w')
             f.write('#!/bin/bash\n')
-            f.write('# This hook is run after this virtualenv is '\
+            f.write('# This hook is run after this virtualenv is '
                     'activated.\n\n')
             f.write('cd %s\n' % self.template.project_root)
             f.close()
