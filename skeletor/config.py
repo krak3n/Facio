@@ -131,7 +131,7 @@ class Config(object):
 
         if not type(items) == list:
             self.cli_opts.error('It appears the template section in your '
-                    '.skeletor.cfg is not configured correctly')
+                                '.skeletor.cfg is not configured correctly')
         else:
             for item in items:
                 name, value = item
@@ -148,7 +148,7 @@ class Config(object):
 
         if not type(valid_settings) == list and not type(items) == list:
             self.cli_opts.error('It appears the your .skeletor.cfg is not '
-                    'configured correctly')
+                                'configured correctly')
         else:
             for item in items:
                 setting, value = item
@@ -170,7 +170,7 @@ class Config(object):
 
         if not re.match('^\w+$', self.project_name):
             self.cli_opts.error('Project names can only contain numbers'
-                    'letters and underscores')
+                                'letters and underscores')
 
     def validate_virtualenv(self):
         ''' Validate virtualenv settings.'''
@@ -179,7 +179,7 @@ class Config(object):
         venv_create = getattr(self, 'venv_create', None)
         if venv_create and not path:
             self.cli_opts.error('You need to provide a virtualenv path '
-                               'where the venv will be created')
+                                'where the venv will be created')
 
     def prompt_template_choice(self):
         '''If the user has multiple templates, prompt them to pick'''
@@ -196,10 +196,10 @@ class Config(object):
         while True:
             if i > max_tries:
                 self.cli_opts.error('You failed to enter a valid template '
-                        'number.')
+                                    'number.')
             try:
                 num = int(raw_input('\nEnter the number for the template '
-                    '(%d of %d tries): ' % (i, max_tries)))
+                                    '(%d of %d tries): ' % (i, max_tries)))
                 if num == 0:
                     raise ValueError
                 template = self.templates[template_list[num - 1]]
@@ -213,15 +213,14 @@ class Config(object):
     def validate_template_options(self):
         '''Validate template options.'''
 
-        if (self.force_defaut_template
-            or len(self.templates) == 1
-            or not self.choose_template):
+        if (self.force_defaut_template or len(self.templates) == 1
+                or not self.choose_template):
             self.template = self.templates['default']
         else:
             self.template = self.prompt_template_choice()
 
         if (not self.template.startswith('git+') and
-            not os.path.isdir(self.template)):
+                not os.path.isdir(self.template)):
             self.cli_opts.error('The path to your template does not '
                                 'exist.')
 
