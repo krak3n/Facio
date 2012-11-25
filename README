@@ -1,5 +1,7 @@
 # Skeletor #
 
+http://en.wikipedia.org/wiki/Skeletor
+
 ## What is it? ##
 
 Lets say you work in a company that turns around many different projects within a year but you use the same basic template for each project. You might copy and paste this around, it might fall out of date, things may get changes and improved but lost.
@@ -13,7 +15,6 @@ Originally developed for [Django](https://www.djangoproject.com/) projects you c
 Skeletor is currently at Beta and should be considered as an unstable piece of software, please use at your own risk :)
 
 **Version:** 1.0 Beta
-
 
 ### Build Status ###
 
