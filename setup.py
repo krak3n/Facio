@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
-facio
-========
+Facio
+=====
 
-facio is a project scaffolding tool origionally developed for Django
+Facio is a project scaffolding tool origionally developed for Django
 and expanded to be framework agnostic. You can use facio to bootstrap
 any sort of project.
 """
