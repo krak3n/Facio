@@ -9,7 +9,7 @@ from .template import Template
 from .virtualenv import Virtualenv
 
 
-class Skeletor(object):
+class Facio(object):
 
     def __init__(self):
         '''Constructor, fires all required methods.'''

@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 """
-Skeletor
+facio
 ========
 
-Skeletor is a project scaffolding tool origionally developed for Django
-and expanded to be framework agnostic. You can use Skeletor to bootstrap
+facio is a project scaffolding tool origionally developed for Django
+and expanded to be framework agnostic. You can use facio to bootstrap
 any sort of project.
 """
 
 from setuptools import setup, find_packages
-from skeletor.version import __version__
+from facio.version import __version__
 
 
 install_requires = ['GitPython==0.3.2.RC1', 'Jinja2==2.6']
 
 setup(
-    name='skeletor',
+    name='facio',
     version=__version__,
     author='Christopher John Reeves',
     author_email='hello@chris.reeves.io',
@@ -25,7 +25,7 @@ setup(
     zip_safe=False,
     packages=find_packages(exclude=['tests', ]),
     install_requires=install_requires,
-    scripts=['skeletor/bin/skeletor'],
+    scripts=['facio/bin/facio'],
     classifiers=[
         'Environment :: Console',
         'Development Status :: 4 - Beta',

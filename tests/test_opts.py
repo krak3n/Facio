@@ -1,6 +1,6 @@
 import optparse
 
-from skeletor.opts import Option
+from facio.opts import Option
 
 from .base import BaseTestCase
 

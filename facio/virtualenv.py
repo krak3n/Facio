@@ -36,7 +36,7 @@ class Virtualenv(object):
 
         error_msg = 'Virtualenv does not appear to be installed on your '\
                     'system. Please install python-virtualenv to use '\
-                    'this feature of Skeletor.'
+                    'this feature of facio.'
         try:
             import virtualenv
         except ImportError:
