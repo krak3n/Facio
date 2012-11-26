@@ -8,8 +8,8 @@ and expanded to be framework agnostic. You can use facio to bootstrap
 any sort of project.
 """
 
+from facio import __version__
 from setuptools import setup, find_packages
-from facio.version import __version__
 
 
 install_requires = ['GitPython==0.3.2.RC1', 'Jinja2==2.6']
