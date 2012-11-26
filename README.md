@@ -24,9 +24,9 @@ facio is currently at Beta and should be considered as an unstable piece of soft
 
 facio is on the excellent [Travis CI](https://travis-ci.org/krak3n/facio) service.
 
-[![Build Status](https://secure.travis-ci.org/krak3n/facio.png?branch=master)](https://travis-ci.org/krak3n/facio) - Master Branch (Most Stable Release)
+[![Build Status](https://secure.travis-ci.org/krak3n/Facio.png?branch=master)](https://travis-ci.org/krak3n/Facio) - Master Branch (Most Stable Release)
 
-[![Build Status](https://secure.travis-ci.org/krak3n/facio.png?branch=develop)](https://travis-ci.org/krak3n/facio) - Develop (Under Development)
+[![Build Status](https://secure.travis-ci.org/krak3n/Facio.png?branch=develop)](https://travis-ci.org/krak3n/Facio) - Develop (Under Development)
 
 ## Stable Features ##
 
