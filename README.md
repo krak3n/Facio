@@ -235,7 +235,7 @@ See AUTHORS file.
 
 ## Special Thanks ##
 
-To the Tech Team at [Poke London](http://www.pokelondon.com/) and the awesome [GitPython library](https://github.com/gitpython-developers/GitPython) and [Jinja2](http://jinja.pocoo.org/docs/) libraries.
+To the Tech Team at [Poke London](http://www.pokelondon.com/) and the awesome [GitPython](https://github.com/gitpython-developers/GitPython) and [Jinja2](http://jinja.pocoo.org/docs/) libraries.
 
 ## Contributing ##
 
