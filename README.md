@@ -219,6 +219,7 @@ The resulting structure would be:
 
 Facio is still in early development and there is still a lot to do, this list is in order or priority:
 
+ * Simple Default Template Bundled with the Package
  * Code refactoring (Template and Config classes specifically)
  * Support for Mercurial and SVN repositories
  * Write more tests
