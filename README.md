@@ -1,18 +1,20 @@
-# Skeletor #
+# Facio #
 
-http://en.wikipedia.org/wiki/Skeletor
+Formally known as Skeletor.
+
+Facio: /&#712;fa.ki.o&#720;/ - Latin, meaning to make, do, act, perform, cause, bring about.
 
 ## What is it? ##
 
 Lets say you work in a company that turns around many different projects within a year but you use the same basic template for each project. You might copy and paste this around, it might fall out of date, things may get changes and improved but lost.
 
-Skeletor gives you the ability to create a standard template (or templates) for your projects so you can bootstrap in one single command.
+facio gives you the ability to create a standard template (or templates) for your projects so you can bootstrap in one single command.
 
-Originally developed for [Django](https://www.djangoproject.com/) projects you can use Skeletor for any type of project.
+Originally developed for [Django](https://www.djangoproject.com/) projects you can use facio for any type of project.
 
 ## Status - Beta##
 
-Skeletor is currently at Beta and should be considered as an unstable piece of software, please use at your own risk :)
+facio is currently at Beta and should be considered as an unstable piece of software, please use at your own risk :)
 
 **Version:** 1.0 Beta
 
@@ -20,11 +22,11 @@ Skeletor is currently at Beta and should be considered as an unstable piece of s
 
 ### Build Status ###
 
-Skeletor is on the excellent [Travis CI](https://travis-ci.org/krak3n/Skeletor) service.
+facio is on the excellent [Travis CI](https://travis-ci.org/krak3n/facio) service.
 
-[![Build Status](https://secure.travis-ci.org/krak3n/Skeletor.png?branch=master)](https://travis-ci.org/krak3n/Skeletor) - Master Branch (Most Stable Release)
+[![Build Status](https://secure.travis-ci.org/krak3n/facio.png?branch=master)](https://travis-ci.org/krak3n/facio) - Master Branch (Most Stable Release)
 
-[![Build Status](https://secure.travis-ci.org/krak3n/Skeletor.png?branch=develop)](https://travis-ci.org/krak3n/Skeletor) - Develop (Under Development)
+[![Build Status](https://secure.travis-ci.org/krak3n/facio.png?branch=develop)](https://travis-ci.org/krak3n/facio) - Develop (Under Development)
 
 ## Stable Features ##
 
@@ -33,7 +35,7 @@ Skeletor is on the excellent [Travis CI](https://travis-ci.org/krak3n/Skeletor) 
 * Multiple templates
 * [Jinja2](http://jinja.pocoo.org/docs/) used for processing templates
 * Python virtualenv creation
-* Configurables using ~/.skeletor.cfg
+* Configurables using ~/.facio.cfg
 
 ## Experimental Features ##
 
@@ -42,92 +44,92 @@ Skeletor is on the excellent [Travis CI](https://travis-ci.org/krak3n/Skeletor) 
 
 ## Installation ##
 
-For ``skeletor`` to be available system wide you must install as root:
+For ``facio`` to be available system wide you must install as root:
 
 
 * **Easy Install:**
 
 ```
-$ sudo easy_install install skeletor
+$ sudo easy_install install facio
 ```
 
 * **Pip:**
 
 ```
-$ sudo pip install skeletor
+$ sudo pip install facio
 ```
 
 * **Manual:**
 
 ```
-$ git clone git@github.com:krak3n/Skeletor.git
-$ cd Skeletor
+$ git clone git@github.com:krak3n/facio.git
+$ cd facio
 $ sudo python setup.py install
 ```
 
 ## Basic Usage ##
 
-Skeletor used via the command line, after installation you should have a Skeletor command available. Use help to see the options available.
+facio used via the command line, after installation you should have a facio command available. Use help to see the options available.
 
-    $ skeletor -h
+    $ facio -h
 
-To create a new project its simple, cd into the directory you want your new project to live, Skeletor will create the directory for you so you don't need to make it, for example:
+To create a new project its simple, cd into the directory you want your new project to live, facio will create the directory for you so you don't need to make it, for example:
 
     $ cd /home/me/projects
-    $ skeletor -n hello_world
+    $ facio -n hello_world
 
-This will create a new hello_world directory at `/home/me/projects` and inside the default Skeletor template will have been created.
+This will create a new hello_world directory at `/home/me/projects` and inside the default facio template will have been created.
 
 ## Templates ##
 
 ### Default Template ###
 
-The default template is a Django based template that [lives on GitHub here](https://github.com/krak3n/Skeletor-Default-Template). It is not recommended you use use this template in production. You should create your own template that best suites your needes for your project. This template is just for illustration uses to see how you could use Skeletor.
+The default template is a Django based template that [lives on GitHub here](https://github.com/krak3n/facio-Default-Template). It is not recommended you use use this template in production. You should create your own template that best suites your needes for your project. This template is just for illustration uses to see how you could use facio.
 
-[Skeletor Default Template on Github](https://github.com/krak3n/Skeletor-Default-Template).
+[facio Default Template on Github](https://github.com/krak3n/facio-Default-Template).
 
 ### Custom Templates ###
 
-First create your own template somewhere on your file system. To use it just tell Skeletor about it by passing the ``-t`` or ``--template`` flag with the path to your template, for example:
+First create your own template somewhere on your file system. To use it just tell facio about it by passing the ``-t`` or ``--template`` flag with the path to your template, for example:
 
 ```
-$ skeletor -n hello_world -t /path/to/my/project/template
+$ facio -n hello_world -t /path/to/my/project/template
 ```
 
 And if you want to use a git repository use pip style syntax:
 
 ```
-$ skeletor -n hello_world -t git+git@github.com/path/to/repo.git
+$ facio -n hello_world -t git+git@github.com/path/to/repo.git
 ```
 
 Of-course it doesn't have to be a Github repository, it can be any.
 
 ## Advanced Usage ##
 
-Skeletor is flexible, and you can hopefully tailor it how you build out project skeletons.
+facio is flexible, and you can hopefully tailor it how you build out project skeletons.
 
 ### Command Line Options ###
 
 **Stable**
  * ``-n / --name``: Your projects name.
  * ``-t / --template``: Path to a custom template, use `git+` to denote the path is to a git repository.
- * ``-c / --choose_template``: If you define multiple templates in the .skeletor.cfg use this flag to trigger a selection prompt instead of using the default template
- * ``-s / --template_settings_dir``: Custom settings directory name, see more info about this in the skeletor.cfg section.
+ * ``-c / --choose_template``: If you define multiple templates in the .facio.cfg use this flag to trigger a selection prompt instead of using the default template
+ * ``-s / --template_settings_dir``: Custom settings directory name, see more info about this in the facio.cfg section.
  * ``--vars``: Custom variables for your templates, comma seperated var=value pairs, e.g: --vars var1=x,var2=y, would be accessed in teplates as {{ var1 }} and in dirs / file names as __var1__ / __var1__.ext (see section on this below)
  * ``-h / --help``: Show help
 
 **Expermental**
  * ``-E / --venv_create``: Create a python virtual environment for this project.
  * ``-P / --venv_path``: Path to virtual environments home e.g `/home/me/.virtualenvs`.
- * ``-S / --venv_use_site_packages``: By default Skeletor creates the virtual environment with the `--no-site-packages` argument to make a clean virtual environment, but if you don't want it do that use this argument and it will be omitted.
- * ``-x / --venv_prefix``: If you want to prefix your virtual environments name with something then use this option, e.g `skeletor -n world -E -x hello-` will create a virtual environment called hello-world.
+ * ``-S / --venv_use_site_packages``: By default facio creates the virtual environment with the `--no-site-packages` argument to make a clean virtual environment, but if you don't want it do that use this argument and it will be omitted.
+ * ``-x / --venv_prefix``: If you want to prefix your virtual environments name with something then use this option, e.g `facio -n world -E -x hello-` will create a virtual environment called hello-world.
 
 ### Config File ###
 
-Most things you can specify as command line options are also configurable in a `skeletor.cfg` file, this should live in your home directory and be prefixed with a `.`.
+Most things you can specify as command line options are also configurable in a `facio.cfg` file, this should live in your home directory and be prefixed with a `.`.
 
 ```
-$ touch ~/.skeletor.cfg
+$ touch ~/.facio.cfg
 ```
 
 #### Example Config ####
@@ -149,7 +151,7 @@ venv_create=1
 venv_path=/home/me/.virtualenvs/
 ```
 
-Above is an example `.skeletor.cfg` file and contains a `[misc]`, `[virtualenv]`, and `[template]` sections. These sections and their allowed options allow you set defaults so when you run Skeletor form the command line you need to keep specifying things like template path and virtual environment creation.
+Above is an example `.facio.cfg` file and contains a `[misc]`, `[virtualenv]`, and `[template]` sections. These sections and their allowed options allow you set defaults so when you run facio form the command line you need to keep specifying things like template path and virtual environment creation.
 
 #### Available Options ####
 
@@ -165,10 +167,10 @@ Above is an example `.skeletor.cfg` file and contains a `[misc]`, `[virtualenv]`
 ## Extra Variables ##
 
 ### In templates ###
-Of course project name is not always enough and in these situations you can send extra variables to Skeletor to use in the template processing. For example:
+Of course project name is not always enough and in these situations you can send extra variables to facio to use in the template processing. For example:
 
 ```
-$ skeletor -n hello_world --vars foo=bar
+$ facio -n hello_world --vars foo=bar
 ```
 
 and in a template:
@@ -215,13 +217,14 @@ The resulting structure would be:
 
 ## To Do ##
 
-Skeletor is still in early development and there is still a lot to do, this list is in order or priority:
+facio is still in early development and there is still a lot to do, this list is in order or priority:
 
+ * Code refactoring (Template and Config classes specifically)
  * Support for Mercurial and SVN repositories
  * Write more tests
  * Read the Docs Documentation
  * Python 3 Support
- 
+
 ## License ##
 
 See LICENSE file.
@@ -232,7 +235,7 @@ See AUTHORS file.
 
 ## Special Thanks ##
 
-To the Tech Team at [Poke London](http://www.pokelondon.com/) and the awesome [GitPython library](https://github.com/gitpython-developers/GitPython) and [Jinja2](http://jinja.pocoo.org/docs/) libraries.
+To the Tech Team at [Poke London](http://www.pokelondon.com/) and the awesome [GitPython](https://github.com/gitpython-developers/GitPython) and [Jinja2](http://jinja.pocoo.org/docs/) libraries.
 
 ## Contributing ##
 

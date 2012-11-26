@@ -7,7 +7,7 @@ import re
 import sys
 
 from random import choice
-from skeletor.opts import Option, OptionParser
+from facio.opts import Option, OptionParser
 
 
 class Config(object):
@@ -18,9 +18,9 @@ class Config(object):
     choose_template = False
 
     templates = {
-        'default': 'git+git@github.com:krak3n/Skeletor-Default-Template.git', }
+        'default': 'git+git@github.com:krak3n/facio-Default-Template.git', }
 
-    config_path = os.path.join(os.path.expanduser('~'), '.skeletor.cfg')
+    config_path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
 
     valid_config_sections = {
         'misc': ['install', ],
@@ -37,7 +37,7 @@ class Config(object):
     def __init__(self, use_cfg=True, config_path=None):
         '''Constructor, setup default properties.'''
 
-        self.use_cfg = use_cfg  # Use ~/.skeletor.cfg for config
+        self.use_cfg = use_cfg  # Use ~/.facio.cfg for config
         if self.use_cfg and config_path:
             self.config_path = config_path  # Override config_path for tests
 
@@ -102,7 +102,7 @@ class Config(object):
                     setattr(self, option, value)
 
     def load_config(self):
-        '''Load users skeletor.cfg if exists.'''
+        '''Load users facio.cfg if exists.'''
 
         if os.path.isfile(self.config_path) and self.use_cfg:
             self.config_parser = ConfigParser.ConfigParser()
@@ -111,7 +111,7 @@ class Config(object):
             self.has_config = True
 
     def read_config(self):
-        '''Read the skeletor.cfg file and store values.'''
+        '''Read the facio.cfg file and store values.'''
 
         for section in self.config_parser.sections():
             if section in self.valid_config_sections:
@@ -131,7 +131,7 @@ class Config(object):
 
         if not type(items) == list:
             self.cli_opts.error('It appears the template section in your '
-                                '.skeletor.cfg is not configured correctly')
+                                '.facio.cfg is not configured correctly')
         else:
             for item in items:
                 name, value = item
@@ -147,7 +147,7 @@ class Config(object):
         '''
 
         if not type(valid_settings) == list and not type(items) == list:
-            self.cli_opts.error('It appears the your .skeletor.cfg is not '
+            self.cli_opts.error('It appears the your .facio.cfg is not '
                                 'configured correctly')
         else:
             for item in items:

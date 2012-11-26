@@ -82,7 +82,7 @@ class Template(object):
         if self.config.template.startswith('git+'):
             self.is_git = True
             self.git_repo_path = self.config.template.replace('git+', '')
-            self.config.template = tempfile.mkdtemp(suffix='skeletor')
+            self.config.template = tempfile.mkdtemp(suffix='facio')
             print 'Using git to clone template from %s' % self.git_repo_path
             self.git_clone()
 

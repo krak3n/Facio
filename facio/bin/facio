@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from skeletor import Skeletor
+from facio import Facio
 
 if __name__ == "__main__":
-    skeletor = Skeletor()
+    facio = Facio()

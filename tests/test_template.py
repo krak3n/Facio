@@ -5,7 +5,7 @@ import uuid
 
 from git import Repo
 from mock import MagicMock, PropertyMock, patch
-from skeletor.template import Template
+from facio.template import Template
 from shutil import rmtree
 from StringIO import StringIO
 
@@ -38,7 +38,7 @@ class TemplateTests(unittest.TestCase):
         self.assertTrue('baz' in t.place_holders)
         self.assertEquals(t.place_holders['baz'], '1')
 
-    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def ensure_dir_cannot_be_created_if_already_exists(self, mock_working_dir):
         mock_working_dir.return_value = tempfile.gettempdir()
         tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
@@ -73,7 +73,7 @@ class TemplateTests(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     @patch('tempfile.mkdtemp', return_value=True)
-    @patch('skeletor.Template.git_clone', return_value=True)
+    @patch('facio.Template.git_clone', return_value=True)
     def should_detect_git_repo(self, mock_git_clone, mock_tempfile,
                                mock_stdout):
         t = Template(self.config)
@@ -85,7 +85,7 @@ class TemplateTests(unittest.TestCase):
                           mock_stdout.getvalue())
         assert t.is_git
 
-    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def should_clone_git_repo(self, mock_working_dir):
 
         # Create a fake temp repo w/ commit
@@ -131,7 +131,7 @@ class TemplateTests(unittest.TestCase):
             assert False
 
     @patch('os.path.isdir', return_value=False)
-    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def ensure_copy_template_failes_if_dir_does_not_exist(
             self, mock_working_dir, mock_isdir):
         mock_working_dir.return_value = tempfile.gettempdir()
@@ -148,7 +148,7 @@ class TemplateTests(unittest.TestCase):
         else:
             assert False
 
-    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def ensure_excluded_dirs_are_not_copied(self, mock_working_dir):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
@@ -158,7 +158,7 @@ class TemplateTests(unittest.TestCase):
                                                     '.exclude_this')))
         rmtree(t.project_root)
 
-    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def should_copy_directory_tree_if_is_dir(self, mock_working_dir):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
@@ -168,7 +168,7 @@ class TemplateTests(unittest.TestCase):
                                                    'should_copy_this')))
         rmtree(t.project_root)
 
-    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def ensure_directory_not_renamed_if_not_in_placeholders(self,
                                                             mock_working_dir):
         mock_working_dir.return_value = tempfile.gettempdir()
@@ -178,7 +178,7 @@ class TemplateTests(unittest.TestCase):
                                                    '__NOT_IN_PLACEHOLDERS__')))
         rmtree(t.project_root)
 
-    @patch('skeletor.template.Template.working_dir', new_callable=PropertyMock)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def should_rename_files_in_placeholders(self, mock_working_dir):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)

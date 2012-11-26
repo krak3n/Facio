@@ -1,8 +1,8 @@
 import sys
 
 from mock import patch
-from skeletor import config
-from skeletor.config import Config
+from facio import config
+from facio.config import Config
 from StringIO import StringIO
 
 from .base import BaseTestCase
@@ -18,7 +18,7 @@ class ConfigTests(BaseTestCase):
         Mocking stdout / stdin / stderr """
 
         self._old_sys_argv = sys.argv
-        sys.argv = [self._old_sys_argv[0].replace('nosetests', 'skeletor')]
+        sys.argv = [self._old_sys_argv[0].replace('nosetests', 'facio')]
 
         self.stdout_patch = patch('sys.stdout', new_callable=StringIO)
         self.stderr_patch = patch('sys.stderr', new_callable=StringIO)
@@ -39,7 +39,7 @@ class ConfigTests(BaseTestCase):
         try:
             Config(use_cfg=False)
         except SystemExit:
-            error_str = 'Usage: skeletor [options]\n\nskeletor: error: '\
+            error_str = 'Usage: facio [options]\n\nfacio: error: '\
                         '-n/--name is a required option.\n'
             self.assertEquals(error_str, self.stderr.getvalue())
             assert True
@@ -89,7 +89,7 @@ class ConfigTests(BaseTestCase):
         else:
             assert False
 
-    def should_exit_if_skeletor_cfg_is_miss_configured(self):
+    def should_exit_if_facio_cfg_is_miss_configured(self):
         try:
             self._set_cli_args(self.base_args)
             self.config.set_attributes('not valid', {'not': 'valid'})
