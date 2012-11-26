@@ -217,7 +217,7 @@ The resulting structure would be:
 
 ## To Do ##
 
-facio is still in early development and there is still a lot to do, this list is in order or priority:
+Facio is still in early development and there is still a lot to do, this list is in order or priority:
 
  * Code refactoring (Template and Config classes specifically)
  * Support for Mercurial and SVN repositories
