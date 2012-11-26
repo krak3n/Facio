@@ -22,7 +22,7 @@ facio is currently at Beta and should be considered as an unstable piece of soft
 
 ### Build Status ###
 
-facio is on the excellent [Travis CI](https://travis-ci.org/krak3n/facio) service.
+Facio is on the excellent [Travis CI](https://travis-ci.org/krak3n/facio) service.
 
 [![Build Status](https://secure.travis-ci.org/krak3n/Facio.png?branch=master)](https://travis-ci.org/krak3n/Facio) - Master Branch (Most Stable Release)
 
@@ -69,7 +69,7 @@ $ sudo python setup.py install
 
 ## Basic Usage ##
 
-facio used via the command line, after installation you should have a facio command available. Use help to see the options available.
+Facio used via the command line, after installation you should have a facio command available. Use help to see the options available.
 
     $ facio -h
 
@@ -86,7 +86,7 @@ This will create a new hello_world directory at `/home/me/projects` and inside t
 
 The default template is a Django based template that [lives on GitHub here](https://github.com/krak3n/facio-Default-Template). It is not recommended you use use this template in production. You should create your own template that best suites your needes for your project. This template is just for illustration uses to see how you could use facio.
 
-[facio Default Template on Github](https://github.com/krak3n/facio-Default-Template).
+[Facio Default Template on Github](https://github.com/krak3n/Facio-Default-Template).
 
 ### Custom Templates ###
 
