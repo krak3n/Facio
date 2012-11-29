@@ -1,6 +1,6 @@
 """
-facio.vcs.git
--------------
+facio.vcs.git_vcs
+-----------------
 
 Git Version Control Template Cloning.
 """
@@ -31,6 +31,7 @@ class Git(object):
         except ImportError:
             raise Exception  # TODO: Custom exception
 
+        self._make_tmp_dir()
         try:
             repo = Repo.init(self.tmp_dir)
             repo.create_remote('origin', self.repo)
