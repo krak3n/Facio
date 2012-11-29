@@ -1,4 +1,10 @@
-#!/usr/bin/env python
+"""
+facio.template
+--------------
+
+Process the users template using Jninja2 rendering it out into the current
+working directory.
+"""
 
 import os
 import re
