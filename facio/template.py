@@ -196,7 +196,10 @@ class Template(object):
                     if d in self.exclude_dirs:
                         exclude = True  # pragma: no cover
                 if not exclude:
-                    tpl = jinja_env.get_template(f)
-                    file_contents = tpl.render(self.place_holders)
-                    with open(filepath, 'w') as f:
-                        f.write(file_contents)
+                    try:
+                        tpl = jinja_env.get_template(f)
+                        file_contents = tpl.render(self.place_holders)
+                        with open(filepath, 'w') as f:
+                            f.write(file_contents)
+                    except Exception, e:
+                        print 'Warning: Failed to process %s: %s' % (f, e)

@@ -7,5 +7,7 @@
 # Dirs
 logs/
 media/
+dist/
+build/
 *.egg-info/
 .tox/

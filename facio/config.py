@@ -18,7 +18,8 @@ class Config(object):
     choose_template = False
 
     templates = {
-        'default': 'git+git@github.com:krak3n/Facio-Default-Template.git', }
+        'default': os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                'default_template'), }
 
     config_path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
 
