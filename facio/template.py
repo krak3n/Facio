@@ -88,8 +88,6 @@ class Template(object):
                 }[vcs]
 
         if vcs_cls:
-            import ipdb
-            ipdb.set_trace()
             vcs_cls.clone()
             self.is_vcs_template = True
             self.config.template = vcs_cls.tmp_dir
