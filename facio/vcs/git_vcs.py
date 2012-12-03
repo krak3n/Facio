@@ -13,6 +13,8 @@ from shutil import rmtree
 
 class Git(object):
 
+    tmp_dir = None
+
     def __init__(self, template_path):
         self.template_path = template_path
 

@@ -85,18 +85,18 @@ class Template(object):
     def vcs(self):
         '''Detect VCS template, if True clone into temp dir.'''
 
-        vcs_cls = None
+        self.vcs_cls = None
         supported_vcs = ['git', ]
         for vcs in supported_vcs:
             if self.config.template.startswith('%s+' % vcs):
-                vcs_cls = {
+                self.vcs_cls = {
                     'git': Git(self.config.template),
                 }[vcs]
 
-        if vcs_cls:
-            vcs_cls.clone()
+        if self.vcs_cls:
+            self.vcs_cls.clone()
             self.is_vcs_template = True
-            self.config.template = vcs_cls.tmp_dir
+            self.config.template = self.vcs_cls.tmp_dir
 
     def copy_template(self):
         '''Moves template into current working dir.'''
