@@ -1,5 +1,10 @@
-#!/usr/bin/env python
-# encoding: utf-8
+"""
+facio.config
+------------
+
+Setsmup variables and configuration for Facio from command line and / or
+a configuration file.
+"""
 
 import ConfigParser
 import os
