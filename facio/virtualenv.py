@@ -1,7 +1,13 @@
-#!/usr/bin/env python
-# encoding: utf-8
+"""
+facio.virtualenv
+----------------
+
+This is experimental. This should create a python virtual environment for the
+project.
+"""
 
 import os
+
 from subprocess import Popen, PIPE, STDOUT
 
 

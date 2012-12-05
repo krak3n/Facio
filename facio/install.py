@@ -1,7 +1,13 @@
-#!/usr/bin/env python
-# encoding: utf-8
+"""
+facio.install
+-------------
+
+This experimental. This should install a python template onto the path
+in develop mode.
+"""
 
 import os
+
 from shutil import rmtree
 from subprocess import Popen, PIPE, STDOUT
 

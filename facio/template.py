@@ -1,17 +1,24 @@
-#!/usr/bin/env python
+"""
+facio.template
+--------------
+
+Process the users template using Jninja2 rendering it out into the current
+working directory.
+"""
 
 import os
 import re
-import tempfile
 
 from shutil import copytree, move, rmtree, copy
+
+from .vcs.git_vcs import Git
 
 
 class Template(object):
 
     def __init__(self, config):
         # Setting defults
-        self.is_git = False
+        self.is_vcs_template = False
         self.complete = False
         self.exclude_dirs = ['.git', '.hg']
         self.place_holders = {
@@ -28,8 +35,8 @@ class Template(object):
             self.add_custom_vars()
         # Set the project root
         self.set_project_root()
-        # Git detection
-        self._is_git()
+        # VCS detection
+        self.vcs()
 
     @property
     def working_dir(self):
@@ -75,35 +82,21 @@ class Template(object):
             if config_value:
                 self.place_holders[place_holder] = config_value
 
-# TODO: git stuff should live in its own class
-    def _is_git(self):
-        '''Detect if the user wants to use a git repository.'''
+    def vcs(self):
+        '''Detect VCS template, if True clone into temp dir.'''
 
-        if self.config.template.startswith('git+'):
-            self.is_git = True
-            self.git_repo_path = self.config.template.replace('git+', '')
-            self.config.template = tempfile.mkdtemp(suffix='facio')
-            print 'Using git to clone template from %s' % self.git_repo_path
-            self.git_clone()
+        self.vcs_cls = None
+        supported_vcs = ['git', ]
+        for vcs in supported_vcs:
+            if self.config.template.startswith('%s+' % vcs):
+                self.vcs_cls = {
+                    'git': Git(self.config.template),
+                }[vcs]
 
-    def git_clone(self):
-        '''Clone git repository into tmp directory.'''
-        try:
-            from git import Repo
-        except ImportError:  # pragma: no cover
-            self.config.cli_opts.error('GitPython module missing, '
-                                       'please install it.')
-
-        try:
-            repo = Repo.init(self.config.template)
-            repo.create_remote('origin', self.git_repo_path)
-            origin = repo.remotes.origin
-            origin.fetch()
-            origin.pull('master')
-        except:
-            self.config.cli_opts.error('Error cloning repository')
-        else:
-            rmtree(os.path.join(self.config.template, '.git'))
+        if self.vcs_cls:
+            self.vcs_cls.clone()
+            self.is_vcs_template = True
+            self.config.template = self.vcs_cls.tmp_dir
 
     def copy_template(self):
         '''Moves template into current working dir.'''
@@ -127,7 +120,7 @@ class Template(object):
             self.config.cli_opts.error('Unable to copy template, directory '
                                        'does not exist')
 
-        if self.is_git:
+        if self.is_vcs_template:
             rmtree(self.config.template)
 
     def rename(self, root, name):
@@ -196,7 +189,10 @@ class Template(object):
                     if d in self.exclude_dirs:
                         exclude = True  # pragma: no cover
                 if not exclude:
-                    tpl = jinja_env.get_template(f)
-                    file_contents = tpl.render(self.place_holders)
-                    with open(filepath, 'w') as f:
-                        f.write(file_contents)
+                    try:
+                        tpl = jinja_env.get_template(f)
+                        file_contents = tpl.render(self.place_holders)
+                        with open(filepath, 'w') as f:
+                            f.write(file_contents)
+                    except Exception, e:
+                        print 'Warning: Failed to process %s: %s' % (f, e)

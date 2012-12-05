@@ -73,17 +73,15 @@ class TemplateTests(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     @patch('tempfile.mkdtemp', return_value=True)
-    @patch('facio.Template.git_clone', return_value=True)
-    def should_detect_git_repo(self, mock_git_clone, mock_tempfile,
+    @patch('facio.vcs.git_vcs.Git.clone', return_value=True)
+    @patch('facio.vcs.git_vcs.Git.tmp_dir', return_value=True)
+    def should_detect_git_repo(self, mock_tmp_dir, mock_clone, mock_tempfile,
                                mock_stdout):
         t = Template(self.config)
-        assert not t.is_git
+        assert not t.vcs_cls
         self.config.template = 'git+git@somewhere.com:repo.git'
         t = Template(self.config)
-        self.assertEquals('Using git to clone template from '
-                          'git@somewhere.com:repo.git\n',
-                          mock_stdout.getvalue())
-        assert t.is_git
+        self.assertEquals(t.vcs_cls.__class__.__name__, 'Git')
 
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def should_clone_git_repo(self, mock_working_dir):
@@ -124,8 +122,6 @@ class TemplateTests(unittest.TestCase):
         try:
             Template(self.config)
         except:
-            self.config.cli_opts.error.assert_called_with(
-                'Error cloning repository')
             assert True
         else:
             assert False
