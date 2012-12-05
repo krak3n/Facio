@@ -12,15 +12,11 @@ facio gives you the ability to create a standard template (or templates) for you
 
 Originally developed for [Django](https://www.djangoproject.com/) projects you can use facio for any type of project.
 
-## Status - Beta##
+## Status ##
 
-facio is currently at Beta and should be considered as an unstable piece of software, please use at your own risk :)
-
-**Version:** 1.0 Beta
+**Version:** 1.0
 
 **Supported Python Versions:** 2.6 and 2.7
-
-### Build Status ###
 
 Facio is on the excellent [Travis CI](https://travis-ci.org/krak3n/facio) service.
 
