@@ -14,7 +14,7 @@ Originally developed for [Django](https://www.djangoproject.com/) projects you c
 
 ## Status ##
 
-**Version:** 1.0
+**Version:** 1.0.1
 
 **Supported Python Versions:** 2.6 and 2.7
 
