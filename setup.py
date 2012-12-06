@@ -12,7 +12,7 @@ from facio import __version__
 from setuptools import setup, find_packages
 
 
-install_requires = ['GitPython==0.3.2.RC1', 'Jinja2==2.6']
+install_requires = ['GitPython==0.3.2.RC1', 'Jinja2==2.6', 'pycolors2==0.0.2']
 
 setup(
     name='facio',
