@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-__version__ = '1.0'
+__version__ = '1.0.1'
 
 from .config import Config
 from .install import Install
