@@ -1,0 +1,4 @@
+include facio/default_template/index.html
+include facio/default_template/css/bootstrap.css
+include README.md
+global-exclude .DS_Store
