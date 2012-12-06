@@ -1,7 +1,5 @@
 # Facio #
 
-Formally known as Skeletor.
-
 Facio: /&#712;fa.ki.o&#720;/ - Latin, meaning to make, do, act, perform, cause, bring about.
 
 ## What is it? ##
