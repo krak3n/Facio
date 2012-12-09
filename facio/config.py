@@ -8,7 +8,6 @@ a configuration file.
 
 import ConfigParser
 import os
-import re
 import sys
 
 from random import choice
@@ -17,7 +16,6 @@ from random import choice
 class Config(object):
 
     venv_create = False
-    has_config = False
     force_defaut_template = False
     choose_template = False
 
@@ -33,37 +31,29 @@ class Config(object):
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
-    def __init__(self, use_cfg=True, config_path=None):
+    def __init__(self, cli):
         '''Constructor, setup default properties.'''
 
-        self.use_cfg = use_cfg  # Use ~/.facio.cfg for config
-        if self.use_cfg and config_path:
-            self.config_path = config_path  # Override config_path for tests
-
+        self.cli = cli
+        self.project_name = cli.project_name
         self.load_config()
 
     def load_config(self):
         '''Load users facio.cfg if exists.'''
 
-        if os.path.isfile(self.config_path) and self.use_cfg:
+        if os.path.isfile(self.config_path):
             self.config_parser = ConfigParser.ConfigParser()
             self.config_parser.read(self.config_path)
-            self.read_config()
-            self.has_config = True
-
-    def read_config(self):
-        '''Read the facio.cfg file and store values.'''
-
-        for section in self.config_parser.sections():
-            if section in self.valid_config_sections:
-                if section == 'template':
-                    self.set_template_options(self.config_parser.items(
-                                              'template'))
-                else:
-                    self.set_attributes(
-                        self.valid_config_sections[section],
-                        self.config_parser.items(section)
-                    )
+            for section in self.config_parser.sections():
+                if section in self.valid_config_sections:
+                    if section == 'template':
+                        self.set_template_options(self.config_parser.items(
+                                                  'template'))
+                    else:
+                        self.set_attributes(
+                            self.valid_config_sections[section],
+                            self.config_parser.items(section)
+                        )
 
     def set_template_options(self, items):
         '''Set template options for template choices
@@ -71,8 +61,8 @@ class Config(object):
         '''
 
         if not type(items) == list:
-            self.cli_opts.error('It appears the template section in your '
-                                '.facio.cfg is not configured correctly')
+            self.cli.error('It appears the template section in your '
+                           '.facio.cfg is not configured correctly')
         else:
             for item in items:
                 name, value = item
@@ -88,8 +78,8 @@ class Config(object):
         '''
 
         if not type(valid_settings) == list and not type(items) == list:
-            self.cli_opts.error('It appears the your .facio.cfg is not '
-                                'configured correctly')
+            self.cli.error('It appears the your .facio.cfg is not '
+                           'configured correctly')
         else:
             for item in items:
                 setting, value = item
@@ -101,17 +91,8 @@ class Config(object):
     def validate(self):
         '''Valid provided configuration options.'''
 
-        self.validate_project_name()
         self.validate_template_options()
         self.validate_virtualenv()
-
-    def validate_project_name(self):
-        ''' Ensure the project name is alpha numeric and only allows
-        userscores. '''
-
-        if not re.match('^\w+$', self.project_name):
-            self.cli_opts.error('Project names can only contain numbers'
-                                'letters and underscores')
 
     def validate_virtualenv(self):
         ''' Validate virtualenv settings.'''
@@ -119,8 +100,8 @@ class Config(object):
         path = getattr(self, 'venv_path', None)
         venv_create = getattr(self, 'venv_create', None)
         if venv_create and not path:
-            self.cli_opts.error('You need to provide a virtualenv path '
-                                'where the venv will be created')
+            self.cli.error('You need to provide a virtualenv path '
+                           'where the venv will be created')
 
     def prompt_template_choice(self):
         '''If the user has multiple templates, prompt them to pick'''
@@ -136,8 +117,7 @@ class Config(object):
         i = 1
         while True:
             if i > max_tries:
-                self.cli_opts.error('You failed to enter a valid template '
-                                    'number.')
+                self.cli.error('You failed to enter a valid template number.')
             try:
                 num = int(raw_input('\nEnter the number for the template '
                                     '(%d of %d tries): ' % (i, max_tries)))
@@ -162,8 +142,7 @@ class Config(object):
 
         if (not self.template.startswith('git+') and
                 not os.path.isdir(self.template)):
-            self.cli_opts.error('The path to your template does not '
-                                'exist.')
+            self.cli.error('The path to your template does not exist.')
 
     @property
     def django_secret_key(self):
