@@ -2,7 +2,7 @@
 facio.config
 ------------
 
-Setsmup variables and configuration for Facio from command line and / or
+Sets up variables and configuration for Facio from command line and / or
 a configuration file.
 """
 
@@ -12,7 +12,6 @@ import re
 import sys
 
 from random import choice
-from facio.opts import Option, OptionParser
 
 
 class Config(object):
@@ -34,12 +33,6 @@ class Config(object):
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
-    valid_cl_options = ['project_name', 'install', 'template',
-                        'template_settings_dir', 'choose_template',
-                        'db_create', 'db_user', 'db_pass', 'db_name',
-                        'venv_create', 'venv_path', 'venv_use_site_packages',
-                        'venv_prefix', 'variables']
-
     def __init__(self, use_cfg=True, config_path=None):
         '''Constructor, setup default properties.'''
 
@@ -48,64 +41,6 @@ class Config(object):
             self.config_path = config_path  # Override config_path for tests
 
         self.load_config()
-        self.set_command_line_options()
-        self.validate()
-
-    def set_command_line_options(self):
-        '''Set command line options.'''
-
-        opt_list = [
-            # Project Name
-            Option('-n', '--name', dest='project_name', action='store',
-                   help='Your project name', required=True, type="string"),
-            # Install the new project onto the path
-            Option('-i', '--install', action='store_true', default=False,
-                   help='Install the project onto your path, e.g '
-                        'python setup.py develop'),
-            # Template Options
-            Option('-t', '--template', dest='template', action='store',
-                   help='Path to your custom template, absolute paths only '
-                        ', git repositories can also be specified by '
-                        'prefixing with git+ for example: git+git@gitbub.com'
-                        '/path/to/repo.git', type="string"),
-            Option('-s', '--template_settings_dir', action='store',
-                   help='Template settings directory name', type="string"),
-            Option('-c', '--choose_template', dest='choose_template',
-                   help="If you have more than 1 template defined use this "
-                        "flag to override the default template, Note: "
-                        "specifying -t (--template) will mean this "
-                        "flag is ignored.", action='store_true', default=None),
-            # Virtual Env Options
-            Option('-E', '--venv_create', dest='venv_create',
-                   action='store_true', default=None,
-                   help='Create python virtual environment'),
-            Option('-P', '--venv_path', dest='venv_path', action='store',
-                   help='Python Virtualenv home directory', type='string'),
-            Option('-S', '--venv_use_site_packages',
-                   dest='venv_use_site_packages', action='store_true',
-                   default=None, help='Create python vittual environment '
-                                      'without --no-site-packages'),
-            Option('--vars', dest='variables', action='store', default=None,
-                   help='Custom variables, e.g --vars hello=world,sky=blue'),
-            Option('-x', '--venv_prefix', dest='venv_prefix', action='store',
-                   help='Virtual environment prefix', type='string')]
-
-        self.cli_opts = OptionParser(option_list=opt_list)
-        self.set_attributes_from_command_line()
-
-    def set_attributes_from_command_line(self):
-        '''Set attibutes that have been parsed via command line.'''
-
-        (cl_options, cl_args) = self.cli_opts.parse_args()
-
-        for option in self.valid_cl_options:
-            value = getattr(cl_options, option, None)
-            if value:
-                if option == 'template':
-                    self.templates['default'] = value
-                    self.force_defaut_template = True
-                else:
-                    setattr(self, option, value)
 
     def load_config(self):
         '''Load users facio.cfg if exists.'''
