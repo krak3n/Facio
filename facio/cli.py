@@ -11,6 +11,7 @@ are split into 3 groups:
 
 
 import optparse
+import re
 
 from . import __version__
 
@@ -34,6 +35,13 @@ class CLIOptions(object):
         self.opts, self.args = self._parser.parse_args()
         self._validate()
 
+    def __getattr__(self, name):
+        opt = getattr(self.opts, name, None)
+        if not opt is None:
+            return opt
+        else:
+            raise AttributeError
+
     def _add_project_options(self):
         group = optparse.OptionGroup(self._parser, 'Project Options')
         group.add_option('-n', '--name', dest='project_name',
@@ -53,12 +61,13 @@ class CLIOptions(object):
                          help='If you have more than 1 template defined use '
                          'this flag to override the default template, Note: '
                          'specifying -t (--template) will mean this '
-                         'flag is ignored.', action='store_true', default=None)
+                         'flag is ignored.', action='store_true',
+                         default=False)
         group.add_option('-s', '--template_settings_dir', action='store',
                          help='Template settings directory name',
                          type='string', metavar='<ARG>')
         group.add_option('--vars', dest='variables', action='store',
-                         default=None, help='Custom variables, e.g --vars '
+                         default=False, help='Custom variables, e.g --vars '
                          'hello=world,sky=blue', metavar='<ARG>'),
         self._parser.add_option_group(group)
 
@@ -68,14 +77,14 @@ class CLIOptions(object):
                          help='Install the project onto your path, e.g '
                          'python setup.py develop'),
         group.add_option('-e', '--venv_create', dest='venv_create',
-                         action='store_true', default=None,
+                         action='store_true', default=False,
                          help='Create python virtual environment'),
         group.add_option('-p', '--venv_path', dest='venv_path', action='store',
                          help='Python virtualenv home directory',
                          type='string', metavar='<ARG>'),
         group.add_option('-S', '--venv_use_site_packages',
                          dest='venv_use_site_packages', action='store_true',
-                         default=None, help='Create python vittual '
+                         default=False, help='Create python vittual '
                          'environment without --no-site-packages'),
         group.add_option('-x', '--venv_prefix', dest='venv_prefix',
                          action='store',
