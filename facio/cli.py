@@ -84,6 +84,15 @@ class CLIOptions(object):
         self._parser.add_option_group(group)
 
     def _validate(self):
+        self._validate_required()
+        self._validate_project_name()
+
+    def _validate_required(self):
         for opt in self.MANDATORY_OPTS:
             if not getattr(self.opts, opt, None):
-                self._parser.print_help()
+                self._parser.error('A mandatory option is missing, see --help')
+
+    def _validate_project_name(self):
+        if not re.match('^\w+$', self.opts.project_name):
+            self._parser.error('Project names can only contain numbers'
+                               'letters and underscores')
