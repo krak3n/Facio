@@ -128,7 +128,7 @@ class Config(object):
                     self._tpl = self.cli_args.template
                 if self.cli_args.choose_template:
                     self._tpl = self._template_choice_prompt()
-            except AssertionError:
+            except AttributeError:
                 try:
                     self._tpl = self.file_args.templates['default']
                 except KeyError:
