@@ -12,137 +12,193 @@ import sys
 
 from random import choice
 
+from .cli import CLIOptions
 
-class Config(object):
 
-    venv_create = False
-    force_defaut_template = False
-    choose_template = False
+class ConfigFile(object):
 
-    templates = {
-        'default': os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                'default_template'), }
+    templates = {}
 
-    config_path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
-
-    valid_config_sections = {
+    sections = {
         'misc': ['install', ],
         'template': [],
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
-    def __init__(self, cli):
-        '''Constructor, setup default properties.'''
+    def __init__(self):
+        self.path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
+        if os.path.isfile(self.path):
+            self.parse_config()
 
-        self.cli = cli
-        self.project_name = cli.project_name
-        self.load_config()
+    def parse_config(self):
+        self.parser = ConfigParser.ConfigParser()
+        self.parser.read(self.path)
+        for section in self.sections:
+            try:
+                items = self.parser.items(section)
+            except ConfigParser.NoSectionError:
+                pass
+            else:
+                if section == 'template':
+                    self.add_templates(items)
+                else:
+                    self.set_attributes(section, items)
 
-    def load_config(self):
-        '''Load users facio.cfg if exists.'''
+    def add_templates(self, items):
+        for item in items:
+            name, value = item
+            self.templates[name] = value
 
-        if os.path.isfile(self.config_path):
-            self.config_parser = ConfigParser.ConfigParser()
-            self.config_parser.read(self.config_path)
-            for section in self.config_parser.sections():
-                if section in self.valid_config_sections:
-                    if section == 'template':
-                        self.set_template_options(self.config_parser.items(
-                                                  'template'))
-                    else:
-                        self.set_attributes(
-                            self.valid_config_sections[section],
-                            self.config_parser.items(section)
-                        )
+    def set_attributes(self, section, items):
+        opts = self.sections[section]
+        for opt in opts:
+            try:
+                opt, val = [(x, y) for x, y in items if x == opt][0]
+            except IndexError:
+                pass
+            else:
+                if val == '0' or val == '1':
+                    val = False if val == '0' else True
+                setattr(self, opt, val)
 
-    def set_template_options(self, items):
-        '''Set template options for template choices
-        @arg1 list: a list of tuples containing config option name / value
-        '''
 
-        if not type(items) == list:
-            self.cli.error('It appears the template section in your '
-                           '.facio.cfg is not configured correctly')
-        else:
-            for item in items:
-                name, value = item
-                self.templates[name] = value
+class Config(object):
 
-    def set_attributes(self, valid_settings, items):
-        '''Set class attributes based on valid settings and parsed
-        items, items should be the following format:
-            [('setting1', 'value1'), [('setting2', 'value2')]
-        In, other words, a list of tuples.
-        @arg1 list: list of valid settings
-        @arg2 list: a list of tuples containing name and value
-        '''
+    default_template = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'default_template')
 
-        if not type(valid_settings) == list and not type(items) == list:
-            self.cli.error('It appears the your .facio.cfg is not '
-                           'configured correctly')
-        else:
-            for item in items:
-                setting, value = item
-                if setting in valid_settings:
-                    if value == '0' or value == '1':
-                        value = False if value == '0' else True
-                    setattr(self, setting, value)
+    def __init__(self):
+        self.cli_args = CLIOptions()
+        self.file_args = ConfigFile()
+        self.django_secret_key
 
-    def validate(self):
-        '''Valid provided configuration options.'''
+    def _error(self, msg):
+        self.cli_opts.error(msg)
 
-        self.validate_template_options()
-        self.validate_virtualenv()
+    #
+    # Project Properties
+    #
 
-    def validate_virtualenv(self):
-        ''' Validate virtualenv settings.'''
+    @property
+    def project_name(self):
+        return self.cli_args.project_name
 
-        path = getattr(self, 'venv_path', None)
-        venv_create = getattr(self, 'venv_create', None)
-        if venv_create and not path:
-            self.cli.error('You need to provide a virtualenv path '
-                           'where the venv will be created')
+    #
+    # Template Properties
+    #
 
-    def prompt_template_choice(self):
-        '''If the user has multiple templates, prompt them to pick'''
+    def _validate_template_options(self):
+        if (not self._tpl.startswith('git+') and
+                not os.path.isdir(self._tpl)):
+            self._error('The path to your template does not exist.')
 
-        sys.stdout.write("Please choose a template:\n\n")
-        i = 0
-        for name in self.templates:
-            template = self.templates[name]
-            sys.stdout.write("%d) %s: %s\n" % ((i + 1), name, template))
-            i += 1
-        template_list = list(self.templates)
+    def _template_choice_prompt(self):
+        templates = self.file_args.templates
         max_tries = 5
+        template_list = list(templates)
+        i = 0
+        sys.stdout.write("Please choose a template:\n\n")
+        for name in templates:
+            template = templates[name]
+            sys.stdout.write("{0}) {1}: {2}\n".format((i + 1), name, template))
+            i += 1
         i = 1
         while True:
             if i > max_tries:
-                self.cli.error('You failed to enter a valid template number.')
+                self._error('You failed to enter a valid template number.')
             try:
-                num = int(raw_input('\nEnter the number for the template '
-                                    '(%d of %d tries): ' % (i, max_tries)))
+                num = int(raw_input(
+                    '\nEnter the number for the template '
+                    '({0} of {1} tries): '.format(i, max_tries)))
                 if num == 0:
                     raise ValueError
-                template = self.templates[template_list[num - 1]]
+                template = templates[template_list[num - 1]]
             except (ValueError, IndexError):
                 sys.stdout.write('\nPlease choose a number between 1 and '
-                                 '%d\n' % len(template_list))
+                                 '{0}\n'.format(len(template_list)))
                 i += 1
             else:
                 return template
 
-    def validate_template_options(self):
-        '''Validate template options.'''
+    @property
+    def template(self):
+        if not getattr(self, '_tpl', None):
+            try:
+                if self.cli_args.template:
+                    self._tpl = self.cli_args.template
+                if self.cli_args.choose_template:
+                    self._tpl = self._template_choice_prompt()
+            except AssertionError:
+                try:
+                    self._tpl = self.file_args.templates['default']
+                except KeyError:
+                    self._tpl = self.default_template
+        self._validate_template_options()
+        return self._tpl
 
-        if (self.force_defaut_template or len(self.templates) == 1
-                or not self.choose_template):
-            self.template = self.templates['default']
-        else:
-            self.template = self.prompt_template_choice()
+    @property
+    def template_settings_dir(self):
+        try:
+            return self.cli_args.template_settings_dir
+        except AssertionError:
+            return False
 
-        if (not self.template.startswith('git+') and
-                not os.path.isdir(self.template)):
-            self.cli.error('The path to your template does not exist.')
+    @property
+    def variables(self):
+        try:
+            return self.cli_args.variables
+        except AssertionError:
+            return False
+
+    #
+    # Python Properties (Experimental)
+    #
+
+    @property
+    def install(self):
+        if self.cli_args.install or self.file_args.install:
+            return True
+        return False
+    #
+    # Virtual Environment Properties (Experimental)
+    #
+
+    def _validate_virtualenv_options(self):
+        if not self.venv_path:
+            self._error('You need to provide a virtualenv path where the '
+                        'venv will be created')
+
+    @property
+    def venv_create(self):
+        if self.cli_args.venv_create or self.file_args.venv_create:
+            self._validate_virtualenv_options()
+            return True
+        return False
+
+    @property
+    def venv_path(self):
+        if self.file_args.venv_path and not self.cli_args.venv_path:
+            return self.file_args.venv_path
+        elif self.cli_args.venv_path:
+            return self.cli_args.venv_path
+        return False
+
+    @property
+    def venv_use_site_packages(self):
+        if (self.cli_args.venv_use_site_packages
+                or self.file_args.venv_use_site_packages):
+            return True
+        return False
+
+    @property
+    def venv_prefix(self):
+        if self.cli_args.venv_prefix:
+            return self.cli_args.venv_prefix
+        return False
+
+    #
+    # Django Secret Key Generation
+    #
 
     @property
     def django_secret_key(self):
