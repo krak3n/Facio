@@ -46,14 +46,15 @@ class Template(object):
         ''' Add custom variables to place holders. '''
 
         # TODO: Needs validation
-        pairs = self.config.variables.split(',')
-        for pair in pairs:
-            try:
-                place_holder, value = pair.split('=')
-            except ValueError:
-                pass  # If its not formatted correctly, we ignore it
-            else:
-                self.place_holders[place_holder] = value
+        if self.config.variables:
+            pairs = self.config.variables.split(',')
+            for pair in pairs:
+                try:
+                    place_holder, value = pair.split('=')
+                except ValueError:
+                    pass  # If its not formatted correctly, we ignore it
+                else:
+                    self.place_holders[place_holder] = value
 
     def set_project_root(self):
         '''Set project root, based on working dir and project name.'''
