@@ -73,7 +73,7 @@ class Config(object):
         self.django_secret_key
 
     def _error(self, msg):
-        self.cli_opts.error(msg)
+        self.cli_args.error(msg)
 
     #
     # Project Properties

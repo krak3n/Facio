@@ -68,10 +68,9 @@ class Template(object):
         if not os.path.isdir(self.project_root):
             os.mkdir(self.project_root)
             if not os.path.isdir(self.project_root):
-                self.config.cli_opts.error('Error creating project '
-                                           'directory')
+                self.config._error('Error creating project directory')
         else:
-            self.config.cli_opts.error('%s already exists' % (
+            self.config._error('%s already exists' % (
                 self.project_root))
 
     def set_template_variables(self):
@@ -118,8 +117,8 @@ class Template(object):
                         copy(path, self.project_root)
             self.swap_placeholders()
         else:
-            self.config.cli_opts.error('Unable to copy template, directory '
-                                       'does not exist')
+            self.config._error('Unable to copy template, directory does not '
+                               'exist')
 
         if self.is_vcs_template:
             rmtree(self.config.template)
@@ -170,8 +169,8 @@ class Template(object):
         try:
             from jinja2 import Environment, FileSystemLoader
         except ImportError:  # pragma: no cover
-            self.config.cli_opts.error('Jinja2 is required for tempalte '
-                                       'processing, please install it.')
+            self.config._error('Jinja2 is required for tempalte processing, '
+                               'please install it.')
 
         while self.rename_directories():
             continue  # pragma: no cover
