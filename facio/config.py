@@ -182,35 +182,75 @@ class Config(object):
                         'venv will be created')
 
     @property
-    def venv_create(self):
+    def _file_args_venve_create(self):
         try:
-            if self.cli_args.venv_create or self.file_args.venv_create:
-                self._validate_virtualenv_options()
-                return True
+            return self.file_args.venv_create
         except AttributeError:
-            pass
+            return False
+
+    @property
+    def _cli_args_venv_create(self):
+        try:
+            return self.cli_args.venv_create
+        except AttributeError:
+            return False
+
+    @property
+    def _file_args_venv_path(self):
+        try:
+            return self.file_args.venv_path
+        except AttributeError:
+            return False
+
+    @property
+    def _cli_args_venv_path(self):
+        try:
+            return self.cli_args.venv_path
+        except AttributeError:
+            return False
+
+    @property
+    def _file_args_venv_use_site_packages(self):
+        try:
+            return self.file_args.venv_use_site_packages
+        except AttributeError:
+            return False
+
+    @property
+    def _cli_args_venv_use_site_packages(self):
+        try:
+            return self.cli_args.venv_use_site_packages
+        except AttributeError:
+            return False
+
+    @property
+    def venv_create(self):
+        if self._cli_args_venv_create or self._file_args_venve_create:
+            self._validate_virtualenv_options()
+            return True
         return False
 
     @property
     def venv_path(self):
-        if self.file_args.venv_path and not self.cli_args.venv_path:
-            return self.file_args.venv_path
-        elif self.cli_args.venv_path:
+        if self._file_args_venv_path and not self._cli_args_venv_path:
+            return self._file_args_venv_path
+        elif self._cli_args_venv_path:
             return self.cli_args.venv_path
         return False
 
     @property
     def venv_use_site_packages(self):
-        if (self.cli_args.venv_use_site_packages
-                or self.file_args.venv_use_site_packages):
+        if (self._cli_args_venv_use_site_packages
+                or self._file_args_venv_use_site_packages):
             return True
         return False
 
     @property
     def venv_prefix(self):
-        if self.cli_args.venv_prefix:
+        try:
             return self.cli_args.venv_prefix
-        return False
+        except AttributeError:
+            return False
 
     #
     # Django Secret Key Generation
