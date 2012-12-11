@@ -168,8 +168,22 @@ class Config(object):
     #
 
     @property
+    def _file_args_install(self):
+        try:
+            return self.file_args.install
+        except AttributeError:
+            return False
+
+    @property
+    def _cli_args_install(self):
+        try:
+            return self.cli_args.install
+        except AttributeError:
+            return False
+
+    @property
     def install(self):
-        if self.cli_args.install or self.file_args.install:
+        if self._cli_args_install or self._file_args_install:
             return True
         return False
     #
