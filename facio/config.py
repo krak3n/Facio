@@ -26,11 +26,14 @@ class ConfigFile(object):
     }
 
     def __init__(self):
-        self.path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
-        if os.path.isfile(self.path):
-            self.parse_config()
+        path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
+        if os.path.isfile(path):
+            self._parse_config()
+            self.cfg_loaded = True
+        else:
+            self.cfg_loaded = False
 
-    def parse_config(self):
+    def _parse_config(self):
         self.parser = ConfigParser.ConfigParser()
         self.parser.read(self.path)
         for section in self.sections:
@@ -40,16 +43,16 @@ class ConfigFile(object):
                 pass
             else:
                 if section == 'template':
-                    self.add_templates(items)
+                    self._add_templates(items)
                 else:
-                    self.set_attributes(section, items)
+                    self._set_attributes(section, items)
 
     def add_templates(self, items):
         for item in items:
             name, value = item
             self.templates[name] = value
 
-    def set_attributes(self, section, items):
+    def _set_attributes(self, section, items):
         opts = self.sections[section]
         for opt in opts:
             try:
