@@ -96,7 +96,7 @@ class Template(object):
         if self.vcs_cls:
             self.vcs_cls.clone()
             self.is_vcs_template = True
-            self.config.template = self.vcs_cls.tmp_dir
+            self.config._tpl = self.vcs_cls.tmp_dir
 
     def copy_template(self):
         '''Moves template into current working dir.'''
