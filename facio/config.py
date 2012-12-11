@@ -121,14 +121,27 @@ class Config(object):
                 return template
 
     @property
+    def _cli_template(self):
+        try:
+            return self.cli_args.template
+        except AttributeError:
+            return False
+
+    @property
+    def _cli_choose_template(self):
+        try:
+            return self.cli_args.choose_template
+        except AttributeError:
+            return False
+
+    @property
     def template(self):
         if not getattr(self, '_tpl', None):
-            try:
-                if self.cli_args.template:
-                    self._tpl = self.cli_args.template
-                if self.cli_args.choose_template:
-                    self._tpl = self._template_choice_prompt()
-            except AttributeError:
+            if self._cli_template:
+                self._tpl = self._cli_template
+            elif self._cli_choose_template:
+                self._tpl = self._template_choice_prompt()
+            else:
                 try:
                     self._tpl = self.file_args.templates['default']
                 except KeyError:
