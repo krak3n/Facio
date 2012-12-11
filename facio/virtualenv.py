@@ -46,7 +46,7 @@ class Virtualenv(object):
         try:
             import virtualenv
         except ImportError:
-            self.config.cli_opts.error(error_msg)
+            self.config._error(error_msg)
             return False
         else:
             # Lets double check
@@ -55,7 +55,7 @@ class Virtualenv(object):
                       close_fds=True)
             output = p.stdout.read()
             if output == '':
-                self.config.cli_opts.error(error_msg)
+                self.config._error(error_msg)
                 return False
         return True
 
@@ -66,12 +66,12 @@ class Virtualenv(object):
         full_path = self.venv_path
 
         if not os.path.exists(self.config.venv_path):
-            self.config.cli_opts.error('Specififed virtual environment path '
-                                       'does not exist: %s' % path)
+            self.config._error('Specififed virtual environment path '
+                               'does not exist: %s' % path)
 
         if os.path.exists(self.venv_path):
-            self.config.cli_opts.error('A virtual environment at %s '
-                                       'already exists' % full_path)
+            self.config._error('A virtual environment at %s '
+                               'already exists' % full_path)
 
         return True
 
