@@ -64,17 +64,17 @@ class ConfigTests(BaseTestCase):
             self._set_cli_args(['-n', valid_name])
             self.assertEquals(self.config.project_name, valid_name)
 
-#    def should_exit_on_invalid_name(self):
-#        invalid_names = ['this_is_not-valid', 'this_is not_valid',
-#                         '*this_is_not_valid']
-#        for invalid_name in invalid_names:
-#            try:
-#                self._set_cli_args(['-n', invalid_name])
-#            except SystemExit:
-#                assert True
-#            else:
-#                assert False
-#
+    def should_exit_on_invalid_name(self):
+        invalid_names = ['this_is_not-valid', 'this_is not_valid',
+                         '*this_is_not_valid']
+        for invalid_name in invalid_names:
+            try:
+                self._set_cli_args(['-n', invalid_name])
+            except SystemExit:
+                assert True
+            else:
+                assert False
+
 #    def ensure_template_var_is_set_from_cli(self):
 #        self._set_cli_args(self.base_args + ['--template',
 #                                             self.test_tpl_path])
