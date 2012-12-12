@@ -48,7 +48,7 @@ class ConfigFile(object):
                 else:
                     self._set_attributes(section, items)
 
-    def add_templates(self, items):
+    def _add_templates(self, items):
         for item in items:
             name, value = item
             self.templates[name] = value
