@@ -79,20 +79,12 @@ class ConfigTests(BaseTestCase):
             else:
                 assert False
 
-#    def ensure_template_var_is_set_from_cli(self):
-#        self._set_cli_args(self.base_args + ['--template',
-#                                             self.test_tpl_path])
-#        self.assertEquals(self.config.template, self.test_tpl_path)
-#
-#    def should_raise_exit_if_template_section_is_not_list(self):
-#        try:
-#            self._set_cli_args(self.base_args)
-#            self.config.set_template_options('this is not a list')
-#        except SystemExit:
-#            assert True
-#        else:
-#            assert False
-#
+    def ensure_template_var_is_set_from_cli(self):
+        self._set_cli_args(self.base_args + ['--template',
+                                             self.test_tpl_path])
+        self.assertEquals(self.config.template, self.test_tpl_path)
+
+
 #    def should_exit_if_facio_cfg_is_miss_configured(self):
 #        try:
 #            self._set_cli_args(self.base_args)
