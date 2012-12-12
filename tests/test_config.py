@@ -58,12 +58,12 @@ class ConfigTests(BaseTestCase):
 
         self.assertTrue(c.file_args.cfg_loaded)
 
-#    def ensure_valid_project_name(self):
-#        valid_names = ['this_is_valid', 'this_is_valid', 'Thisisvalid']
-#        for valid_name in valid_names:
-#            self._set_cli_args(['-n', valid_name])
-#            self.assertEquals(self.config.project_name, valid_name)
-#
+    def ensure_valid_project_name(self):
+        valid_names = ['this_is_valid', 'this1is_valid', 'Thisisvalid']
+        for valid_name in valid_names:
+            self._set_cli_args(['-n', valid_name])
+            self.assertEquals(self.config.project_name, valid_name)
+
 #    def should_exit_on_invalid_name(self):
 #        invalid_names = ['this_is_not-valid', 'this_is not_valid',
 #                         '*this_is_not_valid']
