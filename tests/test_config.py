@@ -71,7 +71,11 @@ class ConfigTests(BaseTestCase):
             try:
                 self._set_cli_args(['-n', invalid_name])
             except SystemExit:
-                assert True
+                error_str = 'Usage: facio -n <project_name> <options>\n\n'\
+                            'facio: error: Project names can only contain '\
+                            'numbersletters and underscores\n'
+                self.assertEquals(self.stderr.getvalue(), error_str)
+                self.stderr.truncate(0)
             else:
                 assert False
 
