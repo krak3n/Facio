@@ -58,11 +58,6 @@ class ConfigTests(BaseTestCase):
 
         self.assertTrue(c.file_args.cfg_loaded)
 
-#    def test_custom_cfg_path_is_set(self):
-#        sys.argv = sys.argv + self.base_args
-#        self.config = Config()
-#        self.assertEquals(self.config.config_path, self.empty_cfg)
-#
 #    def ensure_valid_project_name(self):
 #        valid_names = ['this_is_valid', 'this_is_valid', 'Thisisvalid']
 #        for valid_name in valid_names:
