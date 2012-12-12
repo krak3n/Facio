@@ -25,9 +25,10 @@ class ConfigFile(object):
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
+    path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
+
     def __init__(self):
-        path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
-        if os.path.isfile(path):
+        if os.path.isfile(self.path):
             self._parse_config()
             self.cfg_loaded = True
         else:
