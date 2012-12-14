@@ -86,9 +86,11 @@ class ConfigTests(BaseTestCase):
 
     @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
     def should_exit_if_facio_cfg_is_miss_configured(self, mock_path):
-        mock_path.return_value = self.malformed_cfg
-        self._set_cli_args(self.base_args)
-        self.assertFalse(self.config.file_args.cfg_loaded)
+        cfgs = ['malformed_config1.cfg', 'malformed_config2.cfg']
+        for cfg in cfgs:
+            mock_path.return_value = self._test_cfg_path(cfg)
+            self._set_cli_args(self.base_args)
+            self.assertFalse(self.config.file_args.cfg_loaded)
 
 #    def should_exit_when_venv_create_set_no_venv_path_set(self):
 #        try:
