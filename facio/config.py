@@ -39,7 +39,10 @@ class ConfigFile(object):
             self.parser.read(self.path)
         except ConfigParser.MissingSectionHeaderError:
             self.cfg_loaded = False
-            # TODO: print warning to use
+            # TODO: print warning to user
+        except ConfigParser.ParsingError:
+            # TODO: print warning to user
+            self.cfg_loaded = False
         else:
             self.cfg_loaded = True
             for section in self.sections:
