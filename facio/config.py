@@ -208,7 +208,7 @@ class Config(object):
                         'venv will be created')
 
     @property
-    def _file_args_venve_create(self):
+    def _file_args_venv_create(self):
         try:
             return self.file_args.venv_create
         except AttributeError:
@@ -251,7 +251,7 @@ class Config(object):
 
     @property
     def venv_create(self):
-        if self._cli_args_venv_create or self._file_args_venve_create:
+        if self._cli_args_venv_create or self._file_args_venv_create:
             self._validate_virtualenv_options()
             return True
         return False
