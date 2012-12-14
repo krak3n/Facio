@@ -30,23 +30,28 @@ class ConfigFile(object):
     def __init__(self):
         if os.path.isfile(self.path):
             self._parse_config()
-            self.cfg_loaded = True
         else:
             self.cfg_loaded = False
 
     def _parse_config(self):
         self.parser = ConfigParser.ConfigParser()
-        self.parser.read(self.path)
-        for section in self.sections:
-            try:
-                items = self.parser.items(section)
-            except ConfigParser.NoSectionError:
-                pass
-            else:
-                if section == 'template':
-                    self._add_templates(items)
+        try:
+            self.parser.read(self.path)
+        except ConfigParser.MissingSectionHeaderError:
+            self.cfg_loaded = False
+            # TODO: print warning to use
+        else:
+            self.cfg_loaded = True
+            for section in self.sections:
+                try:
+                    items = self.parser.items(section)
+                except ConfigParser.NoSectionError:
+                    pass
                 else:
-                    self._set_attributes(section, items)
+                    if section == 'template':
+                        self._add_templates(items)
+                    else:
+                        self._set_attributes(section, items)
 
     def _add_templates(self, items):
         for item in items:
