@@ -84,16 +84,16 @@ class ConfigTests(BaseTestCase):
                                              self.test_tpl_path])
         self.assertEquals(self.config.template, self.test_tpl_path)
 
+    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
+    def should_exit_if_facio_cfg_is_miss_configured(self, mock_path):
+        mock_path.return_value = self.malformed_cfg
+        try:
+            self._set_cli_args(self.base_args)
+        except SystemExit:
+            assert True
+        else:
+            assert False
 
-#    def should_exit_if_facio_cfg_is_miss_configured(self):
-#        try:
-#            self._set_cli_args(self.base_args)
-#            self.config.set_attributes('not valid', {'not': 'valid'})
-#        except SystemExit:
-#            assert True
-#        else:
-#            assert False
-#
 #    def should_exit_when_venv_create_set_no_venv_path_set(self):
 #        try:
 #            self._set_cli_args(self.base_args + ['--venv_create', ])
