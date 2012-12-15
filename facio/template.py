@@ -101,10 +101,10 @@ class Template(object):
     def copy_template(self):
         '''Moves template into current working dir.'''
 
-        if os.path.isdir(self.config.template):
+        if os.path.isdir(self.config._tpl):
             self.make_project_dir()
-            for file in os.listdir(self.config.template):
-                path = os.path.join(self.config.template, file)
+            for file in os.listdir(self.config._tpl):
+                path = os.path.join(self.config._tpl, file)
                 dirs = path.split('/')
                 exclude = False
                 for dir in dirs:
@@ -121,7 +121,7 @@ class Template(object):
                                'exist')
 
         if self.is_vcs_template:
-            rmtree(self.config.template)
+            rmtree(self.config._tpl)
 
     def rename(self, root, name):
         '''Rename a file or directory.'''

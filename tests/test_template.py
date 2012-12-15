@@ -22,6 +22,7 @@ class TemplateTests(unittest.TestCase):
         self.config.cli_opts.error = MagicMock(side_effect=Exception)
         self.config.template = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), 'test_template')
+        self.config._tpl = self.config.template
 
     def should_handle_malformed_variables_gracefully(self):
         self.config.variables = 'this,is.wrong'
@@ -107,6 +108,7 @@ class TemplateTests(unittest.TestCase):
 
         # Now attempt to clone but patch for Exception throw
         self.config.template = 'git+' + git_dir
+        self.config._tpl = git_dir
         t = Template(self.config)
         t.copy_template()
 
