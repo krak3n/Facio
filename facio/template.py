@@ -117,6 +117,8 @@ class Template(object):
                         copy(path, self.project_root)
             self.swap_placeholders()
         else:
+            import ipdb
+            ipdb.set_trace()
             self.config._error('Unable to copy template, directory does not '
                                'exist')
 
