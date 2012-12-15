@@ -1,5 +1,6 @@
 import sys
 
+from facio import config
 from facio.config import Config
 from mock import PropertyMock, patch
 from StringIO import StringIO
@@ -101,49 +102,50 @@ class ConfigTests(BaseTestCase):
         else:
             assert False
 
-#    def should_not_exit_when_venv_create_set_venv_path_set(self):
-#        try:
-#            self._set_cli_args(self.base_args + ['--venv_create',
-#                                                 '--venv_path',
-#                                                 '/some/path'])
-#        except SystemExit:
-#            assert False
-#        else:
-#            assert True
-#
-#    def ensure_valid_template_is_chosen_from_config(self):
-#        config.raw_input = lambda _: '2'
-#        try:
-#            self._set_cli_args(self.base_args + ['-c', ])
-#            self.config = Config()
-#            self.assertEquals(self.config.template, '/path/to/template')
-#        except SystemExit:
-#            pass  # We allow a pass here because the template path is invalid
-#
-#    def should_fail_if_invalid_template_choice(self):
-#        config.raw_input = lambda _: '8'
-#        try:
-#            self._set_cli_args(self.base_args + ['-c', ])
-#            self.config = Config()
-#        except SystemExit:
-#            assert True
-#
-#    def ensure_value_error_raised_on_zero_template_choice(self):
-#        config.raw_input = lambda _: '0'
-#        try:
-#            self._set_cli_args(self.base_args + ['-c', ])
-#            self.config = Config()
-#        except SystemExit:
-#            assert True
-#
-#    def should_cache_django_secret_key(self):
-#        sys.argv = sys.argv + self.base_args
-#        self.config = Config()
-#        key = self.config.django_secret_key
-#        self.assertEquals(key, self.config.generated_django_secret_key)
-#
-#    def should_return_cached_version_of_secret_key(self):
-#        sys.argv = sys.argv + self.base_args
-#        self.config = Config()
-#        self.config.generated_django_secret_key = 'this_is_cached'
-#        self.assertEquals(self.config.django_secret_key, 'this_is_cached')
+    def should_not_exit_when_venv_create_set_venv_path_set(self):
+        try:
+            self._set_cli_args(self.base_args + ['--venv_create',
+                                                 '--venv_path',
+                                                 '/some/path'])
+            self.assertTrue(self.config.venv_create)
+        except SystemExit:
+            assert False
+        else:
+            assert True
+
+    def ensure_valid_template_is_chosen_from_config(self):
+        config.raw_input = lambda _: '2'
+        try:
+            self._set_cli_args(self.base_args + ['-c', ])
+            self.config = Config()
+            self.assertEquals(self.config.template, '/path/to/template')
+        except SystemExit:
+            pass  # We allow a pass here because the template path is invalid
+
+    def should_fail_if_invalid_template_choice(self):
+        config.raw_input = lambda _: '8'
+        try:
+            self._set_cli_args(self.base_args + ['-c', ])
+            self.config = Config()
+        except SystemExit:
+            assert True
+
+    def ensure_value_error_raised_on_zero_template_choice(self):
+        config.raw_input = lambda _: '0'
+        try:
+            self._set_cli_args(self.base_args + ['-c', ])
+            self.config = Config()
+        except SystemExit:
+            assert True
+
+    def should_cache_django_secret_key(self):
+        sys.argv = sys.argv + self.base_args
+        self.config = Config()
+        key = self.config.django_secret_key
+        self.assertEquals(key, self.config.generated_django_secret_key)
+
+    def should_return_cached_version_of_secret_key(self):
+        sys.argv = sys.argv + self.base_args
+        self.config = Config()
+        self.config.generated_django_secret_key = 'this_is_cached'
+        self.assertEquals(self.config.django_secret_key, 'this_is_cached')
