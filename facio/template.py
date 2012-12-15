@@ -69,9 +69,12 @@ class Template(object):
             os.mkdir(self.project_root)
             if not os.path.isdir(self.project_root):
                 self.config._error('Error creating project directory')
+                return False
         else:
             self.config._error('%s already exists' % (
                 self.project_root))
+            return False
+        return True
 
     def set_template_variables(self):
         ''' Replace self.place_holders defaults w/ config values. '''
@@ -102,23 +105,22 @@ class Template(object):
         '''Moves template into current working dir.'''
 
         if os.path.isdir(self.config._tpl):
-            self.make_project_dir()
-            for file in os.listdir(self.config._tpl):
-                path = os.path.join(self.config._tpl, file)
-                dirs = path.split('/')
-                exclude = False
-                for dir in dirs:
-                    if dir in self.exclude_dirs:
-                        exclude = True
-                if not exclude:
-                    if os.path.isdir(path):
-                        copytree(path, os.path.join(self.project_root, file))
-                    else:
-                        copy(path, self.project_root)
+            if self.make_project_dir():
+                for file in os.listdir(self.config._tpl):
+                    path = os.path.join(self.config._tpl, file)
+                    dirs = path.split('/')
+                    exclude = False
+                    for dir in dirs:
+                        if dir in self.exclude_dirs:
+                            exclude = True
+                    if not exclude:
+                        if os.path.isdir(path):
+                            copytree(path, os.path.join(self.project_root,
+                                                        file))
+                        else:
+                            copy(path, self.project_root)
             self.swap_placeholders()
         else:
-            import ipdb
-            ipdb.set_trace()
             self.config._error('Unable to copy template, directory does not '
                                'exist')
 
