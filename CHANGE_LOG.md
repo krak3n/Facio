@@ -1,4 +1,4 @@
-# Chnage Log #
+# Change Log #
 
 ## Version 1.0.1 (hotfix) - 6/12/2012 ##
  * Fixed issue where bundled default template was not provided in distribution.

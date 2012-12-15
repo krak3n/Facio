@@ -46,14 +46,15 @@ class Template(object):
         ''' Add custom variables to place holders. '''
 
         # TODO: Needs validation
-        pairs = self.config.variables.split(',')
-        for pair in pairs:
-            try:
-                place_holder, value = pair.split('=')
-            except ValueError:
-                pass  # If its not formatted correctly, we ignore it
-            else:
-                self.place_holders[place_holder] = value
+        if self.config.variables:
+            pairs = self.config.variables.split(',')
+            for pair in pairs:
+                try:
+                    place_holder, value = pair.split('=')
+                except ValueError:
+                    pass  # If its not formatted correctly, we ignore it
+                else:
+                    self.place_holders[place_holder] = value
 
     def set_project_root(self):
         '''Set project root, based on working dir and project name.'''
@@ -67,11 +68,13 @@ class Template(object):
         if not os.path.isdir(self.project_root):
             os.mkdir(self.project_root)
             if not os.path.isdir(self.project_root):
-                self.config.cli_opts.error('Error creating project '
-                                           'directory')
+                self.config._error('Error creating project directory')
+                return False
         else:
-            self.config.cli_opts.error('%s already exists' % (
+            self.config._error('%s already exists' % (
                 self.project_root))
+            return False
+        return True
 
     def set_template_variables(self):
         ''' Replace self.place_holders defaults w/ config values. '''
@@ -96,32 +99,33 @@ class Template(object):
         if self.vcs_cls:
             self.vcs_cls.clone()
             self.is_vcs_template = True
-            self.config.template = self.vcs_cls.tmp_dir
+            self.config._tpl = self.vcs_cls.tmp_dir
 
     def copy_template(self):
         '''Moves template into current working dir.'''
 
-        if os.path.isdir(self.config.template):
-            self.make_project_dir()
-            for file in os.listdir(self.config.template):
-                path = os.path.join(self.config.template, file)
-                dirs = path.split('/')
-                exclude = False
-                for dir in dirs:
-                    if dir in self.exclude_dirs:
-                        exclude = True
-                if not exclude:
-                    if os.path.isdir(path):
-                        copytree(path, os.path.join(self.project_root, file))
-                    else:
-                        copy(path, self.project_root)
+        if os.path.isdir(self.config._tpl):
+            if self.make_project_dir():
+                for file in os.listdir(self.config._tpl):
+                    path = os.path.join(self.config._tpl, file)
+                    dirs = path.split('/')
+                    exclude = False
+                    for dir in dirs:
+                        if dir in self.exclude_dirs:
+                            exclude = True
+                    if not exclude:
+                        if os.path.isdir(path):
+                            copytree(path, os.path.join(self.project_root,
+                                                        file))
+                        else:
+                            copy(path, self.project_root)
             self.swap_placeholders()
         else:
-            self.config.cli_opts.error('Unable to copy template, directory '
-                                       'does not exist')
+            self.config._error('Unable to copy template, directory does not '
+                               'exist')
 
         if self.is_vcs_template:
-            rmtree(self.config.template)
+            rmtree(self.config._tpl)
 
     def rename(self, root, name):
         '''Rename a file or directory.'''
@@ -169,8 +173,8 @@ class Template(object):
         try:
             from jinja2 import Environment, FileSystemLoader
         except ImportError:  # pragma: no cover
-            self.config.cli_opts.error('Jinja2 is required for tempalte '
-                                       'processing, please install it.')
+            self.config._error('Jinja2 is required for tempalte processing, '
+                               'please install it.')
 
         while self.rename_directories():
             continue  # pragma: no cover

@@ -22,6 +22,7 @@ class TemplateTests(unittest.TestCase):
         self.config.cli_opts.error = MagicMock(side_effect=Exception)
         self.config.template = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), 'test_template')
+        self.config._tpl = self.config.template
 
     def should_handle_malformed_variables_gracefully(self):
         self.config.variables = 'this,is.wrong'
@@ -38,35 +39,35 @@ class TemplateTests(unittest.TestCase):
         self.assertTrue('baz' in t.place_holders)
         self.assertEquals(t.place_holders['baz'], '1')
 
+    @patch('os.path.isdir', return_value=True)
+    @patch('facio.config.Config._error')
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
-    def ensure_dir_cannot_be_created_if_already_exists(self, mock_working_dir):
+    def ensure_dir_cannot_be_created_if_already_exists(self, mock_working_dir,
+                                                       mock_error, mock_isdir):
         mock_working_dir.return_value = tempfile.gettempdir()
         tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
         tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
         self.config.project_name = tmp_dir_name
-        try:
-            t = Template(self.config)
-            t.copy_template()
-            rmtree(tmp_dir)
-        except Exception:
-            assert True
-        else:
-            assert False
+        t = Template(self.config)
+        t.copy_template()
+        rmtree(tmp_dir)
 
-        self.config.cli_opts.error.assert_called_with('%s already exists' % (
-            tmp_dir))
+        self.config._error.assert_called_with('%s already exists' % (tmp_dir))
 
     @patch('os.mkdir', return_value=True)
-    def ensure_exception_if_directory_creation_fails(self, mock_os_mkdir):
-        try:
-            t = Template(self.config)
-            t.copy_template()
-        except Exception:
-            assert True
-        else:
-            assert False
+    @patch('facio.config.Config._error')
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
+    def ensure_exception_if_directory_creation_fails(self, mock_working_dir,
+                                                     mock_error,
+                                                     mock_os_mkdir):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
+        tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
+        self.config.project_name = tmp_dir_name
+        t = Template(self.config)
+        t.copy_template()
 
-        self.config.cli_opts.error.assert_called_with(
+        self.config._error.assert_called_with(
             'Error creating project directory')
         mock_os_mkdir.assert_called_with(os.path.join(
             t.working_dir, self.config.project_name))
@@ -107,6 +108,7 @@ class TemplateTests(unittest.TestCase):
 
         # Now attempt to clone but patch for Exception throw
         self.config.template = 'git+' + git_dir
+        self.config._tpl = git_dir
         t = Template(self.config)
         t.copy_template()
 
@@ -127,22 +129,18 @@ class TemplateTests(unittest.TestCase):
             assert False
 
     @patch('os.path.isdir', return_value=False)
+    @patch('facio.config.Config._error')
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def ensure_copy_template_failes_if_dir_does_not_exist(
-            self, mock_working_dir, mock_isdir):
+            self, mock_working_dir, mock_error, mock_isdir):
         mock_working_dir.return_value = tempfile.gettempdir()
         tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
         tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
         self.config.project_name = tmp_dir_name
-        try:
-            t = Template(self.config)
-            t.copy_template()
-        except:
-            self.config.cli_opts.error.assert_called_with(
-                'Unable to copy template, directory does not exist')
-            assert True
-        else:
-            assert False
+        t = Template(self.config)
+        t.copy_template()
+        self.config._error.assert_called_with(
+            'Unable to copy template, directory does not exist')
 
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def ensure_excluded_dirs_are_not_copied(self, mock_working_dir):

@@ -52,16 +52,14 @@ class Install(object):
                       close_fds=True)
             output = p.stdout.read()
             if output == '':
-                self.config.cli_opts.error('Unable to locate python '
-                                           'executable')
+                self.config._error('Unable to locate python executable')
                 return False
             self.executable = output.rstrip()
 
         if not os.path.exists(self.executable):
-            self.config.cli_opts.error('Unable to find python executable at '
-                                       '%s, not able to install %s to the '
-                                       'virtual env' % (self.executable,
-                                                        project))
+            self.config._error('Unable to find python executable at {0}, '
+                               'not able to install %s to the virtual '
+                               'env' % (self.executable, project))
 
         # Check the new package name is not already one installed on the path
         cmd = "%s -c 'import %s'" % (self.executable, project)
@@ -75,8 +73,8 @@ class Install(object):
                 import_error = True
 
         if not import_error:
-            self.config.cli_opts.error('A package with %s name already '
-                                       'exists, cannot install' % (project))
+            self.config._error('A package with %s name already '
+                               'exists, cannot install' % (project))
             return False
 
         # Check the project as a setup.py
@@ -88,8 +86,8 @@ class Install(object):
                 has_setup = True
 
         if not has_setup:
-            self.config.cli_opts.error('There is no setup.py in the project '
-                                       'root, cannot install project.')
+            self.config._error('There is no setup.py in the project root, '
+                               'cannot install project.')
             return False
 
         return True

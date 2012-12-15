@@ -2,233 +2,285 @@
 facio.config
 ------------
 
-Setsmup variables and configuration for Facio from command line and / or
+Sets up variables and configuration for Facio from command line and / or
 a configuration file.
 """
 
 import ConfigParser
 import os
-import re
 import sys
 
 from random import choice
-from facio.opts import Option, OptionParser
+
+from .cli import CLIOptions
 
 
-class Config(object):
+class ConfigFile(object):
 
-    venv_create = False
-    has_config = False
-    force_defaut_template = False
-    choose_template = False
+    templates = {}
 
-    templates = {
-        'default': os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                'default_template'), }
-
-    config_path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
-
-    valid_config_sections = {
+    sections = {
         'misc': ['install', ],
         'template': [],
         'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
-    valid_cl_options = ['project_name', 'install', 'template',
-                        'template_settings_dir', 'choose_template',
-                        'db_create', 'db_user', 'db_pass', 'db_name',
-                        'venv_create', 'venv_path', 'venv_use_site_packages',
-                        'venv_prefix', 'variables']
+    path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
 
-    def __init__(self, use_cfg=True, config_path=None):
-        '''Constructor, setup default properties.'''
-
-        self.use_cfg = use_cfg  # Use ~/.facio.cfg for config
-        if self.use_cfg and config_path:
-            self.config_path = config_path  # Override config_path for tests
-
-        self.load_config()
-        self.set_command_line_options()
-        self.validate()
-
-    def set_command_line_options(self):
-        '''Set command line options.'''
-
-        opt_list = [
-            # Project Name
-            Option('-n', '--name', dest='project_name', action='store',
-                   help='Your project name', required=True, type="string"),
-            # Install the new project onto the path
-            Option('-i', '--install', action='store_true', default=False,
-                   help='Install the project onto your path, e.g '
-                        'python setup.py develop'),
-            # Template Options
-            Option('-t', '--template', dest='template', action='store',
-                   help='Path to your custom template, absolute paths only '
-                        ', git repositories can also be specified by '
-                        'prefixing with git+ for example: git+git@gitbub.com'
-                        '/path/to/repo.git', type="string"),
-            Option('-s', '--template_settings_dir', action='store',
-                   help='Template settings directory name', type="string"),
-            Option('-c', '--choose_template', dest='choose_template',
-                   help="If you have more than 1 template defined use this "
-                        "flag to override the default template, Note: "
-                        "specifying -t (--template) will mean this "
-                        "flag is ignored.", action='store_true', default=None),
-            # Virtual Env Options
-            Option('-E', '--venv_create', dest='venv_create',
-                   action='store_true', default=None,
-                   help='Create python virtual environment'),
-            Option('-P', '--venv_path', dest='venv_path', action='store',
-                   help='Python Virtualenv home directory', type='string'),
-            Option('-S', '--venv_use_site_packages',
-                   dest='venv_use_site_packages', action='store_true',
-                   default=None, help='Create python vittual environment '
-                                      'without --no-site-packages'),
-            Option('--vars', dest='variables', action='store', default=None,
-                   help='Custom variables, e.g --vars hello=world,sky=blue'),
-            Option('-x', '--venv_prefix', dest='venv_prefix', action='store',
-                   help='Virtual environment prefix', type='string')]
-
-        self.cli_opts = OptionParser(option_list=opt_list)
-        self.set_attributes_from_command_line()
-
-    def set_attributes_from_command_line(self):
-        '''Set attibutes that have been parsed via command line.'''
-
-        (cl_options, cl_args) = self.cli_opts.parse_args()
-
-        for option in self.valid_cl_options:
-            value = getattr(cl_options, option, None)
-            if value:
-                if option == 'template':
-                    self.templates['default'] = value
-                    self.force_defaut_template = True
-                else:
-                    setattr(self, option, value)
-
-    def load_config(self):
-        '''Load users facio.cfg if exists.'''
-
-        if os.path.isfile(self.config_path) and self.use_cfg:
-            self.config_parser = ConfigParser.ConfigParser()
-            self.config_parser.read(self.config_path)
-            self.read_config()
-            self.has_config = True
-
-    def read_config(self):
-        '''Read the facio.cfg file and store values.'''
-
-        for section in self.config_parser.sections():
-            if section in self.valid_config_sections:
-                if section == 'template':
-                    self.set_template_options(self.config_parser.items(
-                                              'template'))
-                else:
-                    self.set_attributes(
-                        self.valid_config_sections[section],
-                        self.config_parser.items(section)
-                    )
-
-    def set_template_options(self, items):
-        '''Set template options for template choices
-        @arg1 list: a list of tuples containing config option name / value
-        '''
-
-        if not type(items) == list:
-            self.cli_opts.error('It appears the template section in your '
-                                '.facio.cfg is not configured correctly')
+    def __init__(self):
+        if os.path.isfile(self.path):
+            self._parse_config()
         else:
-            for item in items:
-                name, value = item
-                self.templates[name] = value
+            self.cfg_loaded = False
 
-    def set_attributes(self, valid_settings, items):
-        '''Set class attributes based on valid settings and parsed
-        items, items should be the following format:
-            [('setting1', 'value1'), [('setting2', 'value2')]
-        In, other words, a list of tuples.
-        @arg1 list: list of valid settings
-        @arg2 list: a list of tuples containing name and value
-        '''
-
-        if not type(valid_settings) == list and not type(items) == list:
-            self.cli_opts.error('It appears the your .facio.cfg is not '
-                                'configured correctly')
+    def _parse_config(self):
+        self.parser = ConfigParser.ConfigParser()
+        try:
+            self.parser.read(self.path)
+        except ConfigParser.MissingSectionHeaderError:
+            self.cfg_loaded = False
+            # TODO: print warning to user
+        except ConfigParser.ParsingError:
+            # TODO: print warning to user
+            self.cfg_loaded = False
         else:
-            for item in items:
-                setting, value = item
-                if setting in valid_settings:
-                    if value == '0' or value == '1':
-                        value = False if value == '0' else True
-                    setattr(self, setting, value)
+            self.cfg_loaded = True
+            for section in self.sections:
+                try:
+                    items = self.parser.items(section)
+                except ConfigParser.NoSectionError:
+                    pass
+                else:
+                    if section == 'template':
+                        self._add_templates(items)
+                    else:
+                        self._set_attributes(section, items)
 
-    def validate(self):
-        '''Valid provided configuration options.'''
+    def _add_templates(self, items):
+        for item in items:
+            name, value = item
+            self.templates[name] = value
 
-        self.validate_project_name()
-        self.validate_template_options()
-        self.validate_virtualenv()
+    def _set_attributes(self, section, items):
+        opts = self.sections[section]
+        for opt in opts:
+            try:
+                opt, val = [(x, y) for x, y in items if x == opt][0]
+            except IndexError:
+                pass
+            else:
+                if val == '0' or val == '1':
+                    val = False if val == '0' else True
+                setattr(self, opt, val)
 
-    def validate_project_name(self):
-        ''' Ensure the project name is alpha numeric and only allows
-        userscores. '''
 
-        if not re.match('^\w+$', self.project_name):
-            self.cli_opts.error('Project names can only contain numbers'
-                                'letters and underscores')
+class Config(object):
 
-    def validate_virtualenv(self):
-        ''' Validate virtualenv settings.'''
+    default_template = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'default_template')
 
-        path = getattr(self, 'venv_path', None)
-        venv_create = getattr(self, 'venv_create', None)
-        if venv_create and not path:
-            self.cli_opts.error('You need to provide a virtualenv path '
-                                'where the venv will be created')
+    def __init__(self):
+        self.cli_args = CLIOptions()
+        self.file_args = ConfigFile()
+        self.django_secret_key
 
-    def prompt_template_choice(self):
-        '''If the user has multiple templates, prompt them to pick'''
+    def _error(self, msg):
+        self.cli_args._parser.error(msg)
 
-        sys.stdout.write("Please choose a template:\n\n")
-        i = 0
-        for name in self.templates:
-            template = self.templates[name]
-            sys.stdout.write("%d) %s: %s\n" % ((i + 1), name, template))
-            i += 1
-        template_list = list(self.templates)
+    #
+    # Project Properties
+    #
+
+    @property
+    def project_name(self):
+        return self.cli_args.project_name
+
+    #
+    # Template Properties
+    #
+
+    def _validate_template_options(self):
+        if (not self._tpl.startswith('git+') and
+                not os.path.isdir(self._tpl)):
+            self._error('The path to your template does not exist.')
+
+    def _template_choice_prompt(self):
+        templates = self.file_args.templates
         max_tries = 5
+        template_list = list(templates)
+        i = 0
+        sys.stdout.write("Please choose a template:\n\n")
+        for name in templates:
+            template = templates[name]
+            sys.stdout.write("{0}) {1}: {2}\n".format((i + 1), name, template))
+            i += 1
         i = 1
         while True:
             if i > max_tries:
-                self.cli_opts.error('You failed to enter a valid template '
-                                    'number.')
+                self._error('You failed to enter a valid template number.')
             try:
-                num = int(raw_input('\nEnter the number for the template '
-                                    '(%d of %d tries): ' % (i, max_tries)))
+                num = int(raw_input(
+                    '\nEnter the number for the template '
+                    '({0} of {1} tries): '.format(i, max_tries)))
                 if num == 0:
                     raise ValueError
-                template = self.templates[template_list[num - 1]]
+                template = templates[template_list[num - 1]]
             except (ValueError, IndexError):
                 sys.stdout.write('\nPlease choose a number between 1 and '
-                                 '%d\n' % len(template_list))
+                                 '{0}\n'.format(len(template_list)))
                 i += 1
             else:
                 return template
 
-    def validate_template_options(self):
-        '''Validate template options.'''
+    @property
+    def _cli_template(self):
+        try:
+            return self.cli_args.template
+        except AttributeError:
+            return False
 
-        if (self.force_defaut_template or len(self.templates) == 1
-                or not self.choose_template):
-            self.template = self.templates['default']
-        else:
-            self.template = self.prompt_template_choice()
+    @property
+    def _cli_choose_template(self):
+        try:
+            return self.cli_args.choose_template
+        except AttributeError:
+            return False
 
-        if (not self.template.startswith('git+') and
-                not os.path.isdir(self.template)):
-            self.cli_opts.error('The path to your template does not '
-                                'exist.')
+    @property
+    def template(self):
+        if not getattr(self, '_tpl', None):
+            if self._cli_template:
+                self._tpl = self._cli_template
+            elif self._cli_choose_template:
+                self._tpl = self._template_choice_prompt()
+            else:
+                try:
+                    self._tpl = self.file_args.templates['default']
+                except KeyError:
+                    self._tpl = self.default_template
+        self._validate_template_options()
+        return self._tpl
+
+    @property
+    def template_settings_dir(self):
+        try:
+            return self.cli_args.template_settings_dir
+        except AssertionError:
+            return False
+
+    @property
+    def variables(self):
+        try:
+            return self.cli_args.variables
+        except AssertionError:
+            return False
+
+    #
+    # Python Properties (Experimental)
+    #
+
+    @property
+    def _file_args_install(self):
+        try:
+            return self.file_args.install
+        except AttributeError:
+            return False
+
+    @property
+    def _cli_args_install(self):
+        try:
+            return self.cli_args.install
+        except AttributeError:
+            return False
+
+    @property
+    def install(self):
+        if self._cli_args_install or self._file_args_install:
+            return True
+        return False
+    #
+    # Virtual Environment Properties (Experimental)
+    #
+
+    def _validate_virtualenv_options(self):
+        if not self.venv_path:
+            self._error('You need to provide a virtualenv path where the '
+                        'venv will be created')
+
+    @property
+    def _file_args_venv_create(self):
+        try:
+            return self.file_args.venv_create
+        except AttributeError:
+            return False
+
+    @property
+    def _cli_args_venv_create(self):
+        try:
+            return self.cli_args.venv_create
+        except AttributeError:
+            return False
+
+    @property
+    def _file_args_venv_path(self):
+        try:
+            return self.file_args.venv_path
+        except AttributeError:
+            return False
+
+    @property
+    def _cli_args_venv_path(self):
+        try:
+            return self.cli_args.venv_path
+        except AttributeError:
+            return False
+
+    @property
+    def _file_args_venv_use_site_packages(self):
+        try:
+            return self.file_args.venv_use_site_packages
+        except AttributeError:
+            return False
+
+    @property
+    def _cli_args_venv_use_site_packages(self):
+        try:
+            return self.cli_args.venv_use_site_packages
+        except AttributeError:
+            return False
+
+    @property
+    def venv_create(self):
+        if self._cli_args_venv_create or self._file_args_venv_create:
+            self._validate_virtualenv_options()
+            return True
+        return False
+
+    @property
+    def venv_path(self):
+        if self._file_args_venv_path and not self._cli_args_venv_path:
+            return self._file_args_venv_path
+        elif self._cli_args_venv_path:
+            return self.cli_args.venv_path
+        return False
+
+    @property
+    def venv_use_site_packages(self):
+        if (self._cli_args_venv_use_site_packages
+                or self._file_args_venv_use_site_packages):
+            return True
+        return False
+
+    @property
+    def venv_prefix(self):
+        try:
+            return self.cli_args.venv_prefix
+        except AttributeError:
+            return False
+
+    #
+    # Django Secret Key Generation
+    #
 
     @property
     def django_secret_key(self):
