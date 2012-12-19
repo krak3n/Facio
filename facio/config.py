@@ -11,7 +11,7 @@ import os
 import sys
 
 from clint.textui import puts, indent
-from clint.textui.colored import yellow
+from clint.textui.colored import blue
 from random import choice
 
 from .cli import CLIOptions
@@ -48,7 +48,7 @@ class ConfigFile(object):
         else:
             self.cfg_loaded = True
             with indent(4, quote=' >'):
-                puts(yellow('Loaded ~/.facio.cfg'))
+                puts(blue('Loaded ~/.facio.cfg'))
             for section in self.sections:
                 try:
                     items = self.parser.items(section)

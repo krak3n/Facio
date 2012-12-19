@@ -9,6 +9,7 @@ the template.
 __version__ = '1.0.1'
 
 from clint.textui import puts
+from clint.textui.colored import green
 
 from .config import Config
 from .install import Install
@@ -39,3 +40,5 @@ class Facio(object):
                 self.install = Install(self.config,
                                        self.template,
                                        getattr(self, 'venv', None))
+
+        puts(green('Done.'))
