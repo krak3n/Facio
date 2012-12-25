@@ -8,7 +8,7 @@ the template.
 
 __version__ = '1.0.1'
 
-from clint.textui import puts
+from clint.textui import puts, indent
 from clint.textui.colored import green
 
 from .config import Config
@@ -41,4 +41,5 @@ class Facio(object):
                                        self.template,
                                        getattr(self, 'venv', None))
 
-        puts(green('Done.'))
+        with indent(4, quote=' >'):
+            puts(green('Done'))
