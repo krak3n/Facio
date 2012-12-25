@@ -21,7 +21,7 @@ class Git(object):
         self.template_path = template_path
         with indent(4, quote=' >'):
             puts(blue('Cloning template using Git from: {0}'.format(
-                self.repo())))
+                self.repo)))
 
     @property
     def repo(self):

@@ -17,15 +17,19 @@ class ConfigTests(BaseTestCase):
         """ Config Test Setup
         Mocking stdout / stdin / stderr """
 
-        self._old_sys_argv = sys.argv
-        sys.argv = [self._old_sys_argv[0].replace('nosetests', 'facio')]
-
+        self.puts_patch = patch('facio.config.puts',
+                                stream=StringIO)
         self.stdout_patch = patch('sys.stdout', new_callable=StringIO)
         self.stderr_patch = patch('sys.stderr', new_callable=StringIO)
         self.stdin_patch = patch('sys.stdout', new_callable=StringIO)
+
+        self.puts = self.puts_patch.start()
         self.stdout = self.stdout_patch.start()
         self.stderr = self.stderr_patch.start()
         self.stdin = self.stdin_patch.start()
+
+        self._old_sys_argv = sys.argv
+        sys.argv = [self._old_sys_argv[0].replace('nosetests', 'facio')]
 
     def tearDown(self):
         sys.argv = self._old_sys_argv
@@ -52,11 +56,13 @@ class ConfigTests(BaseTestCase):
         self.assertFalse(c.file_args.cfg_loaded)
 
     @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    def test_cfg_is_loaded(self, mock_path):
+    @patch('facio.config.blue')
+    def test_cfg_is_loaded(self, mock_blue, mock_path):
         sys.argv = sys.argv + self.base_args
         mock_path.return_value = self.empty_cfg
         c = Config()
 
+        mock_blue.assert_called_with('Loaded ~/.facio.cfg')
         self.assertTrue(c.file_args.cfg_loaded)
 
     def ensure_valid_project_name(self):

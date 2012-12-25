@@ -23,6 +23,12 @@ class TemplateTests(unittest.TestCase):
         self.config.template = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), 'test_template')
         self.config._tpl = self.config.template
+        self.puts_patch = patch('facio.template.puts',
+                                stream=StringIO)
+        self.puts_patch.start()
+        self.puts_patch_vcs = patch('facio.vcs.git_vcs.puts',
+                                    stream=StringIO)
+        self.puts_patch_vcs.start()
 
     def should_handle_malformed_variables_gracefully(self):
         self.config.variables = 'this,is.wrong'
