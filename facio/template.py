@@ -159,9 +159,6 @@ class Template(object):
     def rename_directories(self):
         '''Move directories with placeholder names.'''
 
-        with indent(4, quote=' >'):
-            puts(blue('Renaming directories'))
-
         for root, dirs, files in os.walk(self.project_root):
             for d in dirs:
                 filepath = os.path.join(root, d)
@@ -172,9 +169,6 @@ class Template(object):
 
     def rename_files(self):
         '''Move files with placeholder names.'''
-
-        with indent(4, quote=' >'):
-            puts(blue('Renaming files'))
 
         for root, dirs, files in os.walk(self.project_root):
             for f in files:
@@ -193,8 +187,14 @@ class Template(object):
             self.config._error('Jinja2 is required for tempalte processing, '
                                'please install it.')
 
+        with indent(4, quote=' >'):
+            puts(blue('Renaming directories'))
+
         while self.rename_directories():
             continue  # pragma: no cover
+
+        with indent(4, quote=' >'):
+            puts(blue('Renaming files'))
 
         while self.rename_files():
             continue  # pragma: no cover
