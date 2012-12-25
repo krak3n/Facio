@@ -8,6 +8,9 @@ the template.
 
 __version__ = '1.0.1'
 
+from clint.textui import puts, indent
+from clint.textui.colored import green
+
 from .config import Config
 from .install import Install
 from .template import Template
@@ -18,6 +21,9 @@ class Facio(object):
 
     def __init__(self):
         '''Constructor, fires all required methods.'''
+
+        with indent(4, quote=' >'):
+            puts(green('Starting'))
 
         # Basic Skeleton Generation
         self.config = Config()
@@ -34,3 +40,6 @@ class Facio(object):
                 self.install = Install(self.config,
                                        self.template,
                                        getattr(self, 'venv', None))
+
+        with indent(4, quote=' >'):
+            puts(green('Done'))

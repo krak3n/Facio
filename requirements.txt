@@ -1,6 +1,8 @@
 GitPython==0.3.2.RC1
 Jinja2==2.6
+Pygments==1.5
 async==0.6.1
+clint2==0.3.2
 coverage==3.5.2
 figleaf==0.6.1
 flake8==1.4

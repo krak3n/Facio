@@ -9,6 +9,8 @@ working directory.
 import os
 import re
 
+from clint.textui import puts, indent
+from clint.textui.colored import blue, yellow
 from shutil import copytree, move, rmtree, copy
 
 from .vcs.git_vcs import Git
@@ -40,7 +42,11 @@ class Template(object):
 
     @property
     def working_dir(self):
-        return os.popen('pwd').read().split()[0]
+        try:
+            return self._working_dir
+        except AttributeError:
+            self._working_dir = os.popen('pwd').read().split()[0]
+            return self._working_dir
 
     def add_custom_vars(self):
         ''' Add custom variables to place holders. '''
@@ -61,6 +67,8 @@ class Template(object):
 
         self.project_root = os.path.join(self.working_dir,
                                          self.config.project_name)
+        with indent(4, quote=' >'):
+            puts(blue('Project path: {0}'.format(self.project_root)))
 
     def make_project_dir(self):
         '''Make the project director in current working directory.'''
@@ -103,6 +111,9 @@ class Template(object):
 
     def copy_template(self):
         '''Moves template into current working dir.'''
+
+        with indent(4, quote=' >'):
+            puts(blue('Copying template to Project Path'))
 
         if os.path.isdir(self.config._tpl):
             if self.make_project_dir():
@@ -148,6 +159,9 @@ class Template(object):
     def rename_directories(self):
         '''Move directories with placeholder names.'''
 
+        with indent(4, quote=' >'):
+            puts(blue('Renaming directories'))
+
         for root, dirs, files in os.walk(self.project_root):
             for d in dirs:
                 filepath = os.path.join(root, d)
@@ -158,6 +172,9 @@ class Template(object):
 
     def rename_files(self):
         '''Move files with placeholder names.'''
+
+        with indent(4, quote=' >'):
+            puts(blue('Renaming files'))
 
         for root, dirs, files in os.walk(self.project_root):
             for f in files:
@@ -182,6 +199,9 @@ class Template(object):
         while self.rename_files():
             continue  # pragma: no cover
 
+        with indent(4, quote=' >'):
+            puts(blue('Replacing placeholders with variables'))
+
         for root, dirs, files in os.walk(self.project_root):
             jinja_tpl_loader = FileSystemLoader(root)
             jinja_env = Environment(loader=jinja_tpl_loader)
@@ -199,4 +219,7 @@ class Template(object):
                         with open(filepath, 'w') as f:
                             f.write(file_contents)
                     except Exception, e:
-                        print 'Warning: Failed to process %s: %s' % (f, e)
+                        with indent(4, quote=' >'):
+                            puts(yellow(
+                                'Warning: Failed to process '
+                                '{0}: {1}'.format(f, e)))
