@@ -219,4 +219,7 @@ class Template(object):
                         with open(filepath, 'w') as f:
                             f.write(file_contents)
                     except Exception, e:
-                        print 'Warning: Failed to process %s: %s' % (f, e)
+                        with indent(4, quote=' >'):
+                            puts(yellow(
+                                'Warning: Failed to process '
+                                '{0}: {1}'.format(f, e)))
