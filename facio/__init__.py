@@ -22,8 +22,8 @@ class Facio(object):
     def __init__(self):
         '''Constructor, fires all required methods.'''
 
-        puts('Facio - Project scaffolfding')
-        puts('----------------------------')
+        with indent(4, quote=' >'):
+            puts(green('Starting'))
 
         # Basic Skeleton Generation
         self.config = Config()
