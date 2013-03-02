@@ -12,6 +12,7 @@ import re
 from clint.textui import puts, indent
 from clint.textui.colored import blue, yellow
 from shutil import copytree, move, rmtree, copy
+from codecs import open
 
 from .vcs.git_vcs import Git
 
@@ -216,7 +217,7 @@ class Template(object):
                     try:
                         tpl = jinja_env.get_template(f)
                         file_contents = tpl.render(self.place_holders)
-                        with open(filepath, 'w') as f:
+                        with open(filepath, 'w', encoding='utf8') as f:
                             f.write(file_contents)
                     except Exception, e:
                         with indent(4, quote=' >'):
