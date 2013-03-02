@@ -10,6 +10,7 @@ import os
 import re
 
 from shutil import copytree, move, rmtree, copy
+from codecs import open
 
 from .vcs.git_vcs import Git
 
@@ -192,7 +193,7 @@ class Template(object):
                     try:
                         tpl = jinja_env.get_template(f)
                         file_contents = tpl.render(self.place_holders)
-                        with open(filepath, 'w') as f:
+                        with open(filepath, 'w', encoding='utf8') as f:
                             f.write(file_contents)
                     except Exception, e:
                         print 'Warning: Failed to process %s: %s' % (f, e)
