@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Facio Documentation
-=====================
+===================
 
 Facio: /ˈfa.ki.oː/ - Latin, meaning to make, do, act, perform, cause, bring about.
 
