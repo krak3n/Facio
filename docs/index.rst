@@ -3,15 +3,33 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Facio's documentation!
-=================================
+Facio Documentation
+=====================
 
-Contents:
+Facio: /ˈfa.ki.oː/ - Latin, meaning to make, do, act, perform, cause, bring about.
+
+What is it?
+-----------
+
+If you work on quick turn around projects either at work or in your free time you might end up doing a lot of boiler plate cruft for your projects over and over, creating the same basic template. You might copy and paste this around, it might fall out of date, you might make improvements in a project but forget about them for the next.
+
+`Facio` gives you the ability to create a standard template (or templates) for your projects so you can bootstrap in one single command.
+
+Originally developed with `Django`_ in mind you can use `Facio` for any type of project.
+
+Build Status
+------------
+
+Master Branch |travis_master|
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Master is the most stable version of the source code. If this is broken you probably shouldn't pip install.
+
+Develop Branch |travis_develop|
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Develop is where active code changes take place so this is liable to break now and then.
 
 .. toctree::
    :maxdepth: 2
-
-
 
 Indices and tables
 ==================
@@ -20,3 +38,11 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+.. Links
+.. _Django: https://www.djangoproject.com/
+
+.. Images
+.. |travis_master| image:: https://travis-ci.org/krak3n/Facio.png?branch=master
+    :height: 18px
+.. |travis_develop| image:: https://travis-ci.org/krak3n/Facio.png?branch=develop
+    :height: 18px
