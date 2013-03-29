@@ -28,7 +28,8 @@ pythonbrew_bashrc:
     - require:
       - cmd.run: pythonbrew_install
 
-{% for version in '2.6', '2.7', '3.2' %}
+{# Ubuntu 12.04 Python Version is 2.7 #}
+{% for version in '2.6', '3.2' %}
 install_py{{ version }}:
   cmd:
     - run
