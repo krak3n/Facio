@@ -53,12 +53,38 @@
             
   <div class="section" id="installing">
 <h1>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="pip-easy-install">
-<h2>Pip / Easy Install<a class="headerlink" href="#pip-easy-install" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">Facio</span></tt> is available from PyPi so can be installed directly from <tt class="docutils literal"><span class="pre">easy_install</span></tt> and <tt class="docutils literal"><span class="pre">pip</span></tt>.</p>
+<p>Factio can be installed on system using the standard python package installers
+<tt class="docutils literal"><span class="pre">pip</span></tt> and <tt class="docutils literal"><span class="pre">easy_install</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal"><span class="pre">sudo</span></tt> is used in the following commands for system wide installation.</p>
+</div>
+<div class="section" id="easy-install">
+<h2>Easy Install<a class="headerlink" href="#easy-install" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">easy_install</span> <span class="pre">facio</span></tt></p>
-<p>or</p>
+</div>
+<div class="section" id="pip">
+<h2>Pip<a class="headerlink" href="#pip" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">facio</span></tt></p>
+</div>
+<div class="section" id="manual">
+<h2>Manual<a class="headerlink" href="#manual" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none"><div class="highlight"><pre>cd /where/you/want/it/to/live
+git clone git@github.com:krak3n/facio.git
+cd facio
+sudo python setup.py install
+</pre></div>
+</div>
+</div>
+<div class="section" id="verify-install">
+<h2>Verify Install<a class="headerlink" href="#verify-install" title="Permalink to this headline">¶</a></h2>
+<p>Once you have installed <tt class="docutils literal"><span class="pre">Facio</span></tt> using one of the above methods you can very
+the install by checking that the <tt class="docutils literal"><span class="pre">facio</span></tt> script was installed by running:</p>
+<div class="highlight-none"><div class="highlight"><pre>which facio
+&gt; /usr/local/bin/facio
+</pre></div>
+</div>
+<p>If all went well <tt class="docutils literal"><span class="pre">facio</span></tt> is now available from your command line.</p>
 </div>
 </div>
 
@@ -71,7 +97,10 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Installing</a><ul>
-<li><a class="reference internal" href="#pip-easy-install">Pip / Easy Install</a></li>
+<li><a class="reference internal" href="#easy-install">Easy Install</a></li>
+<li><a class="reference internal" href="#pip">Pip</a></li>
+<li><a class="reference internal" href="#manual">Manual</a></li>
+<li><a class="reference internal" href="#verify-install">Verify Install</a></li>
 </ul>
 </li>
 </ul>
