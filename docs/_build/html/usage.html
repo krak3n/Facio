@@ -157,6 +157,58 @@ for example: <a class="reference external" href="mailto:git+git&#37;&#52;&#48;gi
 <div class="section" id="configuration-file">
 <h3>Configuration File<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h3>
 <p>Most things you can specify as command line options are also configurable in a <tt class="docutils literal"><span class="pre">facio.cfg</span></tt> file, this should live in your home directory and be prefixed with a <tt class="docutils literal"><span class="pre">.</span></tt>, for example <tt class="docutils literal"><span class="pre">/home/you/.facio.cfg</span></tt>.</p>
+<div class="section" id="example-facio-cfg">
+<h4>Example <tt class="docutils literal"><span class="pre">~/.facio.cfg</span></tt><a class="headerlink" href="#example-facio-cfg" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="docutils literal"><span class="pre">~/.facio.cfg</span></tt> file uses <tt class="docutils literal"><span class="pre">ini</span></tt> style formatting.</p>
+<div class="highlight-none"><div class="highlight"><pre>[template]
+# The Default Template to user (can be a git repp, prefix with git+url_to_repo
+default=/home/me/my_custom_template/
+# Add other templates here, for example:
+experimental_template: /my/new/template/
+flask: git+git@github.com/my_flask_template.git
+
+[misc]
+install=0 # Experimental
+
+# Experimental
+[virutalenv]
+venv_create=1
+venv_path=/home/me/.virtualenvs/
+</pre></div>
+</div>
+<p>Above is an example <tt class="docutils literal"><span class="pre">~/.facio.cfg</span></tt> file and contains a <tt class="docutils literal"><span class="pre">[misc]</span></tt>, <tt class="docutils literal"><span class="pre">[virtualenv]</span></tt>, and <tt class="docutils literal"><span class="pre">[template]</span></tt> sections. These sections and their allowed options allow you set defaults so when you run <tt class="docutils literal"><span class="pre">facio</span></tt> form the command line you need to keep specifying things like template path and virtual environment creation.</p>
+</div>
+<div class="section" id="available-options">
+<h4>Available Options<a class="headerlink" href="#available-options" title="Permalink to this headline">¶</a></h4>
+<ul>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">[template]</span></tt></dt>
+<dd><ul class="first last simple">
+<li><strong>default</strong>: Path to your custom template, prefix with <tt class="docutils literal"><span class="pre">git+</span></tt> to define git repository path.</li>
+<li><strong>other_template</strong>: Path to other template</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">[misc]</span></tt></dt>
+<dd><ul class="first last simple">
+<li><strong>install</strong>: 0 or 1 - Run <tt class="docutils literal"><span class="pre">setup.py</span></tt> to install project onto python path using <tt class="docutils literal"><span class="pre">setup.py</span> <span class="pre">develop</span></tt></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">[virtualenv]</span></tt></dt>
+<dd><ul class="first last simple">
+<li><strong>venv_create</strong>: 0 or 1 - Create python virtual environment</li>
+<li><strong>venv_path</strong>: Path to python virtual environments home, e.g <tt class="docutils literal"><span class="pre">/home/me/.virtualenvs/</span></tt></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -178,7 +230,11 @@ for example: <a class="reference external" href="mailto:git+git&#37;&#52;&#48;gi
 <li><a class="reference internal" href="#experimental-options">Experimental Options</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#configuration-file">Configuration File</a></li>
+<li><a class="reference internal" href="#configuration-file">Configuration File</a><ul>
+<li><a class="reference internal" href="#example-facio-cfg">Example <tt class="docutils literal"><span class="pre">~/.facio.cfg</span></tt></a></li>
+<li><a class="reference internal" href="#available-options">Available Options</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

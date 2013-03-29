@@ -77,3 +77,39 @@ Configuration File
 ^^^^^^^^^^^^^^^^^^
 
 Most things you can specify as command line options are also configurable in a ``facio.cfg`` file, this should live in your home directory and be prefixed with a ``.``, for example ``/home/you/.facio.cfg``.
+
+Example ``~/.facio.cfg``
+************************
+
+The ``~/.facio.cfg`` file uses ``ini`` style formatting.
+
+.. code-block:: none
+
+    [template]
+    # The Default Template to user (can be a git repp, prefix with git+url_to_repo
+    default=/home/me/my_custom_template/
+    # Add other templates here, for example:
+    experimental_template: /my/new/template/
+    flask: git+git@github.com/my_flask_template.git
+
+    [misc]
+    install=0 # Experimental
+
+    # Experimental
+    [virutalenv]
+    venv_create=1
+    venv_path=/home/me/.virtualenvs/
+
+Above is an example ``~/.facio.cfg`` file and contains a ``[misc]``, ``[virtualenv]``, and ``[template]`` sections. These sections and their allowed options allow you set defaults so when you run ``facio`` form the command line you need to keep specifying things like template path and virtual environment creation.
+
+Available Options
+*****************
+
+* ``[template]``
+    * **default**: Path to your custom template, prefix with ``git+`` to define git repository path.
+    * **other_template**: Path to other template
+* ``[misc]``
+    * **install**: 0 or 1 - Run ``setup.py`` to install project onto python path using ``setup.py develop``
+* ``[virtualenv]``
+    * **venv_create**: 0 or 1 - Create python virtual environment
+    * **venv_path**: Path to python virtual environments home, e.g ``/home/me/.virtualenvs/``
