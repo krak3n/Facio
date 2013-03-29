@@ -8,5 +8,6 @@ base:
     - misc
     - python
     - facio
+    - developer
 
 # vim: set filetype=sls:
