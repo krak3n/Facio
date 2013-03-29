@@ -46,6 +46,7 @@ Topics
 
     installing
     usage
+    developing
 
 Indices and tables
 ==================
