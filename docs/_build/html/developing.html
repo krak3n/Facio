@@ -49,6 +49,24 @@
             
   <div class="section" id="developing-contributing">
 <h1>Developing / Contributing<a class="headerlink" href="#developing-contributing" title="Permalink to this headline">¶</a></h1>
+<p>Fancy helping out? Fork, commit, issue pull request :) Also please write some tests to prove your new bit of code works.</p>
+<p>This project uses git flow, if you are not familiar please see <a class="reference external" href="https://github.com/nvie/gitflow">Git Flow</a>. Under Git Flow master is the most stable branch, develop is where active development occurs so please contribute using the <strong>develop</strong> branch.</p>
+<div class="section" id="vagrant">
+<h2>Vagrant<a class="headerlink" href="#vagrant" title="Permalink to this headline">¶</a></h2>
+<p>I use <a class="reference external" href="http://www.vagrantup.com/">Vagrant</a> for my personal development so I have bundled it with the
+repository. There are a few dependencies to how I have it setup.</p>
+<ul class="simple">
+<li>Vagrant 1.1+</li>
+<li>VirtualBox (what ever the latest is)</li>
+<li>Vagrant Guest Additions Plugin: <tt class="docutils literal"><span class="pre">vagrant</span> <span class="pre">plugin</span> <span class="pre">install</span> <span class="pre">vagrant-vbguest</span></tt></li>
+<li>Vagrant Salt Provisioner: <tt class="docutils literal"><span class="pre">vagrant</span> <span class="pre">plugin</span> <span class="pre">install</span> <span class="pre">vagrant-salt</span></tt></li>
+</ul>
+<p>Once you have all the dependencies installed it should be a simple case of
+running <tt class="docutils literal"><span class="pre">vagrant</span> <span class="pre">up</span></tt> at the root of the repository. Once it&#8217;s finished you
+should have a development environment with all of the <tt class="docutils literal"><span class="pre">facio</span></tt> dependencies
+installed into python virtual environment. All you have to do is <tt class="docutils literal"><span class="pre">python</span>
+<span class="pre">setup.py</span> <span class="pre">develop</span></tt>.</p>
+</div>
 </div>
 
 
@@ -57,6 +75,14 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Developing / Contributing</a><ul>
+<li><a class="reference internal" href="#vagrant">Vagrant</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="templates.html"
                         title="previous chapter">Project Templates</a></p>
