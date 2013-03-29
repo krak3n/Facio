@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; Facio 1.0.1 documentation</title>
+    <title>Project Templates &mdash; Facio 1.0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,7 +25,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Facio 1.0.1 documentation" href="index.html" /> 
+    <link rel="top" title="Facio 1.0.1 documentation" href="index.html" />
+    <link rel="next" title="Developing / Contributing" href="developing.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,6 +36,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="developing.html" title="Developing / Contributing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="Usage"
+             accesskey="P">previous</a> |</li>
         <li><a href="index.html">Facio 1.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -43,13 +51,104 @@
         <div class="bodywrapper">
           <div class="body">
             
-  
+  <div class="section" id="project-templates">
+<h1>Project Templates<a class="headerlink" href="#project-templates" title="Permalink to this headline">¶</a></h1>
+<p>Project templates are simple the bare bones of your project with key parts
+where you would put things like the project name replaced wit <strong>Jinja2</strong>
+template syntax.</p>
+<p>These templates can live locally on your file system or they can live on a
+remote <tt class="docutils literal"><span class="pre">git</span></tt> repository. See <a class="reference internal" href="usage.html"><em>Usage</em></a> for more on this.</p>
+<div class="section" id="basic-example">
+<h2>Basic Example<a class="headerlink" href="#basic-example" title="Permalink to this headline">¶</a></h2>
+<p>This is a basic <tt class="docutils literal"><span class="pre">HTML</span></tt> project template:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+    <span class="nt">&lt;head&gt;</span>
+        <span class="nt">&lt;title&gt;</span>{{ PROJECT_NAME }}<span class="nt">&lt;/title&gt;</span>
+    <span class="nt">&lt;/head&gt;</span>
+    <span class="nt">&lt;body&gt;</span>
+        <span class="nt">&lt;h1&gt;</span>Hello world, I am {{ PROJECT_NAEME }}<span class="nt">&lt;/h1&gt;</span>
+    <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+</div>
+<p>In the above example <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">PROJECT_NAME</span> <span class="pre">}}</span></tt> will be replaced with what ever you
+set the project name to be in the command, so for example: <tt class="docutils literal"><span class="pre">$</span> <span class="pre">facio</span> <span class="pre">-n</span> <span class="pre">foo</span></tt>
+would result in <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">PROJECT_NAME</span> <span class="pre">}}</span></tt> being replaced by <tt class="docutils literal"><span class="pre">foo</span></tt>.</p>
+<p>Your project can be made up of any file types, any directory structure, it all
+gets copied over and processed.</p>
+</div>
+<div class="section" id="custom-variables">
+<h2>Custom Variables<a class="headerlink" href="#custom-variables" title="Permalink to this headline">¶</a></h2>
+<p>Of course project name is not always enough and in these situations you can send extra variables to <tt class="docutils literal"><span class="pre">facio</span></tt> to use in the template processing. To do this run <tt class="docutils literal"><span class="pre">facio</span></tt> with the <tt class="docutils literal"><span class="pre">--vars</span></tt> flag passing a comma separated list, for example:</p>
+<div class="highlight-none"><div class="highlight"><pre>facio -n hello_world --vars foo=bar,something=else
+</pre></div>
+</div>
+<div class="section" id="templates">
+<h3>Templates<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h3>
+<p>Accessing these variables in templates is easy:</p>
+<div class="highlight-none"><div class="highlight"><pre>Hello World
+foo={{ foo }}
+something={{ something }}
+</pre></div>
+</div>
+<p>As Jinja2 is used to render the templates, you can use conditions, and other Jinja2 functionality, for example:</p>
+<div class="highlight-none"><div class="highlight"><pre>{% if foo==&#39;bar&#39; %}
+Foo is bar
+{% else %}
+Foo is not bar
+{% endif %}
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="http://jinja.pocoo.org/docs/">Jinja2</a> Documentation.</p>
+</div>
+<div class="section" id="renaming-files-directories">
+<h3>Renaming Files / Directories<a class="headerlink" href="#renaming-files-directories" title="Permalink to this headline">¶</a></h3>
+<p>You can even rename a directory and/or file by using double underscores around the variable name, for example:</p>
+<div class="highlight-none"><div class="highlight"><pre>- /path/to/template/
+  - __foo__/
+    - another.txt
+  - __foo__.txt
+  - some_file.txt
+  - some_other_file.txt
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>- /path/to/template/
+  - bar/
+    - another.txt
+  - bar.txt
+  - some_file.txt
+  - some_other_file.txt
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Project Templates</a><ul>
+<li><a class="reference internal" href="#basic-example">Basic Example</a></li>
+<li><a class="reference internal" href="#custom-variables">Custom Variables</a><ul>
+<li><a class="reference internal" href="#templates">Templates</a></li>
+<li><a class="reference internal" href="#renaming-files-directories">Renaming Files / Directories</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="usage.html"
+                        title="previous chapter">Usage</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="developing.html"
+                        title="next chapter">Developing / Contributing</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/templates.txt"
@@ -78,6 +177,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="developing.html" title="Developing / Contributing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="Usage"
+             >previous</a> |</li>
         <li><a href="index.html">Facio 1.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>

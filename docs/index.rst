@@ -46,7 +46,25 @@ Topics
 
     installing
     usage
+    templates
     developing
+
+License
+-------
+
+See LICENSE file in the `Git Repository`_.
+
+Authors
+-------
+
+See LICENSE file in the `Git Repository`_.
+
+Special Thanks
+--------------
+
+To the Tech Team at `Poke London`_ and the awesome `Jinja2`_.
+
+And thanks to Jack for helping me name it (and pointing out grammatical errors). <3.
 
 Indices and tables
 ==================
@@ -59,6 +77,8 @@ Indices and tables
 .. _Django: https://www.djangoproject.com/
 .. _Travis CI: https://travis-ci.org/krak3n/Facio
 .. _Jinja2: http://jinja.pocoo.org/docs/
+.. _Git Repository: https://github.com/krak3n/facio
+.. _Poke London: http://pokelondon.com
 
 .. Images
 .. |travis_master| image:: https://travis-ci.org/krak3n/Facio.png?branch=master

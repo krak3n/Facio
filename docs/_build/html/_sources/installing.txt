@@ -1,7 +1,7 @@
 Installing
 ==========
 
-Factio can be installed on system using the standard python package installers
+Facio can be installed on system using the standard python package installers
 ``pip`` and ``easy_install``.
 
 .. note::
