@@ -55,8 +55,8 @@
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
 <p>Facio is designed to be flexible to how you bootstrap your projects, heres how
 to use it.</p>
-<div class="section" id="basic-usage">
-<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="out-of-the-box">
+<h2>Out of the box<a class="headerlink" href="#out-of-the-box" title="Permalink to this headline">¶</a></h2>
 <p>Facio used via the command line, after installation you should have a <tt class="docutils literal"><span class="pre">facio</span></tt> command available. Use help to see the options available.</p>
 <div class="highlight-none"><div class="highlight"><pre>$ facio -h
 </pre></div>
@@ -67,6 +67,93 @@ $ facio -n hello_world
 </pre></div>
 </div>
 <p>This will create a new <tt class="docutils literal"><span class="pre">hello_world</span></tt> directory at <tt class="docutils literal"><span class="pre">/home/me/projects</span></tt> and inside the default <tt class="docutils literal"><span class="pre">facio</span></tt> template will have been processed and placed there.</p>
+</div>
+<div class="section" id="advanced-usage">
+<h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
+<p>Facio is designed to be flexible, with a combination of command line options
+and a configuration file.</p>
+<div class="section" id="command-line">
+<h3>Command Line<a class="headerlink" href="#command-line" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--version</span></kbd></td>
+<td>show program&#8217;s version number and exit</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></td>
+<td>show this help message and exit</td></tr>
+</tbody>
+</table>
+<div class="section" id="project-options">
+<h4>Project Options<a class="headerlink" href="#project-options" title="Permalink to this headline">¶</a></h4>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n <var>&lt;ARG&gt;</var></span>, <span class="option">--name=<var>&lt;ARG&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>The Project Name (Mandatory), only use alphanumeric characters and underscores.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="template-options">
+<h4>Template Options<a class="headerlink" href="#template-options" title="Permalink to this headline">¶</a></h4>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-t <var>&lt;ARG1&gt;</var></span>, <span class="option">--template=<var>&lt;ARG1&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Path to your custom template, absolute paths only, git repositories can also be specified by prefixing with git+
+for example: <a class="reference external" href="mailto:git+git&#37;&#52;&#48;gitbub&#46;com/path/to/repo&#46;git">git+git<span>&#64;</span>gitbub<span>&#46;</span>com/path/to/repo<span>&#46;</span>git</a></td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-c</span>, <span class="option">--choose_template</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>If you have more than 1 template defined use this flag to override the default template, Note: specifying -t
+(&#8211;template) will mean this flag is ignored.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-s <var>&lt;ARG&gt;</var></span>, <span class="option">--template_settings_dir=<var>&lt;ARG&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Template settings directory name</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--vars=<var>&lt;ARG&gt;</var></span></kbd></td>
+<td>Custom variables, e.g &#8211;vars hello=world,sky=blue</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="experimental-options">
+<h4>Experimental Options<a class="headerlink" href="#experimental-options" title="Permalink to this headline">¶</a></h4>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-i</span>, <span class="option">--install</span></kbd></td>
+<td>Install the project onto your path, e.g python setup.py develop</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--venv_create</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Create python virtual environment</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-p <var>&lt;ARG&gt;</var></span>, <span class="option">--venv_path=<var>&lt;ARG&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Python virtualenv home directory</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-S</span>, <span class="option">--venv_use_site_packages</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Create python vittual environment without &#8211;no-site-packages</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-x <var>&lt;ARG&gt;</var></span>, <span class="option">--venv_prefix=<var>&lt;ARG&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Virtual environment name prefix</td></tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 
@@ -79,7 +166,16 @@ $ facio -n hello_world
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Usage</a><ul>
-<li><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li><a class="reference internal" href="#out-of-the-box">Out of the box</a></li>
+<li><a class="reference internal" href="#advanced-usage">Advanced Usage</a><ul>
+<li><a class="reference internal" href="#command-line">Command Line</a><ul>
+<li><a class="reference internal" href="#project-options">Project Options</a></li>
+<li><a class="reference internal" href="#template-options">Template Options</a></li>
+<li><a class="reference internal" href="#experimental-options">Experimental Options</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
