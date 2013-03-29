@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-# Vagrant File for Facio
+# Vagrant File for Facio - Requires Vagrant 1.1+
 # Provisioner: Salt
 # OS: Ubuntu 12.04 LTS 64Bit
 #
@@ -32,6 +32,9 @@ Vagrant.configure("2") do |config|
 
     # The Project Mount - This Directory
     config.vm.synced_folder ".", "/home/vagrant/facio", :nfs => true
+
+    # Salt States
+    config.vm.synced_folder "./salt", "/srv/salt"
 
     # Local Developer States - Not in version control, this is for the developer to manage, e.g Git / Vim Configs
     # Developers should symlink this locally to ~/.salt-dev
