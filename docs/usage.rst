@@ -72,3 +72,8 @@ Experimental Options
             Create python vittual environment without --no-site-packages
 -x <ARG>, --venv_prefix=<ARG>
             Virtual environment name prefix
+
+Configuration File
+^^^^^^^^^^^^^^^^^^
+
+Most things you can specify as command line options are also configurable in a ``facio.cfg`` file, this should live in your home directory and be prefixed with a ``.``, for example ``/home/you/.facio.cfg``.
