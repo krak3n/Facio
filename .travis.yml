@@ -4,7 +4,7 @@ python:
     - "2.7"
 before_install:
     - "cd facio"
-install: "cd facio && pip install -r requirements.txt --use-mirrors"
+install: "pip install -r requirements.txt --use-mirrors"
 before_script:
     - "cd facio"
 script: nosetests --include='^(can|it|ensure|must|should|specs?|examples?)' --with-spec --spec-color -s --with-coverage --cover-erase --cover-package=facio
