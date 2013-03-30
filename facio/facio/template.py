@@ -9,8 +9,11 @@ working directory.
 import os
 import re
 
-from clint.textui import puts, indent
-from clint.textui.colored import blue, yellow
+try:
+    from clint.textui import puts, indent
+    from clint.textui.colored import blue, yellow
+except ImportError:
+    pass
 from shutil import copytree, move, rmtree, copy
 from codecs import open
 

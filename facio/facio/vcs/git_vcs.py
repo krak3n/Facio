@@ -8,8 +8,11 @@ Git Version Control Template Cloning.
 import os
 import tempfile
 
-from clint.textui import puts, indent
-from clint.textui.colored import blue
+try:
+    from clint.textui import puts, indent
+    from clint.textui.colored import blue
+except ImportError:
+    pass
 from shutil import rmtree
 
 

@@ -10,8 +10,11 @@ import ConfigParser
 import os
 import sys
 
-from clint.textui import puts, indent
-from clint.textui.colored import blue
+try:
+    from clint.textui import puts, indent
+    from clint.textui.colored import blue
+except ImportError:
+    pass
 from random import choice
 
 from .cli import CLIOptions
