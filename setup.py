@@ -59,7 +59,7 @@ setup(
     install_requires=install_requires,
     extras_require={
         'tests': test_requires,
-        'dev': dev_requires,
+        'develop': dev_requires,
     },
     classifiers=[
         'Environment :: Console',
