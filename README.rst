@@ -22,3 +22,13 @@ Tests are run using `Travis CI`_.
 * **Master Branch (Stable):** |travis_master|
 
 * **Develop Branch (Active Development):** |travis_develop|
+
+.. Links
+.. _Django: https://www.djangoproject.com/
+.. _Travis CI: https://travis-ci.org/krak3n/Facio
+
+.. Images
+.. |travis_master| image:: https://travis-ci.org/krak3n/Facio.png?branch=master
+    :height: 18px
+.. |travis_develop| image:: https://travis-ci.org/krak3n/Facio.png?branch=develop
+    :height: 18px
