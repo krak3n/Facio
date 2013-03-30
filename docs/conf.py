@@ -11,8 +11,8 @@ sys.path.insert(0, os.path.join(os.path.abspath('.'), '..', 'facio',
 project = u'Facio'
 copyright = u'2013, Christopher Reeves'
 
-version = '1.0'
-release = '1.0.1'
+version = '1.1'
+release = '1.1.0'
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
 templates_path = ['_templates']
