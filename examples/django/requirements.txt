@@ -1,0 +1,11 @@
+Django==1.5.1
+MySQL-python
+ipython
+ipdb
+django-nose
+nose
+nose-cover3
+coverage
+figleaf
+pinocchio
+specloud

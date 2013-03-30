@@ -22,9 +22,6 @@ class Facio(object):
     def __init__(self):
         '''Constructor, fires all required methods.'''
 
-        with indent(4, quote=' >'):
-            puts(green('Starting'))
-
         # Basic Skeleton Generation
         self.config = Config()
         self.template = Template(self.config)
