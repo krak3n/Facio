@@ -12,8 +12,29 @@ from facio import __version__
 from setuptools import setup, find_packages
 
 
-install_requires = ['GitPython==0.3.2.RC1', 'Jinja2==2.6', 'pycolors2==0.0.2',
-                    'clint2==0.3.2']
+install_requires = [
+    'GitPython==0.3.2.RC1',
+    'Jinja2==2.6',
+    'clint2==0.3.2',
+    'pycolors2==0.0.2',
+]
+
+test_requires = [
+    'tox==1.4.2',
+    'specloud==0.4.5',
+    'coverage==3.5.2',
+    'mock==1.0.1',
+    'nose==1.1.2',
+    'nose-cover3==0.1.0',
+    'flake8==1.4',
+    'figleaf==0.6.1',
+]
+
+dev_required = test_requires + [
+    'ipdb==0.7',
+    'ipython==0.13',
+    'Sphinx==1.1.3',
+]
 
 setup(
     name='facio',
