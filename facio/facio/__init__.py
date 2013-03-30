@@ -25,7 +25,10 @@ class Facio(object):
 
         # Basic Skeleton Generation
         self.config = Config()
-        puts(green('Starting'))
+
+        with indent(4, quote=' >'):
+            puts(green('Starting'))
+
         self.template = Template(self.config)
         self.template.copy_template()
 
