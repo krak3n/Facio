@@ -8,8 +8,15 @@ and expanded to be framework agnostic. You can use facio to bootstrap
 any sort of project.
 """
 
-from facio import __version__
+import os
+import sys
+
 from setuptools import setup, find_packages
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                             'src')))
+
+from facio import __version__
 
 
 install_requires = [
