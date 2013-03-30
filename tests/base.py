@@ -4,8 +4,10 @@ import unittest
 
 class BaseTestCase(unittest.TestCase):
 
-    test_tpl_path = os.path.join(os.path.dirname(__file__), 'test_template')
-    test_cfg_base_path = os.path.join(os.path.dirname(__file__),
+    test_tpl_path = os.path.join(os.path.abspath('.'), 'tests',
+                                 'test_template')
+
+    test_cfg_base_path = os.path.join(os.path.abspath('.'), 'tests',
                                       'test_cfgs')
 
     def _test_cfg_path(self, fname):

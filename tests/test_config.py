@@ -119,7 +119,9 @@ class ConfigTests(BaseTestCase):
         else:
             assert True
 
-    def ensure_valid_template_is_chosen_from_config(self):
+    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
+    def ensure_valid_template_is_chosen_from_config(self, mock_path):
+        mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
         config.raw_input = lambda _: '2'
         try:
             self._set_cli_args(self.base_args + ['-c', ])
