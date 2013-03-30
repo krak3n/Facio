@@ -38,6 +38,6 @@ man_pages = [
 
 texinfo_documents = [
     ('index', 'Facio', u'Facio Documentation',
-     u'Christopher Reeves', 'Facio', 'One line description of project.',
-     'Miscellaneous'),
+     u'Christopher Reeves', 'Facio', 'Project scaffolding from custom '
+     'templates.', 'Miscellaneous'),
 ]
