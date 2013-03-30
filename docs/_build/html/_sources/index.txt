@@ -48,6 +48,7 @@ Topics
     usage
     templates
     developing
+    changelog
 
 License
 -------
