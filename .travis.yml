@@ -2,8 +2,7 @@ language: python
 python:
     - "2.6"
     - "2.7"
-install: 'python setup.py test'
-script: nosetests --include='^(can|it|ensure|must|should|specs?|examples?)' --with-spec --spec-color -s --with-coverage --cover-erase --cover-package=facio
+script: python setup.py nosetests --include='^(can|it|ensure|must|should|specs?|examples?)' --with-spec --spec-color -s --with-coverage --cover-erase --cover-package=facio
 branches:
     only:
         - master
