@@ -8,8 +8,6 @@ the template.
 
 __version__ = '1.0.1'
 
-from clint.textui import puts, indent
-from clint.textui.colored import green
 
 from .config import Config
 from .install import Install
@@ -22,8 +20,12 @@ class Facio(object):
     def __init__(self):
         '''Constructor, fires all required methods.'''
 
+        from clint.textui import puts, indent
+        from clint.textui.colored import green
+
         # Basic Skeleton Generation
         self.config = Config()
+        puts(green('Starting'))
         self.template = Template(self.config)
         self.template.copy_template()
 
