@@ -2,8 +2,10 @@ language: python
 python:
     - "2.6"
     - "2.7"
-install: "pip install -r requirements.txt --use-mirrors"
-script: nosetests --include='^(can|it|ensure|must|should|specs?|examples?)' --with-spec --spec-color -s --with-coverage --cover-erase --cover-package=facio
+before_script:
+    - python setup.py develop
+script:
+    - make test
 branches:
     only:
         - master

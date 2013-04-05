@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Facio Documentation &mdash; Facio 1.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Facio 1.1.0 documentation" href="#" />
+    <link rel="next" title="Installing" href="installing.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="installing.html" title="Installing"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">Facio 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="facio-documentation">
+<h1>Facio Documentation<a class="headerlink" href="#facio-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Facio: /ˈfa.ki.oː/ - Latin, meaning to make, do, act, perform, cause, bring about.</p>
+<div class="section" id="what-is-it">
+<h2>What is it?<a class="headerlink" href="#what-is-it" title="Permalink to this headline">¶</a></h2>
+<p>If you work on quick turn around projects either at work or in your free time you might end up doing a lot of boiler plate cruft for your projects over and over, creating the same basic template. You might copy and paste this around, it might fall out of date, you might make improvements in a project but forget about them for the next.</p>
+<p><tt class="docutils literal"><span class="pre">Facio</span></tt> gives you the ability to create a standard template (or templates) for your projects so you can bootstrap in one single command.</p>
+<p>Originally developed with <a class="reference external" href="https://www.djangoproject.com/">Django</a> in mind you can use <tt class="docutils literal"><span class="pre">Facio</span></tt> for any type of project.</p>
+</div>
+<div class="section" id="status">
+<h2>Status<a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
+<p><strong>Current Version:</strong> 1.0.1</p>
+<p>Tests are run using <a class="reference external" href="https://travis-ci.org/krak3n/Facio">Travis CI</a>.</p>
+<ul class="simple">
+<li><strong>Master Branch (Stable):</strong> <img alt="travis_master" src="https://travis-ci.org/krak3n/Facio.png?branch=master" style="height: 18px;" /></li>
+<li><strong>Develop Branch (Active Development):</strong> <img alt="travis_develop" src="https://travis-ci.org/krak3n/Facio.png?branch=develop" style="height: 18px;" /></li>
+</ul>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Custom Templates</li>
+<li>Git support for remote templates</li>
+<li>Multiple templates</li>
+<li><a class="reference external" href="http://jinja.pocoo.org/docs/">Jinja2</a> Templates</li>
+<li>Python virtualenv creation</li>
+<li>Configuration using <tt class="docutils literal"><span class="pre">.facio.cfg</span></tt></li>
+</ul>
+</div>
+<div class="section" id="topics">
+<h2>Topics<a class="headerlink" href="#topics" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installing.html#easy-install">Easy Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installing.html#pip">Pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installing.html#manual">Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installing.html#verify-install">Verify Install</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#out-of-the-box">Out of the box</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#advanced-usage">Advanced Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#command-line">Command Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html#configuration-file">Configuration File</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templates.html">Project Templates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#basic-example">Basic Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#custom-variables">Custom Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="templates.html#templates">Templates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="templates.html#renaming-files-directories">Renaming Files / Directories</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developing.html">Developing / Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developing.html#vagrant">Vagrant</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-1-5-4-2013">Version 1.1 - 5/4/2013</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-1-hotfix-6-12-2012">Version 1.0.1 (hotfix) - 6/12/2012</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-5-12-2012">Version 1.0 - 5/12/2012</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-beta-1-26-11-2012">Version 1.0 Beta 1 - 26/11/2012</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>See LICENSE file in the <a class="reference external" href="https://github.com/krak3n/facio">Git Repository</a>.</p>
+</div>
+<div class="section" id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
+<p>See LICENSE file in the <a class="reference external" href="https://github.com/krak3n/facio">Git Repository</a>.</p>
+</div>
+<div class="section" id="special-thanks">
+<h2>Special Thanks<a class="headerlink" href="#special-thanks" title="Permalink to this headline">¶</a></h2>
+<p>To the Tech Team at <a class="reference external" href="http://pokelondon.com">Poke London</a> and the awesome <a class="reference external" href="http://jinja.pocoo.org/docs/">Jinja2</a>.</p>
+<p>And thanks to Jack for helping me name it (and pointing out grammatical errors). &lt;3.</p>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Facio Documentation</a><ul>
+<li><a class="reference internal" href="#what-is-it">What is it?</a></li>
+<li><a class="reference internal" href="#status">Status</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#topics">Topics</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+<li><a class="reference internal" href="#special-thanks">Special Thanks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installing.html"
+                        title="next chapter">Installing</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="installing.html" title="Installing"
+             >next</a> |</li>
+        <li><a href="#">Facio 1.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Christopher Reeves.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,4 +1,3 @@
-include facio/default_template/index.html
-include facio/default_template/css/bootstrap.css
-include README.md
-global-exclude .DS_Store
+include setup.py README.rst MANIFEST.in LICENSE AUTHORS test-requires.txt install-requires.txt
+recursive-include facio/facio/default_template *
+global-exclude *~
