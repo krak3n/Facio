@@ -20,7 +20,7 @@ Originally developed with `Django`_ in mind you can use ``Facio`` for any type o
 Status
 ------
 
-**Current Version:** 1.0.1
+**Current Version:** 1.1.1
 
 Tests are run using `Travis CI`_.
 
