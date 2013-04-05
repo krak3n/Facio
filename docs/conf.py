@@ -2,12 +2,6 @@
 # Sphinx Documentation Config
 #
 
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.abspath('.'), '..', 'src',
-                                'facio'))
-
 project = u'Facio'
 copyright = u'2013, Christopher Reeves'
 
