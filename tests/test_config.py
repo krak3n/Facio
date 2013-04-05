@@ -38,7 +38,7 @@ class ConfigTests(BaseTestCase):
         sys.argv = sys.argv + args
         self.config = Config()
 
-    def should_exit_with_no_arguments(self):
+    def test_exit_with_no_arguments(self):
         try:
             Config()
         except SystemExit:
@@ -62,13 +62,13 @@ class ConfigTests(BaseTestCase):
         mock_blue.assert_called_with('Loaded ~/.facio.cfg')
         self.assertTrue(c.file_args.cfg_loaded)
 
-    def ensure_valid_project_name(self):
+    def test_valid_project_name(self):
         valid_names = ['this_is_valid', 'this1is_valid', 'Thisisvalid']
         for valid_name in valid_names:
             self._set_cli_args(['-n', valid_name])
             self.assertEquals(self.config.project_name, valid_name)
 
-    def should_exit_on_invalid_name(self):
+    def test_exit_on_invalid_name(self):
         invalid_names = ['this_is_not-valid', 'this_is not_valid',
                          '*this_is_not_valid']
         for invalid_name in invalid_names:
@@ -79,20 +79,20 @@ class ConfigTests(BaseTestCase):
             else:
                 assert False
 
-    def ensure_template_var_is_set_from_cli(self):
+    def test_template_var_is_set_from_cli(self):
         self._set_cli_args(self.base_args + ['--template',
                                              self.test_tpl_path])
         self.assertEquals(self.config.template, self.test_tpl_path)
 
     @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    def should_exit_if_facio_cfg_is_miss_configured(self, mock_path):
+    def test_exit_if_facio_cfg_is_miss_configured(self, mock_path):
         cfgs = ['malformed_config1.cfg', 'malformed_config2.cfg']
         for cfg in cfgs:
             mock_path.return_value = self._test_cfg_path(cfg)
             self._set_cli_args(self.base_args)
             self.assertFalse(self.config.file_args.cfg_loaded)
 
-    def should_exit_when_venv_create_set_no_venv_path_set(self):
+    def test_exit_when_venv_create_set_no_venv_path_set(self):
         try:
             self._set_cli_args(self.base_args + ['--venv_create', ])
             self.assertTrue(self.config.venv_create)
@@ -101,7 +101,7 @@ class ConfigTests(BaseTestCase):
         else:
             assert False
 
-    def should_not_exit_when_venv_create_set_venv_path_set(self):
+    def test_not_exit_when_venv_create_set_venv_path_set(self):
         try:
             self._set_cli_args(self.base_args + ['--venv_create',
                                                  '--venv_path',
@@ -113,7 +113,7 @@ class ConfigTests(BaseTestCase):
             assert True
 
     @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    def ensure_valid_template_is_chosen_from_config(self, mock_path):
+    def test_valid_template_is_chosen_from_config(self, mock_path):
         mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
         config.raw_input = lambda _: '2'
         try:
@@ -123,7 +123,7 @@ class ConfigTests(BaseTestCase):
         except SystemExit:
             pass  # We allow a pass here because the template path is invalid
 
-    def should_fail_if_invalid_template_choice(self):
+    def test_fail_if_invalid_template_choice(self):
         config.raw_input = lambda _: '8'
         try:
             self._set_cli_args(self.base_args + ['-c', ])
@@ -131,7 +131,7 @@ class ConfigTests(BaseTestCase):
         except SystemExit:
             assert True
 
-    def ensure_value_error_raised_on_zero_template_choice(self):
+    def test_value_error_raised_on_zero_template_choice(self):
         config.raw_input = lambda _: '0'
         try:
             self._set_cli_args(self.base_args + ['-c', ])
@@ -139,13 +139,13 @@ class ConfigTests(BaseTestCase):
         except SystemExit:
             assert True
 
-    def should_cache_django_secret_key(self):
+    def test_cache_django_secret_key(self):
         sys.argv = sys.argv + self.base_args
         self.config = Config()
         key = self.config.django_secret_key
         self.assertEquals(key, self.config.generated_django_secret_key)
 
-    def should_return_cached_version_of_secret_key(self):
+    def test_return_cached_version_of_secret_key(self):
         sys.argv = sys.argv + self.base_args
         self.config = Config()
         self.config.generated_django_secret_key = 'this_is_cached'
