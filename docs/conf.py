@@ -6,7 +6,7 @@ project = u'Facio'
 copyright = u'2013, Christopher Reeves'
 
 version = '1.1'
-release = '1.1.0'
+release = '1.1.1'
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
 templates_path = ['_templates']
