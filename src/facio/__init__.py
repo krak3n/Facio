@@ -6,7 +6,7 @@ This kicks the whole thing off, fireing CLI option prompt and processing
 the template.
 """
 
-__version__ = '1.0.1'
+__version__ = '1.1'
 
 
 from .config import Config
