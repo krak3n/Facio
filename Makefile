@@ -1,4 +1,11 @@
 #
+# Generic Methods
+#
+
+install_facio:
+	pip install -q -e . --use-mirrors
+
+#
 # Development methods
 #
 
@@ -6,7 +13,7 @@
 install_develop_reqs:
 	pip install -q "file://`pwd`#egg=facio[develop]"
 
-develop: install_develop_reqs
+develop: install_develop_reqs install_facio
 
 #
 # Testing methods
