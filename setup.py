@@ -19,28 +19,19 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
 from facio import __version__
 
 
-install_requires = [
-    'GitPython==0.3.2.RC1',
-    'Jinja2==2.6',
-    'clint2==0.3.2',
-    'pycolors2==0.0.2',
-]
+install_requires = []
+with open('install-requires.txt') as reqs:
+    install_requires = [line for line in reqs.read().split('\n')]
 
-test_requires = [
-    'tox==1.4.2',
-    'specloud==0.4.5',
-    'coverage==3.5.2',
-    'mock==1.0.1',
-    'nose==1.1.2',
-    'nose-cover3==0.1.0',
-    'flake8==1.4',
-    'figleaf==0.6.1',
-]
+test_requires = []
+with open('test-requires.txt') as reqs:
+    test_requires = [line for line in reqs.read().split('\n')]
 
 dev_requires = test_requires + [
     'ipdb==0.7',
     'ipython==0.13',
     'Sphinx==1.1.3',
+    'flake8==1.4',
 ]
 
 setup(
@@ -57,6 +48,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
+    test_suite='runtests.runtests',
     extras_require={
         'tests': test_requires,
         'develop': dev_requires,

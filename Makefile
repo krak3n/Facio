@@ -25,6 +25,6 @@ install_test_reqs:
 
 # Test Command
 run_tests:
-	nosetests --include='^(can|it|ensure|must|should|specs?|examples?)' --with-spec --spec-color -s --with-coverage --cover-erase --cover-package=facio
+	python setup.py test
 
 test: install_test_reqs run_tests

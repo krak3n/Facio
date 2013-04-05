@@ -165,7 +165,7 @@ class TemplateTests(unittest.TestCase):
         t.exclude_dirs.append('.exclude_this')
         t.copy_template()
         self.assertTrue(os.path.isdir(os.path.join(t.project_root,
-                                                   'test_copy_this')))
+                                                   'should_copy_this')))
         rmtree(t.project_root)
 
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)

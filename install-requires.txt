@@ -1,0 +1,4 @@
+GitPython==0.3.2.RC1
+Jinja2==2.6
+clint2==0.3.2
+pycolors2==0.0.2
