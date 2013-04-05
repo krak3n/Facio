@@ -23,9 +23,15 @@ Tests are run using `Travis CI`_.
 
 * **Develop Branch (Active Development):** |travis_develop|
 
+Documentation
+-------------
+
+Documentation for ``Facio`` can be found on `Read the Docs`_.
+
 .. Links
 .. _Django: https://www.djangoproject.com/
 .. _Travis CI: https://travis-ci.org/krak3n/Facio
+.. _Read the Docs: https://facio.readthedocs.org
 
 .. Images
 .. |travis_master| image:: https://travis-ci.org/krak3n/Facio.png?branch=master
