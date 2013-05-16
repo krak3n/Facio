@@ -1,22 +1,18 @@
 #!/usr/bin/env python
-"""
-Facio
-=====
-
-Facio is a project scaffolding tool origionally developed for Django
-and expanded to be framework agnostic. You can use facio to bootstrap
-any sort of project.
-"""
 
 import os
 import sys
 
 from setuptools import setup, find_packages
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             'src')))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
 from facio import __version__
+
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
 install_requires = [
@@ -49,7 +45,7 @@ setup(
     author_email='hello@chris.reeves.io',
     url='https://github.com/krak3n/facio',
     description='Project scaffolding using custom templates.',
-    long_description=__doc__,
+    long_description=read('README.rst'),
     package_dir={'': 'src'},
     packages=find_packages('src'),
     scripts=['src/facio/bin/facio'],
