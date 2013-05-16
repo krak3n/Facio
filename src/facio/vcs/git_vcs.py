@@ -8,17 +8,12 @@ Git Version Control Template Cloning.
 import os
 import tempfile
 
-try:
-    from clint.textui import puts, indent
-    from clint.textui.colored import blue
-except ImportError:
-    pass
+from clint.textui import puts, indent
+from clint.textui.colored import blue
 from shutil import rmtree
 
 
 class Git(object):
-
-    tmp_dir = None
 
     def __init__(self, template_path):
         self.template_path = template_path
@@ -32,16 +27,14 @@ class Git(object):
             self._repo = self.template_path.replace('git+', '')
         return self._repo
 
-    def _make_tmp_dir(self):
-        self.tmp_dir = tempfile.mkdtemp(suffix='facio')
-
     def clone(self):
+        tmp_dir = tempfile.mkdtemp(suffix='facio')
+
         try:
             from git import Repo
         except ImportError:
             raise Exception  # TODO: Custom exception
 
-        self._make_tmp_dir()
         try:
             repo = Repo.init(self.tmp_dir)
             repo.create_remote('origin', self.repo)
@@ -51,7 +44,7 @@ class Git(object):
         except Exception:
             raise Exception  # TODO: Custom exception
 
-        rmtree(os.path.join(self.tmp_dir, '.git'))
+        rmtree(os.path.join(tmp_dir, '.git'))
 
         with indent(4, quote=' >'):
             puts(blue('Clone complete'))
