@@ -19,13 +19,21 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
 from facio import __version__
 
 
-install_requires = []
-with open('install-requires.txt') as reqs:
-    install_requires = [line for line in reqs.read().split('\n')]
+install_requires = [
+    'GitPython==0.3.2.RC1',
+    'Jinja2==2.6',
+    'clint2==0.3.2',
+]
 
-test_requires = []
-with open('test-requires.txt') as reqs:
-    test_requires = [line for line in reqs.read().split('\n')]
+test_requires = [
+    'tox==1.4.3',
+    'specloud==0.4.5',
+    'coverage==3.5.2',
+    'mock==1.0.1',
+    'nose==1.1.2',
+    'nose-cover3==0.1.0',
+    'figleaf==0.6.1',
+]
 
 dev_requires = test_requires + [
     'ipdb==0.7',
