@@ -16,9 +16,9 @@ def read(fname):
 
 
 install_requires = [
-    'GitPython==0.3.2.RC1',
     'Jinja2==2.6',
     'clint2==0.3.2',
+    'sh==1.08',
 ]
 
 test_requires = [
