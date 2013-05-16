@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 1.1.1 (hotfix) - 5/4/2013
+---------------------------------
+* Fixed Manifest file so bundled template is properly included.
+
 Version 1.1 - 5/4/2013
 ----------------------
 * Improved output to the user
