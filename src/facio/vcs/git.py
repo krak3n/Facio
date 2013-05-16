@@ -1,6 +1,6 @@
 """
-facio.vcs.git_vcs
------------------
+facio.vcs.git
+-------------
 
 Git Version Control Template Cloning.
 """
@@ -15,6 +15,8 @@ from shutil import rmtree
 
 class Git(object):
 
+    tmp_dir = None
+
     def __init__(self, template_path):
         self.template_path = template_path
         with indent(4, quote=' >'):
@@ -28,23 +30,22 @@ class Git(object):
         return self._repo
 
     def clone(self):
-        tmp_dir = tempfile.mkdtemp(suffix='facio')
+        self.tmp_dir = tempfile.mkdtemp(suffix='facio')
 
         try:
-            from git import Repo
+            from sh import git
         except ImportError:
             raise Exception  # TODO: Custom exception
 
         try:
-            repo = Repo.init(self.tmp_dir)
-            repo.create_remote('origin', self.repo)
-            origin = repo.remotes.origin
-            origin.fetch()
-            origin.pull('master')  # TODO: Branch prompt to the user
+            git = git.bake(_cwd=self.tmp_dir)
+            git.clone(self.repo, self.tmp_dir)
+            git.fetch('--all')
+            git.checkout('master')  # TODO: Branch prompt to the user
         except Exception:
             raise Exception  # TODO: Custom exception
 
-        rmtree(os.path.join(tmp_dir, '.git'))
+        rmtree(os.path.join(self.tmp_dir, '.git'))
 
         with indent(4, quote=' >'):
             puts(blue('Clone complete'))
