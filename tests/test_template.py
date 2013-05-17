@@ -107,6 +107,8 @@ class TemplateTests(unittest.TestCase):
         cwd = os.getcwd()
         os.chdir(git_dir)
         git.add('foo.txt')
+        git.config('--local user.email "hello@chris.reeves.io"')
+        git.config('--local user.name "Chris Reeves"')
         git.commit("-m Added foo.txt")
         os.chdir(cwd)
 
