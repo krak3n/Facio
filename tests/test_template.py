@@ -3,9 +3,9 @@ import tempfile
 import unittest
 import uuid
 
-from git import Repo
 from mock import MagicMock, PropertyMock, patch
 from facio.template import Template
+from sh import git
 from shutil import rmtree
 from StringIO import StringIO
 
@@ -26,7 +26,7 @@ class TemplateTests(unittest.TestCase):
         self.puts_patch = patch('facio.template.puts',
                                 stream=StringIO)
         self.puts_patch.start()
-        self.puts_patch_vcs = patch('facio.vcs.git_vcs.puts',
+        self.puts_patch_vcs = patch('facio.vcs.git.puts',
                                     stream=StringIO)
         self.puts_patch_vcs.start()
 
@@ -80,8 +80,8 @@ class TemplateTests(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     @patch('tempfile.mkdtemp', return_value=True)
-    @patch('facio.vcs.git_vcs.Git.clone', return_value=True)
-    @patch('facio.vcs.git_vcs.Git.tmp_dir', return_value=True)
+    @patch('facio.vcs.git.Git.clone', return_value=True)
+    @patch('facio.vcs.git.Git.tmp_dir', return_value=True)
     def test_detect_git_repo(self, mock_tmp_dir, mock_clone, mock_tempfile,
                              mock_stdout):
         t = Template(self.config)
@@ -95,7 +95,8 @@ class TemplateTests(unittest.TestCase):
 
         # Create a fake temp repo w/ commit
         git_dir = tempfile.mkdtemp(prefix='git')
-        git_repo = Repo.init(git_dir)
+        git.init(git_dir)
+
         try:
             f = open(os.path.join(git_dir, 'foo.txt'), 'w')
             f.write('blah')
@@ -105,8 +106,13 @@ class TemplateTests(unittest.TestCase):
             f.close()
         cwd = os.getcwd()
         os.chdir(git_dir)
-        git_repo.index.add(['foo.txt'])
-        git_repo.index.commit("Added foo.txt")
+        git.add('foo.txt')
+        if os.environ.get('TRAVIS_CI') == 'true':
+            git.config('--global', 'user.email',
+                       '"auto-version-test@travis.ci"')
+            git.config('--global', 'user.name',
+                       '"Testing on Travis CI"')
+        git.commit('-m "Added foo.txt"')
         os.chdir(cwd)
 
         # Fake Template Path
@@ -124,7 +130,7 @@ class TemplateTests(unittest.TestCase):
         self.assertFalse(os.path.isdir(t.config.template))
         self.assertFalse(self.config.cli_opts.error.called)
 
-    @patch('git.Repo.init', side_effect=Exception)
+    @patch('sh.git.clone', side_effect=Exception)
     def test_error_on_clone_exception(self, mock_repo_init):
         self.config.template = 'git+this/wont/work'
         try:
