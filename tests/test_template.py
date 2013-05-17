@@ -107,9 +107,10 @@ class TemplateTests(unittest.TestCase):
         cwd = os.getcwd()
         os.chdir(git_dir)
         git.add('foo.txt')
-        git.config('--global user.email "hello@chris.reeves.io"')
-        git.config('--global user.name "Chris Reeves"')
-        git.commit("-m Added foo.txt")
+        git.commit(
+            '--author "Chris Reeves <hello@chris.reeves.io>"',
+            '-m "Added foo.txt"',
+        )
         os.chdir(cwd)
 
         # Fake Template Path
