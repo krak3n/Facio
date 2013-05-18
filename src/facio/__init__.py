@@ -9,16 +9,17 @@ the template.
 __version__ = '1.1.1'
 
 
-from .config import Config
-from .install import Install
-from .template import Template
-from .virtualenv import Virtualenv
 
 
 class Facio(object):
 
     def __init__(self):
         '''Constructor, fires all required methods.'''
+
+        from .config import Config
+        from .install import Install
+        from .template import Template
+        from .virtualenv import Virtualenv
 
         from clint.textui import puts, indent
         from clint.textui.colored import green

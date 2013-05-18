@@ -9,15 +9,12 @@ working directory.
 import os
 import re
 
-try:
-    from clint.textui import puts, indent
-    from clint.textui.colored import blue, yellow
-except ImportError:
-    pass
-from shutil import copytree, move, rmtree, copy
+from clint.textui import puts, indent
+from clint.textui.colored import blue, yellow
 from codecs import open
+from shutil import copytree, move, rmtree, copy
 
-from .vcs.git_vcs import Git
+from .vcs.git import Git
 
 
 class Template(object):

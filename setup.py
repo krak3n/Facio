@@ -1,31 +1,35 @@
 #!/usr/bin/env python
-"""
-Facio
-=====
-
-Facio is a project scaffolding tool origionally developed for Django
-and expanded to be framework agnostic. You can use facio to bootstrap
-any sort of project.
-"""
 
 import os
 import sys
 
 from setuptools import setup, find_packages
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             'src')))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
 from facio import __version__
 
 
-install_requires = []
-with open('install-requires.txt') as reqs:
-    install_requires = [line for line in reqs.read().split('\n')]
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-test_requires = []
-with open('test-requires.txt') as reqs:
-    test_requires = [line for line in reqs.read().split('\n')]
+
+install_requires = [
+    'Jinja2==2.6',
+    'clint2==0.3.2',
+    'sh==1.08',
+]
+
+test_requires = [
+    'tox==1.4.3',
+    'specloud==0.4.5',
+    'coverage==3.5.2',
+    'mock==1.0.1',
+    'nose==1.1.2',
+    'nose-cover3==0.1.0',
+    'figleaf==0.6.1',
+]
 
 dev_requires = test_requires + [
     'ipdb==0.7',
@@ -41,7 +45,7 @@ setup(
     author_email='hello@chris.reeves.io',
     url='https://github.com/krak3n/facio',
     description='Project scaffolding using custom templates.',
-    long_description=__doc__,
+    long_description=read('README.rst'),
     package_dir={'': 'src'},
     packages=find_packages('src'),
     scripts=['src/facio/bin/facio'],

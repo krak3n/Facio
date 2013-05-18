@@ -1,6 +1,6 @@
 """
-facio.vcs.git_vcs
------------------
+facio.vcs.git
+-------------
 
 Git Version Control Template Cloning.
 """
@@ -8,11 +8,8 @@ Git Version Control Template Cloning.
 import os
 import tempfile
 
-try:
-    from clint.textui import puts, indent
-    from clint.textui.colored import blue
-except ImportError:
-    pass
+from clint.textui import puts, indent
+from clint.textui.colored import blue
 from shutil import rmtree
 
 
@@ -32,22 +29,19 @@ class Git(object):
             self._repo = self.template_path.replace('git+', '')
         return self._repo
 
-    def _make_tmp_dir(self):
+    def clone(self):
         self.tmp_dir = tempfile.mkdtemp(suffix='facio')
 
-    def clone(self):
         try:
-            from git import Repo
+            from sh import git
         except ImportError:
             raise Exception  # TODO: Custom exception
 
-        self._make_tmp_dir()
         try:
-            repo = Repo.init(self.tmp_dir)
-            repo.create_remote('origin', self.repo)
-            origin = repo.remotes.origin
-            origin.fetch()
-            origin.pull('master')  # TODO: Branch prompt to the user
+            git = git.bake(_cwd=self.tmp_dir)
+            git.clone(self.repo, self.tmp_dir)
+            git.fetch('--all')
+            git.checkout('master')  # TODO: Branch prompt to the user
         except Exception:
             raise Exception  # TODO: Custom exception
 
