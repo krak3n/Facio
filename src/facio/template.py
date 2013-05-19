@@ -220,7 +220,9 @@ class Template(object):
                         file_contents = tpl.render(self.place_holders)
                         with open(filepath, 'w', encoding='utf8') as f:
                             f.write(file_contents)
-                    except Exception, e:
+                    except Exception:
+                        import sys
+                        e = sys.exc_info()[1]
                         with indent(4, quote=' >'):
                             puts(yellow(
                                 'Warning: Failed to process '
