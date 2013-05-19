@@ -142,13 +142,14 @@ class Template(object):
     def rename(self, root, name):
         '''Rename a file or directory.'''
 
-        e = re.compile(r'__(.*?)__')
+        e = re.compile(r'\{\{(.*?)\}\}')
         try:
             plain = e.findall(name)[0]
             if plain in self.place_holders:
                 place_holder_val = self.place_holders[plain]
                 origin = os.path.join(root, name)
-                new_name = name.replace('__%s__' % plain, place_holder_val)
+                new_name = name.replace('{{{{{0}}}}}'.format(plain),
+                                        place_holder_val)
                 new = os.path.join(root, new_name)
                 move(origin, new)
                 return True
