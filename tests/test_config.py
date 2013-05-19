@@ -115,7 +115,7 @@ class ConfigTests(BaseTestCase):
     @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
     def test_valid_template_is_chosen_from_config(self, mock_path):
         mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
-        config.raw_input = lambda _: '2'
+        config.input = lambda _: '2'
         try:
             self._set_cli_args(self.base_args + ['-c', ])
             self.config = Config()
@@ -124,7 +124,7 @@ class ConfigTests(BaseTestCase):
             pass  # We allow a pass here because the template path is invalid
 
     def test_fail_if_invalid_template_choice(self):
-        config.raw_input = lambda _: '8'
+        config.input = lambda _: '8'
         try:
             self._set_cli_args(self.base_args + ['-c', ])
             self.config = Config()
@@ -132,7 +132,7 @@ class ConfigTests(BaseTestCase):
             assert True
 
     def test_value_error_raised_on_zero_template_choice(self):
-        config.raw_input = lambda _: '0'
+        config.input = lambda _: '0'
         try:
             self._set_cli_args(self.base_args + ['-c', ])
             self.config = Config()

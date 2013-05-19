@@ -13,6 +13,7 @@ from clint.textui import puts, indent
 from clint.textui.colored import blue
 from random import choice
 from six.moves import configparser as ConfigParser
+from six.moves import input
 
 from .cli import CLIOptions
 
@@ -123,7 +124,7 @@ class Config(object):
             if i > max_tries:
                 self._error('You failed to enter a valid template number.')
             try:
-                num = int(raw_input(
+                num = int(input(
                     '\nEnter the number for the template '
                     '({0} of {1} tries): '.format(i, max_tries)))
                 if num == 0:
