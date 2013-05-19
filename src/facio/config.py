@@ -20,7 +20,7 @@ from .cli import CLIOptions
 
 class ConfigFile(object):
 
-    templates = {}
+    templates = []
 
     sections = {
         'misc': ['install', ],
@@ -64,7 +64,7 @@ class ConfigFile(object):
     def _add_templates(self, items):
         for item in items:
             name, value = item
-            self.templates[name] = value
+            self.templates.append((name, value))
 
     def _set_attributes(self, section, items):
         opts = self.sections[section]
@@ -112,11 +112,9 @@ class Config(object):
     def _template_choice_prompt(self):
         templates = self.file_args.templates
         max_tries = 5
-        template_list = list(templates)
         i = 0
         sys.stdout.write("Please choose a template:\n\n")
-        for name in templates:
-            template = templates[name]
+        for name, template in templates:
             sys.stdout.write("{0}) {1}: {2}\n".format((i + 1), name, template))
             i += 1
         i = 1
@@ -129,10 +127,10 @@ class Config(object):
                     '({0} of {1} tries): '.format(i, max_tries)))
                 if num == 0:
                     raise ValueError
-                template = templates[template_list[num - 1]]
+                name, template = templates[num - 1]
             except (ValueError, IndexError):
                 sys.stdout.write('\nPlease choose a number between 1 and '
-                                 '{0}\n'.format(len(template_list)))
+                                 '{0}\n'.format(len(templates)))
                 i += 1
             else:
                 return template
