@@ -84,4 +84,3 @@ Indices and tables
 .. |PyPi_version| image:: https://pypip.in/v/facio/badge.png
     :target: https://crate.io/packages/facio
     :height: 18px
-    :margin: 0px
