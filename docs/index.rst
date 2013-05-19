@@ -82,5 +82,4 @@ Indices and tables
 .. |travis_develop| image:: https://travis-ci.org/krak3n/Facio.png?branch=develop
     :height: 18px
 .. |PyPi_version| image:: https://pypip.in/v/facio/badge.png
-    :target: https://crate.io/packages/facio
     :height: 18px
