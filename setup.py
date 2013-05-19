@@ -22,20 +22,18 @@ install_requires = [
 ]
 
 test_requires = [
-    'tox==1.4.3',
-    'specloud==0.4.5',
-    'coverage==3.5.2',
     'mock==1.0.1',
-    'nose==1.1.2',
-    'nose-cover3==0.1.0',
-    'figleaf==0.6.1',
+    'tox==1.4.3',
+    'nose==1.3',
+    'spec==0.11.1',
+    'nose-cov==1.6',
 ]
 
 dev_requires = test_requires + [
     'ipdb==0.7',
     'ipython==0.13',
     'Sphinx==1.1.3',
-    'flake8==1.4',
+    'flake8==2.0',
 ]
 
 setup(
