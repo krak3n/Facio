@@ -181,7 +181,7 @@ class TemplateTests(unittest.TestCase):
         t = Template(self.config)
         t.copy_template()
         self.assertTrue(os.path.isdir(os.path.join(t.project_root,
-                                                   '__NOT_IN_PLACEHOLDERS__')))
+                                                   '{{NOT_IN_PLACEHOLDERS}}')))
         rmtree(t.project_root)
 
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
@@ -190,6 +190,6 @@ class TemplateTests(unittest.TestCase):
         t = Template(self.config)
         t.copy_template()
         self.assertTrue(os.path.isfile(os.path.join(
-            t.project_root, '__NOT_IN_PLACEHOLDERS__',
+            t.project_root, '{{NOT_IN_PLACEHOLDERS}}',
             '%s.txt' % self.config.project_name)))
         rmtree(t.project_root)
