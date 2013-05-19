@@ -71,9 +71,9 @@ You can even rename a directory and/or file by using double underscores around t
 .. code-block:: none
 
     - /path/to/template/
-      - __foo__/
+      - {{foo}}/
         - another.txt
-      - __foo__.txt
+      - {{foo}}.txt
       - some_file.txt
       - some_other_file.txt
 
