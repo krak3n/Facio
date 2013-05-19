@@ -27,7 +27,7 @@ test_requires = [
     'tox==1.4.3',
     'nose==1.3',
     'spec==0.11.1',
-    'nose-cov==1.6',
+    'coverage==3.6',
 ]
 
 dev_requires = test_requires + [
