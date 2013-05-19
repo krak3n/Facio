@@ -3,7 +3,7 @@ import sys
 from facio import config
 from facio.config import Config
 from mock import PropertyMock, patch
-from StringIO import StringIO
+from six import StringIO
 
 from .base import BaseTestCase
 

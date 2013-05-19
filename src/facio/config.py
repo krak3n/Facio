@@ -6,16 +6,13 @@ Sets up variables and configuration for Facio from command line and / or
 a configuration file.
 """
 
-import ConfigParser
 import os
 import sys
 
-try:
-    from clint.textui import puts, indent
-    from clint.textui.colored import blue
-except ImportError:
-    pass
+from clint.textui import puts, indent
+from clint.textui.colored import blue
 from random import choice
+from six.moves import configparser as ConfigParser
 
 from .cli import CLIOptions
 
