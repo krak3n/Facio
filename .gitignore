@@ -1,13 +1,44 @@
-# Files
-*.DS_Store
+# Numerous always-ignore extensions
 *.pyc
-*.vagrant
-*.coverage
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.vi
+*.cache
+*.egg-info
+*~
+*#
+.coverage
 
-# Dirs
-logs/
-media/
-dist/
-build/
-*.egg-info/
-.tox/
+# OS or Editor folders
+.DS_Store
+Thumbs.db
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+nbproject
+*.sublime-project
+*.sublime-workspace
+.tm_properties
+._*
+
+# Folders to ignore
+.hg
+.svn
+.CVS
+.idea
+_assets
+_design
+_content
+_tmp
+dist
+build
+_build
+.tox
+.vagrant
