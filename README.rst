@@ -15,12 +15,8 @@ Originally developed with `Django`_ in mind you can use ``Facio`` for any type o
 Status
 ------
 
-**Current Version:** |PyPi_version|
-
-Tests are run using `Travis CI`_.
-
+* **Current Version:** |PyPi_version|
 * **Master Branch (Stable):** |travis_master|
-
 * **Develop Branch (Active Development):** |travis_develop|
 
 Documentation

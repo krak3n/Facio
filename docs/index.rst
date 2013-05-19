@@ -15,12 +15,8 @@ Originally developed with `Django`_ in mind you can use ``Facio`` for any type o
 Status
 ------
 
-**Current Version:** |PyPi_version|
-
-Tests are run using `Travis CI`_.
-
+* **Current Version:** |PyPi_version|
 * **Master Branch (Stable):** |travis_master|
-
 * **Develop Branch (Active Development):** |travis_develop|
 
 Features
@@ -82,4 +78,5 @@ Indices and tables
 .. |travis_develop| image:: https://travis-ci.org/krak3n/Facio.png?branch=develop
     :height: 18px
 .. |PyPi_version| image:: https://pypip.in/v/facio/badge.png
+    :target: https://crate.io/packages/facio
     :height: 18px
