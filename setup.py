@@ -19,23 +19,22 @@ install_requires = [
     'Jinja2==2.6',
     'clint2==0.3.2',
     'sh==1.08',
+    'six==1.3.0',
 ]
 
 test_requires = [
-    'tox==1.4.3',
-    'specloud==0.4.5',
-    'coverage==3.5.2',
     'mock==1.0.1',
-    'nose==1.1.2',
-    'nose-cover3==0.1.0',
-    'figleaf==0.6.1',
+    'tox==1.4.3',
+    'nose==1.3',
+    'spec==0.11.1',
+    'coverage==3.6',
 ]
 
 dev_requires = test_requires + [
     'ipdb==0.7',
-    'ipython==0.13',
+    'ipython==0.13.2',
     'Sphinx==1.1.3',
-    'flake8==1.4',
+    'flake8==2.0',
 ]
 
 setup(
@@ -63,9 +62,11 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
         'Intended Audience :: Developers',
         'Operating System :: Unix',
-        'License :: OSI Approved :: Apache Software License',
+        'License :: OSI Approved :: BSD License',
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],

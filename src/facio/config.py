@@ -6,23 +6,21 @@ Sets up variables and configuration for Facio from command line and / or
 a configuration file.
 """
 
-import ConfigParser
 import os
 import sys
 
-try:
-    from clint.textui import puts, indent
-    from clint.textui.colored import blue
-except ImportError:
-    pass
+from clint.textui import puts, indent
+from clint.textui.colored import blue
 from random import choice
+from six.moves import configparser as ConfigParser
+from six.moves import input
 
 from .cli import CLIOptions
 
 
 class ConfigFile(object):
 
-    templates = {}
+    templates = []
 
     sections = {
         'misc': ['install', ],
@@ -66,7 +64,7 @@ class ConfigFile(object):
     def _add_templates(self, items):
         for item in items:
             name, value = item
-            self.templates[name] = value
+            self.templates.append((name, value))
 
     def _set_attributes(self, section, items):
         opts = self.sections[section]
@@ -114,11 +112,9 @@ class Config(object):
     def _template_choice_prompt(self):
         templates = self.file_args.templates
         max_tries = 5
-        template_list = list(templates)
         i = 0
         sys.stdout.write("Please choose a template:\n\n")
-        for name in templates:
-            template = templates[name]
+        for name, template in templates:
             sys.stdout.write("{0}) {1}: {2}\n".format((i + 1), name, template))
             i += 1
         i = 1
@@ -126,15 +122,15 @@ class Config(object):
             if i > max_tries:
                 self._error('You failed to enter a valid template number.')
             try:
-                num = int(raw_input(
+                num = int(input(
                     '\nEnter the number for the template '
                     '({0} of {1} tries): '.format(i, max_tries)))
                 if num == 0:
                     raise ValueError
-                template = templates[template_list[num - 1]]
+                name, template = templates[num - 1]
             except (ValueError, IndexError):
                 sys.stdout.write('\nPlease choose a number between 1 and '
-                                 '{0}\n'.format(len(template_list)))
+                                 '{0}\n'.format(len(templates)))
                 i += 1
             else:
                 return template
@@ -162,8 +158,10 @@ class Config(object):
                 self._tpl = self._template_choice_prompt()
             else:
                 try:
-                    self._tpl = self.file_args.templates['default']
-                except KeyError:
+                    self._tpl = [t for n, t
+                                 in self.file_args.templates
+                                 if n == 'default'][0]
+                except IndexError:
                     self._tpl = self.default_template
         self._validate_template_options()
         return self._tpl

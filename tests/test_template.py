@@ -7,7 +7,7 @@ from mock import MagicMock, PropertyMock, patch
 from facio.template import Template
 from sh import git
 from shutil import rmtree
-from StringIO import StringIO
+from six import StringIO
 
 
 class TemplateTests(unittest.TestCase):

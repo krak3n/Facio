@@ -5,9 +5,8 @@
 
 base:
   '*':
-    - misc
+    - packages
     - python
     - facio
+    # Local developer states - unique to you - mounted at ~/.salt-dev
     - developer
-
-# vim: set filetype=sls:

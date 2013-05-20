@@ -3,8 +3,4 @@
 #
 
 include:
-  - python.packages
-  - python.virtualenv
-  - python.pythonbrew
-
-# vim: set filetype=sls:
+  - python.install

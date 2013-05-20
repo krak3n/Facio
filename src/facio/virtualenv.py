@@ -8,6 +8,7 @@ project.
 
 import os
 
+from six import print_
 from subprocess import Popen, PIPE, STDOUT
 
 
@@ -79,12 +80,12 @@ class Virtualenv(object):
         '''Create python virtualevironment.'''
 
         if self.validate():
-            print 'Creating python virtual environment at %s ...' % (
-                self.venv_path)
+            print_('Creating python virtual environment at %s ...' % (
+                self.venv_path))
             cmd = 'cd %s && virtualenv %s' % (self.config.venv_path,
                                               self.venv_path)
             if not getattr(self.config, 'venv_use_site_packages', False):
                 cmd += ' --no-site-packages'
-            print 'Runing: ' + cmd
+            print_('Runing: ' + cmd)
 
             os.system(cmd)

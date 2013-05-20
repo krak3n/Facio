@@ -1,8 +1,0 @@
-[run]
-branch = True
-omit =
-    facio/__init__.py
-    tests/
-[report]
-exclude_lines =
-    pragma: no cover
