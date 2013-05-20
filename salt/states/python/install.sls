@@ -16,7 +16,7 @@ python_versions_ppa:
     - managed
     - ppa: fkrull/deadsnakes
 
-{% for v in ["3.3", "3.2", "2.6", "2.7"] %}
+{% for v in ["2.6", "2.7", "3.2", "3.3"] %}
 python_{{ v|replace(".", "_") }}_install:
   pkg:
     - installed
