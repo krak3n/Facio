@@ -158,8 +158,10 @@ class Config(object):
                 self._tpl = self._template_choice_prompt()
             else:
                 try:
-                    self._tpl = self.file_args.templates['default']
-                except KeyError:
+                    self._tpl = [t for n, t
+                                 in self.file_args.templates
+                                 if n == 'default'][0]
+                except IndexError:
                     self._tpl = self.default_template
         self._validate_template_options()
         return self._tpl
