@@ -19,6 +19,12 @@ Status
 * **Master Branch (Stable):** |travis_master|
 * **Develop Branch (Active Development):** |travis_develop|
 
+Supports
+--------
+
+* Python 2.6, 2.7
+* Python 3.2, 3.3
+
 Documentation
 -------------
 
