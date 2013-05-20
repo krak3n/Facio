@@ -9,6 +9,7 @@ in develop mode.
 import os
 
 from shutil import rmtree
+from six import print_
 from subprocess import Popen, PIPE, STDOUT
 
 
@@ -44,9 +45,9 @@ class Install(object):
             self.executable = os.path.join(virtualenv_path, 'bin', 'python')
         else:
             if os.environ.get('VIRTUAL_ENV'):
-                print 'Warning: You have an active virtual environment '\
-                      'installing to %s virtual environment.' % (
-                          os.environ.get('VIRTUAL_ENV'))
+                print_('Warning: You have an active virtual environment '
+                       'installing to %s virtual environment.' % (
+                           os.environ.get('VIRTUAL_ENV')))
             cmd = 'which python'
             p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
                       close_fds=True)
