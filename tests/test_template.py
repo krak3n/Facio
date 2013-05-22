@@ -1,16 +1,18 @@
 import os
 import tempfile
-import unittest
 import uuid
 
-from mock import MagicMock, PropertyMock, patch
+from codecs import open
 from facio.template import Template
+from mock import MagicMock, PropertyMock, patch
 from sh import git
 from shutil import rmtree
 from six import StringIO
 
+from .base import BaseTestCase
 
-class TemplateTests(unittest.TestCase):
+
+class TemplateTests(BaseTestCase):
     """ Template Tests """
 
     def setUp(self):
@@ -193,3 +195,23 @@ class TemplateTests(unittest.TestCase):
             t.project_root, '{{NOT_IN_PLACEHOLDERS}}',
             '%s.txt' % self.config.project_name)))
         rmtree(t.project_root)
+
+    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
+    def test_files_are_ignores(self, mock_working_dir, mock_cfg_path):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        mock_cfg_path.return_value = self._test_cfg_path('ignore_files.cfg')
+        t = Template(self.config)
+        t.copy_template()
+        should_ignore = [
+            'ignore.gif',
+            'ignore.png',
+            'i_dont_need_processing.txt'
+        ]
+        for root, dirs, files in os.walk(t.project_root):
+            for name in files:
+                if name in should_ignore:
+                    filepath = os.path.join(root, name)
+                    with open(filepath, 'r', encoding='utf8') as f:
+                        contents = f.read()
+                    self.assertEqual(contents, '{{ PROJECT_NAME }}\n')
