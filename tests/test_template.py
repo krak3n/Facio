@@ -196,11 +196,10 @@ class TemplateTests(BaseTestCase):
             '%s.txt' % self.config.project_name)))
         rmtree(t.project_root)
 
-    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
-    def test_files_are_ignores(self, mock_working_dir, mock_cfg_path):
+    def test_files_are_ignores(self, mock_working_dir):
         mock_working_dir.return_value = tempfile.gettempdir()
-        mock_cfg_path.return_value = self._test_cfg_path('ignore_files.cfg')
+        self.config.ignore = ['*.gif', '*.png', 'i_dont_need_processing.txt']
         t = Template(self.config)
         t.copy_template()
         should_ignore = [
