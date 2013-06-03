@@ -180,6 +180,15 @@ class Config(object):
         except AssertionError:
             return False
 
+    @property
+    def ignore(self):
+        try:
+            globs = self.file_args.ignore
+        except AttributeError:
+            return []
+        else:
+            return globs.split(',')
+
     #
     # Python Properties (Experimental)
     #

@@ -6,6 +6,7 @@ Process the users template using Jninja2 rendering it out into the current
 working directory.
 """
 
+import glob
 import os
 import re
 
@@ -180,6 +181,13 @@ class Template(object):
                         self.rename_files()
         return False
 
+    def _ignore_list(self):
+        globs = self.config.ignore
+        ignore_list = []
+        for g in globs:
+            [ignore_list.append(f) for f in glob.glob(g)]
+        return ignore_list
+
     def swap_placeholders(self):
         '''Swap placeholders for real values.'''
 
@@ -204,9 +212,13 @@ class Template(object):
         with indent(4, quote=' >'):
             puts(blue('Replacing placeholders with variables'))
 
+        cwd = os.getcwd()
+
         for root, dirs, files in os.walk(self.project_root):
             jinja_tpl_loader = FileSystemLoader(root)
             jinja_env = Environment(loader=jinja_tpl_loader)
+            os.chdir(root)
+            ignore_list = self._ignore_list()
             for f in files:
                 filepath = os.path.join(root, f)
                 exclude = False
@@ -214,7 +226,7 @@ class Template(object):
                 for d in dirs:
                     if d in self.exclude_dirs:
                         exclude = True  # pragma: no cover
-                if not exclude:
+                if not exclude and f not in ignore_list:
                     try:
                         tpl = jinja_env.get_template(f)
                         file_contents = tpl.render(self.place_holders)
@@ -227,3 +239,4 @@ class Template(object):
                             puts(yellow(
                                 'Warning: Failed to process '
                                 '{0}: {1}'.format(f, e)))
+        os.chdir(cwd)

@@ -93,6 +93,7 @@ The ``~/.facio.cfg`` file uses ``ini`` style formatting.
     flask: git+git@github.com/my_flask_template.git
 
     [misc]
+    ignore='*.gif','./[0-9].*','?.png'
     install=0 # Experimental
 
     # Experimental
@@ -109,6 +110,9 @@ Available Options
     * **default**: Path to your custom template, prefix with ``git+`` to define git repository path.
     * **other_template**: Path to other template
 * ``[misc]``
+    * **ignore**: A comma separated list of globs which specify a pattern of
+      files to ignore, for example ``'*.gif'`` would ignore all files with a gif
+      extenstion.
     * **install**: 0 or 1 - Run ``setup.py`` to install project onto python path using ``setup.py develop``
 * ``[virtualenv]``
     * **venv_create**: 0 or 1 - Create python virtual environment
