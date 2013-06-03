@@ -16,7 +16,6 @@ Vagrant.configure("2") do |config|
     # Port Forwarding / Assign static IP
     #
 
-    config.vm.network :forwarded_port, guest: 80, host: 8080
     config.vm.network :private_network, ip: "10.10.10.10"
 
     #
