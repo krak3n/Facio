@@ -47,7 +47,8 @@ Template Options
 
 -t <ARG1>, --template=<ARG1>
             Path to your custom template, absolute paths only, git repositories can also be specified by prefixing with git+
-            for example: git+git@gitbub.com/path/to/repo.git
+            for example: git+git@gitbub.com/path/to/repo.git. This can also be the template name you gave a template in the
+            ``.facio.cfg`` file.
 
 -c, --choose_template
             If you have more than 1 template defined use this flag to override the default template, Note: specifying -t
