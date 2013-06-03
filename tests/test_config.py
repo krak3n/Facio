@@ -153,7 +153,7 @@ class ConfigTests(BaseTestCase):
     def test_can_refernce_template_by_name_from_cli_invalid(self, mock_path):
         mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
         try:
-            self._set_cli_args(self.base_args + ['-t', 'not_valud_name'])
+            self._set_cli_args(self.base_args + ['-t', 'not_valid_name'])
             config = Config()
         except SystemExit:
             assert True
