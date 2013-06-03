@@ -143,18 +143,18 @@ class ConfigTests(BaseTestCase):
     def test_can_refernce_template_by_name_from_cli(self, mock_path):
         mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
         try:
-            self._set_cli_args(self.base_args + ['-t', 'another_template'])
-            config = Config()
-            self.assertEquals(config.template, '/path/to/template')
-        except SystemExit
-            pass  # We allow a pass here because the template path is invalid
+            self._set_cli_args(self.base_args + ['-t', 'foo'])
+            self.config = Config()
+            self.assertEquals(self.config.template, '/path/to/template/foo')
+        except SystemExit:
+            assert False
 
     @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
     def test_can_refernce_template_by_name_from_cli_invalid(self, mock_path):
         mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
         try:
             self._set_cli_args(self.base_args + ['-t', 'not_valid_name'])
-            config = Config()
+            Config()
         except SystemExit:
             assert True
 
