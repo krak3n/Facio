@@ -139,8 +139,12 @@ class ConfigTests(BaseTestCase):
         except SystemExit:
             assert True
 
+    @patch('os.path.isdir', return_value=True)
     @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    def test_can_refernce_template_by_name_from_cli(self, mock_path):
+    def test_can_refernce_template_by_name_from_cli(
+            self,
+            mock_path,
+            mock_isdir):
         mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
         try:
             self._set_cli_args(self.base_args + ['-t', 'foo'])
