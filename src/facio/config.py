@@ -105,6 +105,11 @@ class Config(object):
     #
 
     def _validate_template_options(self):
+        templates = self.file_args.templates
+        try:
+            self._tpl = [t for n, t in templates if n == self._tpl][0]
+        except IndexError:
+            pass
         if (not self._tpl.startswith('git+') and
                 not os.path.isdir(self._tpl)):
             self._error('The path to your template does not exist.')
