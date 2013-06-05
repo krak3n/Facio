@@ -4,7 +4,8 @@ source = facio
 
 [report]
 omit =
-    tests/
+    tests/*
+    */__init__.py
 
 exclude_lines =
     # Have to re-enable the standard pragma
