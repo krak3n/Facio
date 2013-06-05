@@ -30,12 +30,12 @@ class Git(object):
         return self._repo
 
     def clone(self):
-        self.tmp_dir = tempfile.mkdtemp(suffix='facio')
-
         try:
             from sh import git
         except ImportError:
-            raise Exception  # TODO: Custom exception
+            raise Exception('Please install sh')  # TODO: Custom exception
+
+        self.tmp_dir = tempfile.mkdtemp(suffix='facio')
 
         try:
             git = git.bake(_cwd=self.tmp_dir)

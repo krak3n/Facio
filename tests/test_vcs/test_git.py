@@ -4,6 +4,7 @@
 """
 
 import os
+import sys
 import tempfile
 import uuid
 
@@ -83,3 +84,12 @@ class GitTests(BaseTestCase):
             assert True
         else:
             assert False
+
+    def test_exception_catch_sh_missing(self):
+        self.config.template = 'git+this/wont/work'
+        with patch('__builtin__.__import__', side_effect=ImportError):
+            try:
+                Template(self.config)
+            except Exception:
+                e = sys.exc_info()[1]
+                self.assertEquals('Please install sh', e.message)
