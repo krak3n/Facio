@@ -14,3 +14,5 @@ branches:
         - develop
 env:
   - TRAVIS_CI=true
+after_success:
+    - coveralls

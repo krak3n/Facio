@@ -20,6 +20,7 @@ install_requires = [
     'clint2==0.3.2',
     'sh==1.08',
     'six==1.3.0',
+    'coveralls == 0.2'
 ]
 
 test_requires = [
