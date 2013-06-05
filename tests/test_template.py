@@ -27,7 +27,7 @@ class TemplateTests(BaseTestCase):
         self.config.template_settings_dir = 'settings'
         self.config.cli_opts.error = MagicMock(side_effect=Exception)
         self.config.template = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), 'test_template')
+            os.path.realpath(__file__)), 'files', 'template')
         self.config._tpl = self.config.template
         self.puts_patch = patch('facio.template.puts',
                                 stream=StringIO)
