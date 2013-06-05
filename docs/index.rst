@@ -3,6 +3,8 @@ Facio Documentation
 
 Facio: /ˈfa.ki.oː/ - Latin, meaning to make, do, act, perform, cause, bring about.
 
+|PyPi_version| |PyPi_downloads| |travis_master| |coveralls_master|
+
 What is it?
 -----------
 
@@ -12,18 +14,10 @@ If you work on quick turn around projects either at work or in your free time yo
 
 Originally developed with `Django`_ in mind you can use ``Facio`` for any type of project.
 
-Status
-------
-
-* **Current Version:** |PyPi_version|
-* **Master Branch (Stable):** |travis_master|
-* **Develop Branch (Active Development):** |travis_develop|
-
 Supports
 --------
 
-* Python 2.6, 2.7
-* Python 3.2, 3.3
+* Python 2.6, 2.7, 3.2, 3.3
 
 Features
 --------
@@ -72,6 +66,7 @@ Indices and tables
 * :ref:`search`
 
 .. Links
+
 .. _Django: https://www.djangoproject.com/
 .. _Travis CI: https://travis-ci.org/krak3n/Facio
 .. _Jinja2: http://jinja.pocoo.org/docs/
@@ -79,10 +74,19 @@ Indices and tables
 .. _Poke London: http://pokelondon.com
 
 .. Images
+
 .. |travis_master| image:: https://travis-ci.org/krak3n/Facio.png?branch=master
-    :height: 18px
-.. |travis_develop| image:: https://travis-ci.org/krak3n/Facio.png?branch=develop
-    :height: 18px
+    :target: https://travis-ci.org/krak3n/Facio
+    :alt: Travis build status on Master Branch
+
 .. |PyPi_version| image:: https://pypip.in/v/facio/badge.png
-    :target: https://crate.io/packages/facio
-    :height: 18px
+    :target: https://crate.io/packages/facio/
+    :alt: Latest PyPI version
+
+.. |PyPi_downloads| image:: https://pypip.in/d/facio/badge.png
+    :target: https://crate.io/packages/facio/
+    :alt: Number of PyPI downloads
+
+.. |coveralls_master| image:: https://coveralls.io/repos/krak3n/Facio/badge.png?branch=master
+    :target: https://coveralls.io/r/krak3n/Facio?branch=master
+    :alt: Latest PyPI version
