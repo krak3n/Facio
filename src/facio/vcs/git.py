@@ -33,7 +33,7 @@ class Git(object):
         try:
             from sh import git
         except ImportError:
-            raise Exception('Please install sh')  # TODO: Custom exception
+            raise ImportError('Please install Git')  # TODO: Custom exception
 
         self.tmp_dir = tempfile.mkdtemp(suffix='facio')
 
