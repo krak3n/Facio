@@ -16,6 +16,7 @@ from codecs import open
 from shutil import copytree, move, rmtree, copy
 
 from .vcs.git import Git
+from .vcs.hg import Mercurial
 
 
 class Template(object):
@@ -99,11 +100,12 @@ class Template(object):
         '''Detect VCS template, if True clone into temp dir.'''
 
         self.vcs_cls = None
-        supported_vcs = ['git', ]
+        supported_vcs = ['git', 'hg']
         for vcs in supported_vcs:
             if self.config.template.startswith('%s+' % vcs):
                 self.vcs_cls = {
                     'git': Git(self.config.template),
+                    'hg': Mercurial(self.config.template),
                 }[vcs]
 
         if self.vcs_cls:
