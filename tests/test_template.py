@@ -93,6 +93,18 @@ class TemplateTests(BaseTestCase):
         t = Template(self.config)
         self.assertEquals(t.vcs_cls.__class__.__name__, 'Git')
 
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('tempfile.mkdtemp', return_value=True)
+    @patch('facio.vcs.git.Git.clone', return_value=True)
+    @patch('facio.vcs.git.Git.tmp_dir', return_value=True)
+    def test_detect_hg_repo(self, mock_tmp_dir, mock_clone, mock_tempfile,
+                            mock_stdout):
+        t = Template(self.config)
+        assert not t.vcs_cls
+        self.config.template = 'hg+ssh://someone@somewhere.com//path'
+        t = Template(self.config)
+        self.assertEquals(t.vcs_cls.__class__.__name__, 'Mercurial')
+
     @patch('os.path.isdir', return_value=False)
     @patch('facio.config.Config._error')
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
