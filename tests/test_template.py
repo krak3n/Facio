@@ -95,8 +95,8 @@ class TemplateTests(BaseTestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     @patch('tempfile.mkdtemp', return_value=True)
-    @patch('facio.vcs.git.Git.clone', return_value=True)
-    @patch('facio.vcs.git.Git.tmp_dir', return_value=True)
+    @patch('facio.vcs.hg.Mercurial.clone', return_value=True)
+    @patch('facio.vcs.hg.Mercurial.tmp_dir', return_value=True)
     def test_detect_hg_repo(self, mock_tmp_dir, mock_clone, mock_tempfile,
                             mock_stdout):
         t = Template(self.config)
