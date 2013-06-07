@@ -104,9 +104,9 @@ class Template(object):
         for vcs in supported_vcs:
             if self.config.template.startswith('%s+' % vcs):
                 self.vcs_cls = {
-                    'git': Git(self.config.template),
-                    'hg': Mercurial(self.config.template),
-                }[vcs]
+                    'git': lambda: Git(self.config.template),
+                    'hg': lambda: Mercurial(self.config.template),
+                }[vcs]()
 
         if self.vcs_cls:
             self.vcs_cls.clone()

@@ -111,6 +111,7 @@ class Config(object):
         except IndexError:
             pass  # We don't care if this fails, assume it's a path
         if (not self._tpl.startswith('git+') and
+                not self._tpl.startswith('hg+') and
                 not os.path.isdir(self._tpl)):
             self._error('The path to your template does not exist.')
 
