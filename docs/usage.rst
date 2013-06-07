@@ -28,6 +28,17 @@ Advanced Usage
 Facio is designed to be flexible, with a combination of command line options
 and a configuration file.
 
+Supported VCS
+^^^^^^^^^^^^^
+
+In addition to local file paths you can also use a ``VCS`` repository to use as
+your templates location. Currently ``facio`` supports:
+
+* **Git**: Add ``git+`` followed by the remote path to the repository, for
+  example: ``git+git@gitbub.com/path/to/repo.git``.
+* **Mercurial**: Add ``hg+`` followed by the remote path to the repository, for
+  example: ``hg+you@bitbucket.com/path/to/repo``.
+
 Command Line
 ^^^^^^^^^^^^
 
@@ -46,9 +57,9 @@ Template Options
 ****************
 
 -t <ARG1>, --template=<ARG1>
-            Path to your custom template, absolute paths only, git repositories can also be specified by prefixing with git+
-            for example: git+git@gitbub.com/path/to/repo.git. This can also be the template name you gave a template in the
-            ``.facio.cfg`` file.
+            Path to your custom template, absolute paths only, ``git`` and ``hg`` repositories can also be specified by prefixing with ``(git|hg)+``
+            for example: ``git+git@gitbub.com/path/to/repo.git``. This can also be the template name you gave a template in the
+            ``.facio.cfg`` file, for example ``facio -n foo -t bar``.
 
 -c, --choose_template
             If you have more than 1 template defined use this flag to override the default template, Note: specifying -t
@@ -92,6 +103,7 @@ The ``~/.facio.cfg`` file uses ``ini`` style formatting.
     # Add other templates here, for example:
     experimental_template: /my/new/template/
     flask: git+git@github.com/my_flask_template.git
+    mercurial: hg+you@bitbucket.com/my_mercurial_template.git
 
     [misc]
     ignore='*.gif','./[0-9].*','?.png'
