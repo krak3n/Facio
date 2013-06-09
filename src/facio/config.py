@@ -10,12 +10,12 @@ import os
 import sys
 
 from clint.textui import puts, indent
-from clint.textui.colored import blue
+from clint.textui.colored import blue, red
 from random import choice
 from six.moves import configparser as ConfigParser
 from six.moves import input
 
-from .cli import CLIOptions
+from .cli import CLI
 
 
 class ConfigFile(object):
@@ -85,12 +85,12 @@ class Config(object):
         os.path.dirname(os.path.realpath(__file__)), 'default_template')
 
     def __init__(self):
-        self.cli_args = CLIOptions()
+        self.cli_args = CLI()
         self.file_args = ConfigFile()
         self.django_secret_key
 
     def _error(self, msg):
-        self.cli_args._parser.error(msg)
+        raise SystemExit(red(msg))
 
     #
     # Project Properties
@@ -98,7 +98,7 @@ class Config(object):
 
     @property
     def project_name(self):
-        return self.cli_args.project_name
+        return self.cli_args.get('<project_name>')
 
     #
     # Template Properties
@@ -144,15 +144,15 @@ class Config(object):
     @property
     def _cli_template(self):
         try:
-            return self.cli_args.template
-        except AttributeError:
+            return self.cli_args.get('--template')
+        except KeyError:
             return False
 
     @property
     def _cli_choose_template(self):
         try:
-            return self.cli_args.choose_template
-        except AttributeError:
+            return self.cli_args.get('--select')
+        except KeyError:
             return False
 
     @property
@@ -182,8 +182,8 @@ class Config(object):
     @property
     def variables(self):
         try:
-            return self.cli_args.variables
-        except AssertionError:
+            return self.cli_args.get('--vars')
+        except KeyError:
             return False
 
     @property
