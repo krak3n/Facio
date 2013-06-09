@@ -18,7 +18,7 @@ class CLI(object):
     of project.
 
     Usage:
-        facio <name> [--template <path>|--select] [--vars <variables>]
+        facio <project_name> [--template <path>|--select] [--vars <variables>]
 
     Options:
         -h --help              Show this help text.
