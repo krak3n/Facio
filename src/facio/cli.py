@@ -10,7 +10,12 @@ from facio import __version__
 
 
 class CLI(object):
-    """Facio.
+    """
+    Facio.
+
+    Facio is a project scaffolding tool originally  developed for Django and
+    expanded to be framework agnostic. You can use facio to bootstrap any sort
+    of project.
 
     Usage:
         facio <name> [--template <path>|--select] [--vars <variables>]
@@ -25,6 +30,9 @@ class CLI(object):
                                to select a template from this list.
         --vars <variables>     Comma separated key=value pairs of values to be
                                used in processing templates.
+
+    Example:
+        facio hello_world -t git+git@github.com:you/django.git --vars foo=bar
     """
 
     def __init__(self):
