@@ -5,6 +5,9 @@
    :synopsis: Facio command line entry point and configuration.
 """
 
+import re
+import sys
+
 from docopt import docopt
 from facio import __version__
 
@@ -39,3 +42,9 @@ class CLI(object):
         self.arguments = docopt(
             self.__doc__,
             version='Facio {0}'.format(__version__))
+        self._validate_project_name()
+
+    def _validate_project_name(self):
+        if not re.match('^\w+$', self.arguments.get('<project_name>')):
+            sys.exit('Project names can only contain numbers letters and '
+                     'underscores')

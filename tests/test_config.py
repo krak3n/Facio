@@ -1,5 +1,6 @@
 import sys
 
+from docopt import DocoptExit
 from facio import config
 from facio.config import Config
 from mock import PropertyMock, patch
@@ -11,7 +12,7 @@ from .base import BaseTestCase
 class ConfigTests(BaseTestCase):
     """ Argument Passing & Config Tests. """
 
-    base_args = ['-n', 'test_skeleton']
+    base_args = ['test_skeleton', ]
 
     def setUp(self):
         """ Config Test Setup
@@ -28,14 +29,14 @@ class ConfigTests(BaseTestCase):
         self.stderr = self.stderr_patch.start()
         self.stdin = self.stdin_patch.start()
 
+        sys.argv = ['facio', ]
         self._old_sys_argv = sys.argv
-        sys.argv = [self._old_sys_argv[0].replace('nosetests', 'facio')]
 
     def tearDown(self):
         sys.argv = self._old_sys_argv
 
     def _set_cli_args(self, args):
-        sys.argv = sys.argv + args
+        sys.argv = ['facio', ] + args
         self.config = Config()
 
     def test_exit_with_no_arguments(self):
@@ -58,23 +59,26 @@ class ConfigTests(BaseTestCase):
         sys.argv = sys.argv + self.base_args
         mock_path.return_value = self.empty_cfg
         c = Config()
-
         mock_blue.assert_called_with('Loaded ~/.facio.cfg')
         self.assertTrue(c.file_args.cfg_loaded)
 
     def test_valid_project_name(self):
         valid_names = ['this_is_valid', 'this1is_valid', 'Thisisvalid']
         for valid_name in valid_names:
-            self._set_cli_args(['-n', valid_name])
-            self.assertEquals(self.config.project_name, valid_name)
+            try:
+                self._set_cli_args([valid_name, ])
+                self.assertEquals(self.config.project_name, valid_name)
+            except:
+                import ipdb
+                ipdb.set_trace()
 
     def test_exit_on_invalid_name(self):
         invalid_names = ['this_is_not-valid', 'this_is not_valid',
                          '*this_is_not_valid']
         for invalid_name in invalid_names:
             try:
-                self._set_cli_args(['-n', invalid_name])
-            except SystemExit:
+                self._set_cli_args([invalid_name, ])
+            except (SystemExit, DocoptExit):
                 self.stderr.truncate(0)
             else:
                 assert False
@@ -92,32 +96,12 @@ class ConfigTests(BaseTestCase):
             self._set_cli_args(self.base_args)
             self.assertFalse(self.config.file_args.cfg_loaded)
 
-    def test_exit_when_venv_create_set_no_venv_path_set(self):
-        try:
-            self._set_cli_args(self.base_args + ['--venv_create', ])
-            self.assertTrue(self.config.venv_create)
-        except SystemExit:
-            assert True
-        else:
-            assert False
-
-    def test_not_exit_when_venv_create_set_venv_path_set(self):
-        try:
-            self._set_cli_args(self.base_args + ['--venv_create',
-                                                 '--venv_path',
-                                                 '/some/path'])
-            self.assertTrue(self.config.venv_create)
-        except SystemExit:
-            assert False
-        else:
-            assert True
-
     @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
     def test_valid_template_is_chosen_from_config(self, mock_path):
         mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
         config.input = lambda _: '2'
         try:
-            self._set_cli_args(self.base_args + ['-c', ])
+            self._set_cli_args(self.base_args + ['-s', ])
             self.config = Config()
             self.assertEquals(self.config.template, '/path/to/template')
         except SystemExit:
@@ -126,7 +110,7 @@ class ConfigTests(BaseTestCase):
     def test_fail_if_invalid_template_choice(self):
         config.input = lambda _: '8'
         try:
-            self._set_cli_args(self.base_args + ['-c', ])
+            self._set_cli_args(self.base_args + ['-s', ])
             self.config = Config()
         except SystemExit:
             assert True
@@ -134,7 +118,7 @@ class ConfigTests(BaseTestCase):
     def test_value_error_raised_on_zero_template_choice(self):
         config.input = lambda _: '0'
         try:
-            self._set_cli_args(self.base_args + ['-c', ])
+            self._set_cli_args(self.base_args + ['-s', ])
             self.config = Config()
         except SystemExit:
             assert True

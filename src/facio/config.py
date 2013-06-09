@@ -96,7 +96,7 @@ class Config(object):
 
     @property
     def project_name(self):
-        return self.cli_args.get('<project_name>')
+        return self.cli_args.arguments.get('<project_name>')
 
     #
     # Template Properties
@@ -142,14 +142,14 @@ class Config(object):
     @property
     def _cli_template(self):
         try:
-            return self.cli_args.get('--template')
+            return self.cli_args.arguments.get('--template')
         except KeyError:
             return False
 
     @property
     def _cli_choose_template(self):
         try:
-            return self.cli_args.get('--select')
+            return self.cli_args.arguments.get('--select')
         except KeyError:
             return False
 
@@ -173,7 +173,7 @@ class Config(object):
     @property
     def variables(self):
         try:
-            return self.cli_args.get('--vars')
+            return self.cli_args.arguments.get('--vars')
         except KeyError:
             return False
 
