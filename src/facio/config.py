@@ -23,9 +23,7 @@ class ConfigFile(object):
     templates = []
 
     sections = {
-        'misc': ['install', ],
         'template': [],
-        'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
     path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
