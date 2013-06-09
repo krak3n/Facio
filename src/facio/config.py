@@ -10,12 +10,12 @@ import os
 import sys
 
 from clint.textui import puts, indent
-from clint.textui.colored import blue
+from clint.textui.colored import blue, red
 from random import choice
 from six.moves import configparser as ConfigParser
 from six.moves import input
 
-from .cli import CLIOptions
+from .cli import CLI
 
 
 class ConfigFile(object):
@@ -23,9 +23,7 @@ class ConfigFile(object):
     templates = []
 
     sections = {
-        'misc': ['install', ],
         'template': [],
-        'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
     }
 
     path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
@@ -85,12 +83,12 @@ class Config(object):
         os.path.dirname(os.path.realpath(__file__)), 'default_template')
 
     def __init__(self):
-        self.cli_args = CLIOptions()
+        self.cli_args = CLI()
         self.file_args = ConfigFile()
         self.django_secret_key
 
     def _error(self, msg):
-        self.cli_args._parser.error(msg)
+        raise SystemExit(red(msg))
 
     #
     # Project Properties
@@ -98,7 +96,7 @@ class Config(object):
 
     @property
     def project_name(self):
-        return self.cli_args.project_name
+        return self.cli_args.arguments.get('<project_name>')
 
     #
     # Template Properties
@@ -144,15 +142,15 @@ class Config(object):
     @property
     def _cli_template(self):
         try:
-            return self.cli_args.template
-        except AttributeError:
+            return self.cli_args.arguments.get('--template')
+        except KeyError:
             return False
 
     @property
     def _cli_choose_template(self):
         try:
-            return self.cli_args.choose_template
-        except AttributeError:
+            return self.cli_args.arguments.get('--select')
+        except KeyError:
             return False
 
     @property
@@ -173,17 +171,10 @@ class Config(object):
         return self._tpl
 
     @property
-    def template_settings_dir(self):
-        try:
-            return self.cli_args.template_settings_dir
-        except AssertionError:
-            return False
-
-    @property
     def variables(self):
         try:
-            return self.cli_args.variables
-        except AssertionError:
+            return self.cli_args.arguments.get('--vars')
+        except KeyError:
             return False
 
     @property
@@ -194,109 +185,6 @@ class Config(object):
             return []
         else:
             return globs.split(',')
-
-    #
-    # Python Properties (Experimental)
-    #
-
-    @property
-    def _file_args_install(self):
-        try:
-            return self.file_args.install
-        except AttributeError:
-            return False
-
-    @property
-    def _cli_args_install(self):
-        try:
-            return self.cli_args.install
-        except AttributeError:
-            return False
-
-    @property
-    def install(self):
-        if self._cli_args_install or self._file_args_install:
-            return True
-        return False
-    #
-    # Virtual Environment Properties (Experimental)
-    #
-
-    def _validate_virtualenv_options(self):
-        if not self.venv_path:
-            self._error('You need to provide a virtualenv path where the '
-                        'venv will be created')
-
-    @property
-    def _file_args_venv_create(self):
-        try:
-            return self.file_args.venv_create
-        except AttributeError:
-            return False
-
-    @property
-    def _cli_args_venv_create(self):
-        try:
-            return self.cli_args.venv_create
-        except AttributeError:
-            return False
-
-    @property
-    def _file_args_venv_path(self):
-        try:
-            return self.file_args.venv_path
-        except AttributeError:
-            return False
-
-    @property
-    def _cli_args_venv_path(self):
-        try:
-            return self.cli_args.venv_path
-        except AttributeError:
-            return False
-
-    @property
-    def _file_args_venv_use_site_packages(self):
-        try:
-            return self.file_args.venv_use_site_packages
-        except AttributeError:
-            return False
-
-    @property
-    def _cli_args_venv_use_site_packages(self):
-        try:
-            return self.cli_args.venv_use_site_packages
-        except AttributeError:
-            return False
-
-    @property
-    def venv_create(self):
-        if self._cli_args_venv_create or self._file_args_venv_create:
-            self._validate_virtualenv_options()
-            return True
-        return False
-
-    @property
-    def venv_path(self):
-        if self._file_args_venv_path and not self._cli_args_venv_path:
-            return self._file_args_venv_path
-        elif self._cli_args_venv_path:
-            return self.cli_args.venv_path
-        return False
-
-    @property
-    def venv_use_site_packages(self):
-        if (self._cli_args_venv_use_site_packages
-                or self._file_args_venv_use_site_packages):
-            return True
-        return False
-
-    @property
-    def venv_prefix(self):
-        try:
-            return self.cli_args.venv_prefix
-        except AttributeError:
-            return False
 
     #
     # Django Secret Key Generation
