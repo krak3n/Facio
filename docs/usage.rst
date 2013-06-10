@@ -22,12 +22,6 @@ To create a new project its simple, ``cd`` into the directory you want your new 
 
 This will create a new ``hello_world`` directory at ``/home/me/projects`` and inside the default ``facio`` template will have been processed and placed there.
 
-Advanced Usage
---------------
-
-Facio is designed to be flexible, with a combination of command line options
-and a configuration file.
-
 Supported VCS
 ^^^^^^^^^^^^^
 
@@ -39,51 +33,38 @@ your templates location. Currently ``facio`` supports:
 * **Mercurial**: Add ``hg+`` followed by the remote path to the repository, for
   example: ``hg+you@bitbucket.com/path/to/repo``.
 
-Command Line
-^^^^^^^^^^^^
+Command Line Usage
+^^^^^^^^^^^^^^^^^^
 
---version
-            show program's version number and exit
--h, --help
-            show this help message and exit
+.. program:: facio
 
-Project Options
-***************
+.. cmdoption:: -h, --help
 
--n <ARG>, --name=<ARG>
-            The Project Name (Mandatory), only use alphanumeric characters and underscores.
+   Show the help message
 
-Template Options
-****************
+.. cmdoption:: --version
 
--t <ARG1>, --template=<ARG1>
-            Path to your custom template, absolute paths only, ``git`` and ``hg`` repositories can also be specified by prefixing with ``(git|hg)+``
-            for example: ``git+git@gitbub.com/path/to/repo.git``. This can also be the template name you gave a template in the
-            ``.facio.cfg`` file, for example ``facio -n foo -t bar``.
+    Show version
 
--c, --choose_template
-            If you have more than 1 template defined use this flag to override the default template, Note: specifying -t
-            (--template) will mean this flag is ignored.
+.. cmdoption:: -t <path>, --template <path>
 
--s <ARG>, --template_settings_dir=<ARG>
-            Template settings directory name
+    Template path, can be repository link (git+ / hg+) or a template name defined in ~/.facio.cfg.
 
---vars=<ARG>
-            Custom variables, e.g --vars hello=world,sky=blue
+.. cmdoption:: -s, --select
 
-Experimental Options
-********************
+    Lists templates in ~/.facio.cfg prompting you to select a template from this list.
 
--i, --install
-            Install the project onto your path, e.g python setup.py develop
--e, --venv_create
-            Create python virtual environment
--p <ARG>, --venv_path=<ARG>
-            Python virtualenv home directory
--S, --venv_use_site_packages
-            Create python vittual environment without --no-site-packages
--x <ARG>, --venv_prefix=<ARG>
-            Virtual environment name prefix
+.. cmdoption:: --vars <variables>
+
+    Comma separated key=value pairs of values to be used in processing templates.
+
+Example
+*******
+
+.. code-block:: none
+
+    facio hello_world -t git+git@github.com:you/django.git --vars foo=bar
+
 
 Configuration File
 ^^^^^^^^^^^^^^^^^^
@@ -107,14 +88,8 @@ The ``~/.facio.cfg`` file uses ``ini`` style formatting.
 
     [misc]
     ignore='*.gif','./[0-9].*','?.png'
-    install=0 # Experimental
 
-    # Experimental
-    [virutalenv]
-    venv_create=1
-    venv_path=/home/me/.virtualenvs/
-
-Above is an example ``~/.facio.cfg`` file and contains a ``[misc]``, ``[virtualenv]``, and ``[template]`` sections. These sections and their allowed options allow you set defaults so when you run ``facio`` form the command line you need to keep specifying things like template path and virtual environment creation.
+Above is an example ``~/.facio.cfg`` file and contains a ``[misc]`` and ``[template]`` sections. These sections and their allowed options allow you set defaults so when you run ``facio`` form the command line you need to keep specifying things like templates.
 
 Available Options
 *****************
@@ -126,7 +101,3 @@ Available Options
     * **ignore**: A comma separated list of globs which specify a pattern of
       files to ignore, for example ``'*.gif'`` would ignore all files with a gif
       extenstion.
-    * **install**: 0 or 1 - Run ``setup.py`` to install project onto python path using ``setup.py develop``
-* ``[virtualenv]``
-    * **venv_create**: 0 or 1 - Create python virtual environment
-    * **venv_path**: Path to python virtual environments home, e.g ``/home/me/.virtualenvs/``
