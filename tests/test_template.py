@@ -177,3 +177,9 @@ class TemplateTests(BaseTestCase):
                     with open(filepath, 'r', encoding='utf8') as f:
                         contents = f.read()
                     self.assertEqual(contents, '{{ PROJECT_NAME }}\n')
+
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
+    def test_template_detects_pipeline_file(self, mock_working_dir):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        t = Template(self.config)
+        self.assertTrue(t.has_pipeline_file)
