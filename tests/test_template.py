@@ -179,7 +179,14 @@ class TemplateTests(BaseTestCase):
                     self.assertEqual(contents, '{{ PROJECT_NAME }}\n')
 
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
-    def test_template_detects_pipeline_file(self, mock_working_dir):
+    def test_detects_pipeline_file(self, mock_working_dir):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
         self.assertTrue(t.has_pipeline_file)
+
+    @patch('os.path.isfile', return_value=False)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
+    def test_fale_no_pipeline_file(self, mock_working_dir, mock_isfile):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        t = Template(self.config)
+        self.assertFale(t.has_pipeline_file)
