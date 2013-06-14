@@ -5,13 +5,25 @@ import unittest
 
 class BaseTestCase(unittest.TestCase):
 
-    test_tpl_path = os.path.join(os.path.abspath('.'), 'tests',
-                                 'files', 'template')
-
-    test_cfg_base_path = os.path.join(os.path.abspath('.'), 'tests',
-                                      'files', 'configs')
-
     IS_PY3 = sys.version_info[0] == 3
+
+    test_tpl_path = os.path.join(
+        os.path.abspath('.'),
+        'tests',
+        'files',
+        'template')
+
+    test_cfg_base_path = os.path.join(
+        os.path.abspath('.'),
+        'tests',
+        'files',
+        'configs')
+
+    test_pieplines_path = os.path.join(
+        os.path.abspath('.'),
+        'tests',
+        'files',
+        'pipelines')
 
     def _test_cfg_path(self, fname):
         return os.path.join(self.test_cfg_base_path, fname)

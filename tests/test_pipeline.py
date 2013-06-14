@@ -4,8 +4,8 @@
 """
 
 import os
-import uuid
 
+from facio.pipline import Pipeline
 from mock import MagicMock, patch
 from six import StringIO
 
@@ -16,15 +16,23 @@ class PipelineTest(BaseTestCase):
     """ Pipeline Tests """
 
     def setUp(self):
-        # Mock out the config class
-        self.config = MagicMock(name='config')
-        self.config.project_name = uuid.uuid4().hex  # Random project name
-        self.config.django_secret_key = 'xxx'
-        self.config.template_settings_dir = 'settings'
-        self.config.cli_opts.error = MagicMock(side_effect=Exception)
-        self.config.template = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), 'files', 'template')
-        self.config._tpl = self.config.template
-        self.puts_patch = patch('facio.template.puts',
-                                stream=StringIO)
-        self.puts_patch.start()
+        self.template = self._mock_template_class()
+        self.puts = self._mock_puts()
+
+    def _mock_template_class(self):
+        template = MagicMock(name='template')
+        template.config = MagicMock(name='config')
+
+        return template
+
+    def _mock_puts(self):
+        puts = patch('facio.pipeline.puts', stream=StringIO)
+        puts.start()
+
+        return puts
+
+    def test_can_parse_file(self):
+        self.template.pipeline_file = os.path.join(
+            self.test_pieplines_path,
+            'complete.yml')
+        Pipeline(self.template)
