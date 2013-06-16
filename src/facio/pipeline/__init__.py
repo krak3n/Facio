@@ -31,3 +31,12 @@ class Pipeline(object):
                 puts("Error loading Pipeline - Is it correctly formatted?")
             else:
                 puts("Loading Pipeline")
+
+    @property
+    def has_before(self):
+        """ Does the pipeline contain a before module list.
+
+        :returns: Bool
+        """
+
+        return self.pipeline.get('before', False)
