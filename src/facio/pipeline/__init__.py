@@ -39,4 +39,19 @@ class Pipeline(object):
         :returns: Bool
         """
 
-        return self.pipeline.get('before', False)
+        try:
+            return self.pipeline.get('before', False)
+        except AttributeError:
+            return False
+
+    @property
+    def has_after(self):
+        """ Does the pipeline contain a after module list.
+
+        :returns: Bool
+        """
+
+        try:
+            return self.pipeline.get('after', False)
+        except AttributeError:
+            return False
