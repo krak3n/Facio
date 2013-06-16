@@ -1,0 +1,4 @@
+before:
+    - foo.bar.thing
+after:
+    - bare.foo.thing
