@@ -7,7 +7,6 @@ import os
 
 from facio.pipeline import Pipeline
 from mock import MagicMock, patch
-from six import StringIO
 
 from .base import BaseTestCase
 
@@ -17,7 +16,6 @@ class PipelineTest(BaseTestCase):
 
     def setUp(self):
         self.template = self._mock_template_class()
-        self.puts = self._mock_puts()
 
     def _mock_template_class(self):
         template = MagicMock(name='template')
@@ -28,25 +26,19 @@ class PipelineTest(BaseTestCase):
 
         return template
 
-    def _mock_puts(self):
-        puts = patch('facio.pipeline.puts', stream=StringIO)
-        puts.start()
-
-        return puts
-
     def test_can_load_yaml(self):
-        Pipeline(self.template)
-        puts = self.puts.getvalue()
-        self.assertEquals(puts, "Loading Pipeline")
+        with patch('facio.pipeline.puts') as puts:
+            Pipeline(self.template)
+            puts.assert_called_with("Loading Pipeline")
 
     def test_yaml_load_error_output(self):
         self.template.pipeline_file = os.path.join(
             self.test_pieplines_path,
             'malformed.yml')
-        Pipeline(self.template)
-        puts = self.puts.getvalue()
-        self.assertEquals(puts, "Error loading Pipeline - Is it correctly "
-                                "formatted")
+        with patch('facio.pipeline.puts') as puts:
+            Pipeline(self.template)
+        puts.assert_called_with("Error loading Pipeline - Is it correctly "
+                                "formatted?")
 
     def test_has_before_true(self):
         pass
