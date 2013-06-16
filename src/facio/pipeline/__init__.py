@@ -6,6 +6,7 @@
 import yaml
 
 from clint.textui import puts
+from importlib import import_module
 from yaml.scanner import ScannerError
 
 
@@ -55,3 +56,18 @@ class Pipeline(object):
             return self.pipeline.get('after', False)
         except AttributeError:
             return False
+
+    def import_module(self, path):
+        """ Import module to run in before or post pipeline.
+
+        :param path: The python path to the module
+        :type path: str
+        """
+
+        try:
+            module = import_module(path)
+        except ImportError:
+            puts('Failed to Load module: {0}'.format(path))
+        else:
+            puts('Loaded module: {0}'.format(path))
+            return module
