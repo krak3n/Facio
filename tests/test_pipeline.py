@@ -33,6 +33,12 @@ class PipelineTest(BaseTestCase):
 
         return puts
 
+    def test_can_load_yaml(self):
+        pass
+
+    def test_yaml_load_error_output(self):
+        pass
+
     def test_has_before_true(self):
         pass
 
