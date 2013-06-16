@@ -47,7 +47,7 @@ class PipelineTest(BaseTestCase):
     def test_has_before_false(self):
         self.template.pipeline_file = os.path.join(
             self.test_pieplines_path,
-            'empty.yml')
+            'after.yml')
         p = Pipeline(self.template)
         self.assertFalse(p.has_before)
 
