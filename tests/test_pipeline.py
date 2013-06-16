@@ -41,10 +41,15 @@ class PipelineTest(BaseTestCase):
                                 "formatted?")
 
     def test_has_before_true(self):
-        pass
+        p = Pipeline(self.template)
+        self.assertTrue(p.has_before)
 
     def test_has_before_false(self):
-        pass
+        self.template.pipeline_file = os.path.join(
+            self.test_pieplines_path,
+            'empty.yml')
+        p = Pipeline(self.template)
+        self.assertFalse(p.has_before)
 
     def test_has_after_true(self):
         pass
