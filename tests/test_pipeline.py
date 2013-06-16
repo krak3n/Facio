@@ -5,7 +5,6 @@
 
 import os
 
-from facio.pipline import Pipeline
 from mock import MagicMock, patch
 from six import StringIO
 
@@ -21,6 +20,9 @@ class PipelineTest(BaseTestCase):
 
     def _mock_template_class(self):
         template = MagicMock(name='template')
+        template.pipeline_file = os.path.join(
+            self.test_pieplines_path,
+            'complete.yml')
         template.config = MagicMock(name='config')
 
         return template
@@ -31,8 +33,32 @@ class PipelineTest(BaseTestCase):
 
         return puts
 
-    def test_can_parse_file(self):
-        self.template.pipeline_file = os.path.join(
-            self.test_pieplines_path,
-            'complete.yml')
-        Pipeline(self.template)
+    def test_has_before_true(self):
+        pass
+
+    def test_has_before_false(self):
+        pass
+
+    def test_has_after_true(self):
+        pass
+
+    def test_has_after_false(self):
+        pass
+
+    def test_parse_success(self):
+        pass
+
+    def test_parse_failure_output_error(self):
+        pass
+
+    def test_import_success(self):
+        pass
+
+    def test_import_module_failure(self):
+        pass
+
+    def test_run_module_failure(self):
+        pass
+
+    def test_run_module_success(self):
+        pass
