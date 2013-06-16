@@ -40,6 +40,15 @@ class PipelineTest(BaseTestCase):
         puts.assert_called_with("Error loading Pipeline - Is it correctly "
                                 "formatted?")
 
+    def test_empty_pipeline_always_retuns_false(self):
+        self.template.pipeline_file = os.path.join(
+            self.test_pieplines_path,
+            'empty.yml')
+        p = Pipeline(self.template)
+
+        self.assertFalse(p.has_before)
+        self.assertFalse(p.has_after)
+
     def test_has_before_true(self):
         p = Pipeline(self.template)
         self.assertTrue(p.has_before)
@@ -52,10 +61,15 @@ class PipelineTest(BaseTestCase):
         self.assertFalse(p.has_before)
 
     def test_has_after_true(self):
-        pass
+        p = Pipeline(self.template)
+        self.assertTrue(p.has_after)
 
     def test_has_after_false(self):
-        pass
+        self.template.pipeline_file = os.path.join(
+            self.test_pieplines_path,
+            'before.yml')
+        p = Pipeline(self.template)
+        self.assertFalse(p.has_after)
 
     def test_parse_success(self):
         pass
