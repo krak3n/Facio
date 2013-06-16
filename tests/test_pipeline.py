@@ -4,6 +4,7 @@
 """
 
 import os
+import sys
 
 from facio.pipeline import Pipeline
 from mock import MagicMock, patch
@@ -71,17 +72,25 @@ class PipelineTest(BaseTestCase):
         p = Pipeline(self.template)
         self.assertFalse(p.has_after)
 
-    def test_parse_success(self):
-        pass
-
-    def test_parse_failure_output_error(self):
-        pass
-
     def test_import_success(self):
-        pass
+        p = Pipeline(self.template)
+        test_pipeline_path = [
+            os.path.dirname(__file__),
+            'files',
+            'pipelines',
+            'modules'
+        ]
+        sys.path.append(os.path.abspath(os.path.join(*test_pipeline_path)))
+        with patch('facio.pipeline.puts') as puts:
+            p.import_module('pipeline_test_module')
+            puts.assert_called_with('Loaded module: pipeline_test_module')
 
     def test_import_module_failure(self):
-        pass
+        p = Pipeline(self.template)
+        with patch('facio.pipeline.puts') as puts:
+            p.import_module('pipeline_test_module')
+            puts.assert_called_with('Failed to Load module: '
+                                    'pipeline_test_module')
 
     def test_run_module_failure(self):
         pass
