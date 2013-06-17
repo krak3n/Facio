@@ -20,6 +20,7 @@ class Pipeline(object):
         :type tpl_class: Object
         """
 
+        self.calls = []
         self.tpl = tpl_class
         self._parse()
 
@@ -87,25 +88,31 @@ class Pipeline(object):
             module = import_module(path)
         except ImportError:
             puts('Failed to Load module: {0}'.format(path))
+            return False
         else:
             puts('Loaded module: {0}'.format(path))
             return module
 
-    def run_module(self, module):
+    def run_module(self, path):
         """ Run a before or after module.
 
-        :param module: The instance of the module
-        :type module: Object
+        :param path: Path to the module
+        :type module: str
         """
 
-        try:
-            return module.run()
-        except AttributeError:
-            puts('Error Running Module: Missing run() method.')
-        except Exception:
-            e = sys.exc_info()[1]
-            traceback = sys.exc_info()[2]
-            puts('Exeption caught in module: {0} line: {1}'.format(
-                e,
-                traceback.tb_lineno))
-        return None
+        module = self.import_module(path)
+        result = None
+
+        if module:
+            try:
+                result = module.run()
+            except AttributeError:
+                puts('Error Running Module: Missing run() method.')
+            except Exception:
+                e = sys.exc_info()[1]
+                traceback = sys.exc_info()[2]
+                puts('Exeption caught in module: {0} line: {1}'.format(
+                    e,
+                    traceback.tb_lineno))
+            self.calls.append({path: result})
+            return result
