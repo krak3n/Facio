@@ -42,7 +42,7 @@ class PipelineTest(BaseTestCase):
                                 "formatted?")
 
     @patch('__builtin__.open')
-    def test_yaml_formatted_correctly(self, open_mock):
+    def test_yaml_formatted_correctly_before(self, open_mock):
         data = """
         before:
             foo:
@@ -55,6 +55,21 @@ class PipelineTest(BaseTestCase):
         with patch('facio.pipeline.puts') as puts:
             Pipeline(self.template)
             puts.assert_called_with('Ignoring before: should be a list')
+
+    @patch('__builtin__.open')
+    def test_yaml_formatted_correctly_after(self, open_mock):
+        data = """
+        after:
+            foo:
+                - thing.bar
+        """
+        open_mock.return_value.__enter__ = lambda s: s
+        open_mock.return_value.__exit__ = MagicMock()
+        open_mock.return_value.read.return_value = cStringIO(data)
+        self.template.pipeline_file = 'mocked.yml'
+        with patch('facio.pipeline.puts') as puts:
+            Pipeline(self.template)
+            puts.assert_called_with('Ignoring after: should be a list')
 
     def test_empty_pipeline_always_retuns_false(self):
         self.template.pipeline_file = os.path.join(
