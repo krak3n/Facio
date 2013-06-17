@@ -13,6 +13,9 @@ from yaml.scanner import ScannerError
 
 class Pipeline(object):
 
+    before_valid = False
+    after_valid = False
+
     def __init__(self, tpl_class):
         """ Pipeline class instanctiation.
 
@@ -28,11 +31,29 @@ class Pipeline(object):
 
         with open(self.tpl.pipeline_file) as f:
             try:
-                self.pipeline = yaml.load(f)
+                self.pipeline = yaml.load(f.read())
             except ScannerError:
                 puts("Error loading Pipeline - Is it correctly formatted?")
             else:
                 puts("Loading Pipeline")
+
+    def _validate_before(self):
+        if 'before' in self.pipeline:
+            if not type(self.pipeline.get('before')) == list:
+                puts('Ignoring before: should be a list')
+                return False
+            else:
+                return True
+        return False
+
+    def _validate_after(self):
+        if 'after' in self.pipeline:
+            if not type(self.pipeline.get('after')) == list:
+                puts('Ignoring after: should be a list')
+                return False
+            else:
+                return True
+        return False
 
     @property
     def has_before(self):
@@ -42,8 +63,8 @@ class Pipeline(object):
         """
 
         try:
-            return self.pipeline.get('before', False)
-        except AttributeError:
+            return self._validate_before()
+        except TypeError:
             return False
 
     @property
@@ -54,8 +75,8 @@ class Pipeline(object):
         """
 
         try:
-            return self.pipeline.get('after', False)
-        except AttributeError:
+            return self._validate_after()
+        except TypeError:
             return False
 
     def import_module(self, path):
