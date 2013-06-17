@@ -3,7 +3,6 @@
    :synopsis: Tests for the facio pipeline module.
 """
 
-import os
 import six
 
 from facio.pipeline import Pipeline
@@ -20,9 +19,7 @@ class PipelineTest(BaseTestCase):
 
     def _mock_template_class(self):
         template = MagicMock(name='template')
-        template.pipeline_file = os.path.join(
-            self.test_pieplines_path,
-            'complete.yml')
+        template.pipeline_file = 'mocked.yml'
         template.config = MagicMock(name='config')
 
         return template
@@ -37,18 +34,35 @@ class PipelineTest(BaseTestCase):
         return m
 
     def test_can_load_yaml(self):
+        data = """
+        before:
+            - foo.bar.thing
+        after:
+            - bare.foo.thing
+        """
+        open_mock = self._mock_open(data)
+        open_mock.start()
         with patch('facio.pipeline.puts') as puts:
             Pipeline(self.template)
             puts.assert_called_with("Loading Pipeline")
+        open_mock.stop()
 
     def test_yaml_load_error_output(self):
-        self.template.pipeline_file = os.path.join(
-            self.test_pieplines_path,
-            'malformed.yml')
+        data = """
+        s:
+        is
+        not*
+        *correct
+        - hello
+            :world
+        """
+        open_mock = self._mock_open(data)
+        open_mock.start()
         with patch('facio.pipeline.puts') as puts:
             Pipeline(self.template)
-        puts.assert_called_with("Error loading Pipeline - Is it correctly "
-                                "formatted?")
+            puts.assert_called_with("Error loading Pipeline - Is it correctly "
+                                    "formatted?")
+        open_mock.stop()
 
     def test_yaml_formatted_correctly_before(self):
         data = """
@@ -58,7 +72,6 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
-        self.template.pipeline_file = 'mocked.yml'
         with patch('facio.pipeline.puts') as puts:
             p = Pipeline(self.template)
             self.assertFalse(p.has_before)
@@ -73,7 +86,6 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
-        self.template.pipeline_file = 'mocked.yml'
         with patch('facio.pipeline.puts') as puts:
             p = Pipeline(self.template)
             self.assertFalse(p.has_after)
@@ -81,51 +93,78 @@ class PipelineTest(BaseTestCase):
         open_mock.stop()
 
     def test_empty_pipeline_always_retuns_false(self):
-        self.template.pipeline_file = os.path.join(
-            self.test_pieplines_path,
-            'empty.yml')
+        data = """
+        """
+        open_mock = self._mock_open(data)
+        open_mock.start()
         p = Pipeline(self.template)
 
         self.assertFalse(p.has_before)
         self.assertFalse(p.has_after)
+        open_mock.stop()
 
     def test_has_before_true(self):
+        data = """
+        before:
+            - thing.foo.bar
+        """
+        open_mock = self._mock_open(data)
+        open_mock.start()
         p = Pipeline(self.template)
         self.assertTrue(p.has_before)
+        open_mock.stop()
 
     def test_has_before_false(self):
-        self.template.pipeline_file = os.path.join(
-            self.test_pieplines_path,
-            'after.yml')
+        data = """
+        not_before:
+            - thing.foo.bar
+        """
+        open_mock = self._mock_open(data)
+        open_mock.start()
         p = Pipeline(self.template)
         self.assertFalse(p.has_before)
+        open_mock.stop()
 
     def test_has_after_true(self):
+        data = """
+        after:
+            - thing.foo.bar
+        """
+        open_mock = self._mock_open(data)
+        open_mock.start()
         p = Pipeline(self.template)
         self.assertTrue(p.has_after)
+        open_mock.stop()
 
     def test_has_after_false(self):
-        self.template.pipeline_file = os.path.join(
-            self.test_pieplines_path,
-            'before.yml')
+        data = """
+        not_after:
+            - thing.foo.bar
+        """
+        open_mock = self._mock_open(data)
+        open_mock.start()
         p = Pipeline(self.template)
         self.assertFalse(p.has_after)
+        open_mock.stop()
 
+    @patch('facio.pipeline.Pipeline._parse', return_value=True)
     @patch('facio.pipeline.import_module', return_value=True)
-    def test_import_success(self, mock_importlib):
+    def test_import_success(self, mock_importlib, mock_parse):
         p = Pipeline(self.template)
         with patch('facio.pipeline.puts') as puts:
             p.import_module('path.to.module')
             puts.assert_called_with('Loaded module: path.to.module')
 
-    def test_import_module_failure(self):
+    @patch('facio.pipeline.Pipeline._parse', return_value=True)
+    def test_import_module_failure(self, mock_parse):
         p = Pipeline(self.template)
         with patch('facio.pipeline.puts') as puts:
             p.import_module('pipeline_test_module')
             puts.assert_called_with('Failed to Load module: '
                                     'pipeline_test_module')
 
-    def test_run_module_success(self):
+    @patch('facio.pipeline.Pipeline._parse', return_value=True)
+    def test_run_module_success(self, mock_parse):
         p = Pipeline(self.template)
         module = MagicMock()
         module.run.return_value = True
@@ -133,7 +172,8 @@ class PipelineTest(BaseTestCase):
         self.assertTrue(module.run.called)
         self.assertTrue(rtn)
 
-    def test_run_module_failure(self):
+    @patch('facio.pipeline.Pipeline._parse', return_value=True)
+    def test_run_module_failure(self, mock_parse):
         p = Pipeline(self.template)
         module = MagicMock()
         module.run.side_effect = AttributeError
@@ -141,7 +181,8 @@ class PipelineTest(BaseTestCase):
         self.assertTrue(module.run.called)
         self.assertFalse(rtn)
 
-    def test_module_exception_caught(self):
+    @patch('facio.pipeline.Pipeline._parse', return_value=True)
+    def test_module_exception_caught(self, mock_parse):
         module = MagicMock()
         module.foo.side_effect = KeyError('Failed lookup')
 
