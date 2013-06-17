@@ -196,3 +196,29 @@ class PipelineTest(BaseTestCase):
         self.assertTrue(module.foo.called)
         puts.assert_called_with('Exeption caught in module: '
                                 '\'Failed lookup\' line: 105')
+
+    @patch('facio.pipeline.Pipeline._parse', return_value=True)
+    def test_store_pipeline_states(self, return_value=True):
+        p = Pipeline(self.template)
+        import_module_mock = patch('facio.pipeline.import_module')
+        mock = import_module_mock .start()
+
+        module1 = MagicMock()
+        module1.run.return_value = True
+        module2 = MagicMock()
+        module2.run.return_value = False
+        module3 = MagicMock()
+        module3.run.return_value = [1, 2, 3]
+
+        for x in range(1, 4):
+            mock.return_value = locals().get('module{0}'.format(x))
+            module = p.import_module(mock)
+            p.run_module(module)
+
+        self.assertTrue(module1.run.called)
+        self.assertTrue(module2.run.called)
+        self.assertTrue(module3.run.called)
+        self.assertEquals(len(p.calls), 3)
+        self.assertTrue(p.calls[0].get('result'))
+        self.assertFalse(p.calls[1].get('result'))
+        self.assertEquals(p.calls[1].get('result'), [1, 2, 3])
