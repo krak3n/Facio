@@ -7,6 +7,7 @@ import os
 
 from facio.pipeline import Pipeline
 from mock import MagicMock, patch
+from six.moves import cStringIO
 
 from .base import BaseTestCase
 
@@ -39,6 +40,22 @@ class PipelineTest(BaseTestCase):
             Pipeline(self.template)
         puts.assert_called_with("Error loading Pipeline - Is it correctly "
                                 "formatted?")
+
+    @patch('__builtin__.open')
+    def test_yaml_formatted_correctly(self, open_mock):
+        pipeline = """
+        before:
+            foo:
+                - thing.bar
+                - 4
+        """
+        open_mock.return_value.__enter__ = lambda s: s
+        open_mock.return_value.__exit__ = MagicMock()
+        open_mock.return_value.read.return_value = cStringIO(pipeline)
+        self.template.pipeline_file = 'mocked.yml'
+        with patch('facio.pipeline.puts') as puts:
+            Pipeline(self.template)
+        puts.assert_called_with('Ignoring before: should be a list')
 
     def test_empty_pipeline_always_retuns_false(self):
         self.template.pipeline_file = os.path.join(
