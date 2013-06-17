@@ -4,10 +4,10 @@
 """
 
 import os
+import six
 
 from facio.pipeline import Pipeline
-from mock import MagicMock, patch
-from six.moves import cStringIO
+from mock import MagicMock, mock_open, patch
 
 from .base import BaseTestCase
 
@@ -27,6 +27,15 @@ class PipelineTest(BaseTestCase):
 
         return template
 
+    def _mock_open(self, data):
+        if six.PY3:
+            func = 'builtins.open'
+        else:
+            func = '__builtin__.open'
+        m = patch(func, mock_open(read_data=data),
+                  create=True)
+        return m
+
     def test_can_load_yaml(self):
         with patch('facio.pipeline.puts') as puts:
             Pipeline(self.template)
@@ -41,37 +50,35 @@ class PipelineTest(BaseTestCase):
         puts.assert_called_with("Error loading Pipeline - Is it correctly "
                                 "formatted?")
 
-    @patch('__builtin__.open')
-    def test_yaml_formatted_correctly_before(self, open_mock):
+    def test_yaml_formatted_correctly_before(self):
         data = """
         before:
             foo:
                 - thing.bar
         """
-        open_mock.return_value.__enter__ = lambda s: s
-        open_mock.return_value.__exit__ = MagicMock()
-        open_mock.return_value.read.return_value = cStringIO(data)
+        open_mock = self._mock_open(data)
+        open_mock.start()
         self.template.pipeline_file = 'mocked.yml'
         with patch('facio.pipeline.puts') as puts:
             p = Pipeline(self.template)
             self.assertFalse(p.has_before)
             puts.assert_called_with('Ignoring before: should be a list')
+        open_mock.stop()
 
-    @patch('__builtin__.open')
-    def test_yaml_formatted_correctly_after(self, open_mock):
+    def test_yaml_formatted_correctly_after(self):
         data = """
         after:
             foo:
                 - thing.bar
         """
-        open_mock.return_value.__enter__ = lambda s: s
-        open_mock.return_value.__exit__ = MagicMock()
-        open_mock.return_value.read.return_value = cStringIO(data)
+        open_mock = self._mock_open(data)
+        open_mock.start()
         self.template.pipeline_file = 'mocked.yml'
         with patch('facio.pipeline.puts') as puts:
             p = Pipeline(self.template)
             self.assertFalse(p.has_after)
             puts.assert_called_with('Ignoring after: should be a list')
+        open_mock.stop()
 
     def test_empty_pipeline_always_retuns_false(self):
         self.template.pipeline_file = os.path.join(
