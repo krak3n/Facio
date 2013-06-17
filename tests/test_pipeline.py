@@ -53,7 +53,8 @@ class PipelineTest(BaseTestCase):
         open_mock.return_value.read.return_value = cStringIO(data)
         self.template.pipeline_file = 'mocked.yml'
         with patch('facio.pipeline.puts') as puts:
-            Pipeline(self.template)
+            p = Pipeline(self.template)
+            self.assertFalse(p.has_before)
             puts.assert_called_with('Ignoring before: should be a list')
 
     @patch('__builtin__.open')
@@ -68,7 +69,8 @@ class PipelineTest(BaseTestCase):
         open_mock.return_value.read.return_value = cStringIO(data)
         self.template.pipeline_file = 'mocked.yml'
         with patch('facio.pipeline.puts') as puts:
-            Pipeline(self.template)
+            p = Pipeline(self.template)
+            self.assertFalse(p.has_after)
             puts.assert_called_with('Ignoring after: should be a list')
 
     def test_empty_pipeline_always_retuns_false(self):
@@ -145,4 +147,4 @@ class PipelineTest(BaseTestCase):
             p.run_module(module)
         self.assertTrue(module.foo.called)
         puts.assert_called_with('Exeption caught in module: '
-                                '\'Failed lookup\' line: 98')
+                                '\'Failed lookup\' line: 105')
