@@ -166,25 +166,36 @@ class PipelineTest(BaseTestCase):
     @patch('facio.pipeline.Pipeline._parse', return_value=True)
     def test_run_module_success(self, mock_parse):
         p = Pipeline(self.template)
+        import_module_mock = patch('facio.pipeline.import_module')
+        mock = import_module_mock.start()
         module = MagicMock()
         module.run.return_value = True
-        rtn = p.run_module(module)
+        mock.return_value = module
+        rtn = p.run_module('foo.bar.baz')
         self.assertTrue(module.run.called)
         self.assertTrue(rtn)
+        mock = import_module_mock.stop()
 
     @patch('facio.pipeline.Pipeline._parse', return_value=True)
     def test_run_module_failure(self, mock_parse):
         p = Pipeline(self.template)
+        import_module_mock = patch('facio.pipeline.import_module')
+        mock = import_module_mock.start()
         module = MagicMock()
         module.run.side_effect = AttributeError
-        rtn = p.run_module(module)
+        mock.return_value = module
+        rtn = p.run_module('foo.bar.baz')
         self.assertTrue(module.run.called)
         self.assertFalse(rtn)
+        mock = import_module_mock.stop()
 
     @patch('facio.pipeline.Pipeline._parse', return_value=True)
     def test_module_exception_caught(self, mock_parse):
+        import_module_mock = patch('facio.pipeline.import_module')
+        mock = import_module_mock.start()
         module = MagicMock()
         module.foo.side_effect = KeyError('Failed lookup')
+        mock.return_value = module
 
         def fake_run():
             module.foo()
@@ -192,16 +203,17 @@ class PipelineTest(BaseTestCase):
         module.run = fake_run
         p = Pipeline(self.template)
         with patch('facio.pipeline.puts') as puts:
-            p.run_module(module)
+            p.run_module('foo.bar.baz')
         self.assertTrue(module.foo.called)
         puts.assert_called_with('Exeption caught in module: '
-                                '\'Failed lookup\' line: 105')
+                                '\'Failed lookup\' line: 108')
+        mock = import_module_mock.stop()
 
     @patch('facio.pipeline.Pipeline._parse', return_value=True)
     def test_store_pipeline_states(self, return_value=True):
         p = Pipeline(self.template)
         import_module_mock = patch('facio.pipeline.import_module')
-        mock = import_module_mock .start()
+        mock = import_module_mock.start()
 
         module1 = MagicMock()
         module1.run.return_value = True
@@ -212,13 +224,14 @@ class PipelineTest(BaseTestCase):
 
         for x in range(1, 4):
             mock.return_value = locals().get('module{0}'.format(x))
-            module = p.import_module(mock)
-            p.run_module(module)
+            p.run_module('foo.bar.baz{0}'.format(x))
 
         self.assertTrue(module1.run.called)
         self.assertTrue(module2.run.called)
         self.assertTrue(module3.run.called)
         self.assertEquals(len(p.calls), 3)
-        self.assertTrue(p.calls[0].get('result'))
-        self.assertFalse(p.calls[1].get('result'))
-        self.assertEquals(p.calls[1].get('result'), [1, 2, 3])
+        self.assertTrue(p.calls[0].get('foo.bar.baz1'))
+        self.assertFalse(p.calls[1].get('foo.bar.baz2'))
+        self.assertEquals(p.calls[2].get('foo.bar.baz3'), [1, 2, 3])
+
+        mock = import_module_mock.stop()
