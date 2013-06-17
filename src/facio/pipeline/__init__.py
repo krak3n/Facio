@@ -13,9 +13,6 @@ from yaml.scanner import ScannerError
 
 class Pipeline(object):
 
-    before_valid = False
-    after_valid = False
-
     def __init__(self, tpl_class):
         """ Pipeline class instanctiation.
 
