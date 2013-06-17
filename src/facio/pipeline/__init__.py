@@ -3,6 +3,7 @@
    :synopsis: Pipeline detection and execution.
 """
 
+import sys
 import yaml
 
 from clint.textui import puts
@@ -71,3 +72,22 @@ class Pipeline(object):
         else:
             puts('Loaded module: {0}'.format(path))
             return module
+
+    def run_module(self, module):
+        """ Run a before or after module.
+
+        :param module: The instance of the module
+        :type module: Object
+        """
+
+        try:
+            return module.run()
+        except AttributeError:
+            puts('Error Running Module: Missing run() method.')
+        except Exception:
+            e = sys.exc_info()[1]
+            traceback = sys.exc_info()[2]
+            puts('Exeption caught in module: {0} line: {1}'.format(
+                e,
+                traceback.tb_lineno))
+        return None
