@@ -92,8 +92,33 @@ class PipelineTest(BaseTestCase):
             puts.assert_called_with('Failed to Load module: '
                                     'pipeline_test_module')
 
-    def test_run_module_failure(self):
-        pass
-
     def test_run_module_success(self):
-        pass
+        p = Pipeline(self.template)
+        module = MagicMock()
+        module.run.return_value = True
+        rtn = p.run_module(module)
+        self.assertTrue(module.run.called)
+        self.assertTrue(rtn)
+
+    def test_run_module_failure(self):
+        p = Pipeline(self.template)
+        module = MagicMock()
+        module.run.side_effect = AttributeError
+        rtn = p.run_module(module)
+        self.assertTrue(module.run.called)
+        self.assertFalse(rtn)
+
+    def test_module_exception_caught(self):
+        module = MagicMock()
+        module.foo.side_effect = KeyError('Failed lookup')
+
+        def fake_run():
+            module.foo()
+
+        module.run = fake_run
+        p = Pipeline(self.template)
+        with patch('facio.pipeline.puts') as puts:
+            p.run_module(module)
+        self.assertTrue(module.foo.called)
+        puts.assert_called_with('Exeption caught in module: '
+                                '\'Failed lookup\' line: 84')
