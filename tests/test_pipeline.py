@@ -232,25 +232,17 @@ class PipelineTest(BaseTestCase):
     def test_store_pipeline_states(self, return_value=True):
         p = Pipeline(self.template)
         import_module_mock = patch('facio.pipeline.import_module')
-        mock = import_module_mock.start()
+        mock_import = import_module_mock.start()
+        mocked_modules = self._module_factory(3)
 
-        module1 = MagicMock()
-        module1.run.return_value = True
-        module2 = MagicMock()
-        module2.run.return_value = False
-        module3 = MagicMock()
-        module3.run.return_value = [1, 2, 3]
+        for path, module in mocked_modules:
+            mock_import.return_value = module
+            p.run_module(path)
 
-        for x in range(1, 4):
-            mock.return_value = locals().get('module{0}'.format(x))
-            p.run_module('foo.bar.baz{0}'.format(x))
+            self.assertTrue(module.run.called)
+            self.assertEqual(p.calls[-1:][0].get(path),
+                             module.run.return_value)
 
-        self.assertTrue(module1.run.called)
-        self.assertTrue(module2.run.called)
-        self.assertTrue(module3.run.called)
         self.assertEquals(len(p.calls), 3)
-        self.assertTrue(p.calls[0].get('foo.bar.baz1'))
-        self.assertFalse(p.calls[1].get('foo.bar.baz2'))
-        self.assertEquals(p.calls[2].get('foo.bar.baz3'), [1, 2, 3])
 
-        mock = import_module_mock.stop()
+        mock_import = import_module_mock.stop()
