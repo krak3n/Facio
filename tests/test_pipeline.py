@@ -258,4 +258,4 @@ class PipelineTest(BaseTestCase):
             p.run_module(path)
 
         self.assertFalse(p.has_run('not.in.facked.modules'))
-        self.assertEqual(p.has_run('foo.bar.baz2'), mocked_modules[1][1])
+        self.assertEqual(p.has_run('foo.bar.baz2'), mocked_modules[1][1].run())
