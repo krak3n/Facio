@@ -246,3 +246,16 @@ class PipelineTest(BaseTestCase):
         self.assertEquals(len(p.calls), 3)
 
         mock_import = import_module_mock.stop()
+
+    @patch('facio.pipeline.Pipeline._parse', return_value=True)
+    def test_pipeline_call_history_retrival(self, return_value=True):
+        p = Pipeline(self.template)
+        import_module_mock = patch('facio.pipeline.import_module')
+        mock_import = import_module_mock.start()
+        mocked_modules = self._module_factory(10)
+        for path, module in mocked_modules:
+            mock_import.return_value = module
+            p.run_module(path)
+
+        self.assertFalse(p.has_run('not.in.facked.modules'))
+        self.assertEqual(p.has_run('foo.bar.baz2'), mocked_modules[1][1])
