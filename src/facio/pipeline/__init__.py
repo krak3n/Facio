@@ -116,3 +116,19 @@ class Pipeline(object):
                     traceback.tb_lineno))
             self.calls.append({path: result})
             return result
+
+    def has_run(self, path):
+        """ Has a pipeline module run.
+
+        :param path: The pipeline python module path
+        :type path: str
+
+        :returns: False if not run else the modules returned data
+        """
+
+        try:
+            data = [d for d in self.calls if path in d][0]
+        except IndexError:
+            return False
+        else:
+            return data[path]
