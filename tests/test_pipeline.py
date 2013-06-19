@@ -7,6 +7,7 @@ import six
 
 from facio.pipeline import Pipeline
 from mock import MagicMock, mock_open, patch
+from random import choice
 
 from .base import BaseTestCase
 
@@ -32,6 +33,23 @@ class PipelineTest(BaseTestCase):
         m = patch(func, mock_open(read_data=data),
                   create=True)
         return m
+
+    def _module_factory(self, n):
+        """ Generate n number of mocked pipeline modules.
+
+        :param n: Number of modules to generate
+        :type n: int
+
+        :returns: list -- List of mocked modules as tuples
+        """
+
+        modules = []
+        for x in range(0, (n + 1)):
+            mocked_module = MagicMock()
+            mocked_module .run.return_value = n * choice(range(1, 11))
+            modules.append((
+                'foo.bar.baz{0}'.format(x),
+                mocked_module))
 
     def test_can_load_yaml(self):
         data = """
