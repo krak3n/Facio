@@ -44,12 +44,13 @@ class PipelineTest(BaseTestCase):
         """
 
         modules = []
-        for x in range(0, (n + 1)):
+        for x in range(1, (n + 1)):
             mocked_module = MagicMock()
             mocked_module .run.return_value = n * choice(range(1, 11))
             modules.append((
                 'foo.bar.baz{0}'.format(x),
                 mocked_module))
+        return modules
 
     def test_can_load_yaml(self):
         data = """
