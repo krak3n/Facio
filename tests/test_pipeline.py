@@ -34,25 +34,6 @@ class PipelineTest(BaseTestCase):
 
         return template
 
-    def _mock_clint_start(self):
-        """ Mock the clint.textui modules """
-
-        def effect(text):
-            return text
-
-        for path in self.clint_paths:
-            name = path.replace('.', '_')
-            setattr(self, 'patched_{}'.format(name),
-                    patch(path, side_effect=effect))
-            patcher = getattr(self, 'patched_{}'.format(name))
-            setattr(self, 'mocked_{}'.format(name), patcher.start())
-
-    def _mock_clint_stop(self):
-        for path in self.clint_paths:
-            name = path.replace('.', '_')
-            patcher = getattr(self, 'patched_{}'.format(name))
-            patcher.stop()
-
     def _mock_open(self, data):
         if six.PY3:
             func = 'builtins.open'
