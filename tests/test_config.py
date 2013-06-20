@@ -4,7 +4,6 @@ from docopt import DocoptExit
 from facio import config
 from facio.config import Config
 from mock import PropertyMock, patch
-from six import StringIO
 
 from .base import BaseTestCase
 
@@ -18,17 +17,10 @@ class ConfigTests(BaseTestCase):
         """ Config Test Setup
         Mocking stdout / stdin / stderr """
 
-        self.puts_patch = patch('facio.config.puts',
-                                stream=StringIO)
-        self.stdout_patch = patch('sys.stdout', new_callable=StringIO)
-        self.stderr_patch = patch('sys.stderr', new_callable=StringIO)
-        self.stdin_patch = patch('sys.stdout', new_callable=StringIO)
-
-        self.puts = self.puts_patch.start()
-        self.stdout = self.stdout_patch.start()
-        self.stderr = self.stderr_patch.start()
-        self.stdin = self.stdin_patch.start()
-
+        self.clint_paths = [
+            'facio.config.puts',
+        ]
+        self._mock_clint_start()
         sys.argv = ['facio', ]
         self._old_sys_argv = sys.argv
 
@@ -79,7 +71,7 @@ class ConfigTests(BaseTestCase):
             try:
                 self._set_cli_args([invalid_name, ])
             except (SystemExit, DocoptExit):
-                self.stderr.truncate(0)
+                assert True
             else:
                 assert False
 

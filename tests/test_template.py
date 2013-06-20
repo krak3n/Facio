@@ -11,7 +11,6 @@ from codecs import open
 from facio.template import Template
 from mock import MagicMock, PropertyMock, patch
 from shutil import rmtree
-from six import StringIO
 
 from .base import BaseTestCase
 
@@ -20,7 +19,10 @@ class TemplateTests(BaseTestCase):
     """ Template Tests """
 
     def setUp(self):
-        # Mock out the config class
+        self.clint_paths = [
+            'facio.template.puts',
+        ]
+        self._mock_clint_start()
         self.config = MagicMock(name='config')
         self.config.project_name = uuid.uuid4().hex  # Random project name
         self.config.django_secret_key = 'xxx'
@@ -29,9 +31,6 @@ class TemplateTests(BaseTestCase):
         self.config.template = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), 'files', 'template')
         self.config._tpl = self.config.template
-        self.puts_patch = patch('facio.template.puts',
-                                stream=StringIO)
-        self.puts_patch.start()
 
     def test_handle_malformed_variables_gracefully(self):
         self.config.variables = 'this,is.wrong'
@@ -89,24 +88,20 @@ class TemplateTests(BaseTestCase):
         mock_os_mkdir.assert_called_with(os.path.join(
             t.working_dir, self.config.project_name))
 
-    @patch('sys.stdout', new_callable=StringIO)
     @patch('tempfile.mkdtemp', return_value=True)
     @patch('facio.vcs.git.Git.clone', return_value=True)
     @patch('facio.vcs.git.Git.tmp_dir', return_value=True)
-    def test_detect_git_repo(self, mock_tmp_dir, mock_clone, mock_tempfile,
-                             mock_stdout):
+    def test_detect_git_repo(self, mock_tmp_dir, mock_clone, mock_tempfile):
         t = Template(self.config)
         assert not t.vcs_cls
         self.config.template = 'git+git@somewhere.com:repo.git'
         t = Template(self.config)
         self.assertEquals(t.vcs_cls.__class__.__name__, 'Git')
 
-    @patch('sys.stdout', new_callable=StringIO)
     @patch('tempfile.mkdtemp', return_value=True)
     @patch('facio.vcs.hg.Mercurial.clone', return_value=True)
     @patch('facio.vcs.hg.Mercurial.tmp_dir', return_value=True)
-    def test_detect_hg_repo(self, mock_tmp_dir, mock_clone, mock_tempfile,
-                            mock_stdout):
+    def test_detect_hg_repo(self, mock_tmp_dir, mock_clone, mock_tempfile):
         t = Template(self.config)
         assert not t.vcs_cls
         self.config.template = 'hg+ssh://someone@somewhere.com//path'

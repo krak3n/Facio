@@ -18,14 +18,9 @@ class PipelineTest(BaseTestCase):
     def setUp(self):
         self.clint_paths = [
             'facio.pipeline.puts',
-            'facio.pipeline.red',
-            'facio.pipeline.blue',
         ]
         self._mock_clint_start()
         self.template = self._mock_template_class()
-
-    def tearDown(self):
-        self._mock_clint_stop()
 
     def _mock_template_class(self):
         template = MagicMock(name='template')

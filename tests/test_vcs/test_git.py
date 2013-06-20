@@ -10,7 +10,6 @@ import uuid
 from facio.template import Template
 from mock import MagicMock, PropertyMock, patch
 from sh import git
-from six import StringIO
 from shutil import rmtree
 
 from ..base import BaseTestCase
@@ -20,19 +19,15 @@ class GitTests(BaseTestCase):
     """ Git Tests """
 
     def setUp(self):
+        self.clint_paths = [
+            'facio.vcs.git.puts',
+        ]
+        self._mock_clint_start()
         self.config = MagicMock(name='config')
         self.config.project_name = uuid.uuid4().hex  # Random project name
         self.config.django_secret_key = 'xxx'
         self.config.template_settings_dir = 'settings'
         self.config.cli_opts.error = MagicMock(side_effect=Exception)
-        self.puts_patch = patch(
-            'facio.template.puts',
-            stream=StringIO)
-        self.puts_patch.start()
-        self.puts_patch_vcs = patch(
-            'facio.vcs.git.puts',
-            stream=StringIO)
-        self.puts_patch_vcs.start()
 
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def test_clone_git_repo(self, mock_working_dir):

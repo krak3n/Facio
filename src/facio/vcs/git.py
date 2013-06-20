@@ -19,9 +19,6 @@ class Git(object):
 
     def __init__(self, template_path):
         self.template_path = template_path
-        with indent(4, quote=' >'):
-            puts(blue('Cloning template using Git from: {0}'.format(
-                self.repo)))
 
     @property
     def repo(self):
@@ -30,6 +27,11 @@ class Git(object):
         return self._repo
 
     def clone(self):
+
+        with indent(4, quote=' >'):
+            puts(blue('Cloning template using Git from: {0}'.format(
+                self.repo)))
+
         try:
             from sh import git
         except ImportError:

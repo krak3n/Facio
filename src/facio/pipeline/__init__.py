@@ -6,7 +6,8 @@
 import sys
 import yaml
 
-from clint.textui import puts
+from clint.textui import puts, indent
+from clint.textui.colored import blue, red
 from importlib import import_module
 from yaml.scanner import ScannerError
 
@@ -31,9 +32,11 @@ class Pipeline(object):
             try:
                 self.pipeline = yaml.load(f.read())
             except ScannerError:
-                puts("Error loading Pipeline - Is it correctly formatted?")
+                with indent(4, quote=' >'):
+                    puts(red("Error loading Pipeline - Is it correctly "
+                             "formatted?"))
             else:
-                puts("Loading Pipeline")
+                puts(blue("Loading Pipeline"))
 
     def _validate_before(self):
         if 'before' in self.pipeline:
