@@ -259,3 +259,45 @@ class PipelineTest(BaseTestCase):
 
         self.assertFalse(p.has_run('not.in.facked.modules'))
         self.assertEqual(p.has_run('foo.bar.baz2'), mocked_modules[1][1].run())
+
+    def test_run_before(self):
+        data = """
+        before:
+            - thing.foo.bar
+        """
+        import_module_mock = patch('facio.pipeline.import_module')
+        mock_import = import_module_mock.start()
+        mock_module = MagicMock()
+        mock_module.run.return_value = True
+        mock_import.return_value = mock_module
+        open_mock = self._mock_open(data)
+        open_mock.start()
+
+        p = Pipeline(self.template)
+        p.run_before()
+
+        self.assertTrue(mock_module.run.called)
+        self.assertTrue(p.has_run('thing.foo.bar'))
+
+        open_mock.stop()
+
+    def test_run_after(self):
+        data = """
+        after:
+            - thing.foo.bar
+        """
+        import_module_mock = patch('facio.pipeline.import_module')
+        mock_import = import_module_mock.start()
+        mock_module = MagicMock()
+        mock_module.run.return_value = True
+        mock_import.return_value = mock_module
+        open_mock = self._mock_open(data)
+        open_mock.start()
+
+        p = Pipeline(self.template)
+        p.run_after()
+
+        self.assertTrue(mock_module.run.called)
+        self.assertTrue(p.has_run('thing.foo.bar'))
+
+        open_mock.stop()
