@@ -49,6 +49,7 @@ class Template(object):
 
         path = os.path.join(self.config._tpl, '.facio.pipeline.yml')
         if os.path.isfile(path):
+            self.pipeline_file = path
             return True
         return False
 

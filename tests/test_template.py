@@ -185,7 +185,7 @@ class TemplateTests(BaseTestCase):
         self.assertTrue(t.has_pipeline_file)
         self.assertEqual(
             t.pipeline_file,
-            os.path.join(t.working_dir, '.facio.pipeline.yml'))
+            os.path.join(t.config._tpl, '.facio.pipeline.yml'))
 
     @patch('os.path.isfile', return_value=False)
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
