@@ -15,6 +15,7 @@ from clint.textui.colored import blue, yellow
 from codecs import open
 from shutil import copytree, move, rmtree, copy
 
+from .pipeline import Pipeline
 from .vcs.git import Git
 from .vcs.hg import Mercurial
 
@@ -42,6 +43,17 @@ class Template(object):
         self.set_project_root()
         # VCS detection
         self.vcs()
+
+    @property
+    def has_pipeline_file(self):
+        """ Detect if the template has a pipeline file. """
+
+        path = os.path.join(self.config._tpl, '.facio.pipeline.yml')
+        if os.path.isfile(path):
+            self.pipeline_file = path
+            self.pipeline = Pipeline(self)
+            return True
+        return False
 
     @property
     def working_dir(self):
@@ -116,6 +128,10 @@ class Template(object):
     def copy_template(self):
         '''Moves template into current working dir.'''
 
+        if self.has_pipeline_file:
+            if self.pipeline.has_before:
+                self.pipeline.run_before()
+
         with indent(4, quote=' >'):
             puts(blue('Copying template to Project Path'))
 
@@ -141,6 +157,10 @@ class Template(object):
 
         if self.is_vcs_template:
             rmtree(self.config._tpl)
+
+        if self.has_pipeline_file:
+            if self.pipeline.has_after:
+                self.pipeline.run_after()
 
     def rename(self, root, name):
         '''Rename a file or directory.'''

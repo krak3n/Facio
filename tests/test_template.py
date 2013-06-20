@@ -48,11 +48,15 @@ class TemplateTests(BaseTestCase):
         self.assertTrue('baz' in t.place_holders)
         self.assertEquals(t.place_holders['baz'], '1')
 
+    @patch('facio.template.Template.has_pipeline_file',
+           new_callable=PropertyMock,
+           return_value=False)
     @patch('os.path.isdir', return_value=True)
     @patch('facio.config.Config._error')
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def test_dir_cannot_be_created_if_already_exists(self, mock_working_dir,
-                                                     mock_error, mock_isdir):
+                                                     mock_error, mock_isdir,
+                                                     mock_pipeline_file):
         mock_working_dir.return_value = tempfile.gettempdir()
         tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
         tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
@@ -63,12 +67,16 @@ class TemplateTests(BaseTestCase):
 
         self.config._error.assert_called_with('%s already exists' % (tmp_dir))
 
+    @patch('facio.template.Template.has_pipeline_file',
+           new_callable=PropertyMock,
+           return_value=False)
     @patch('os.mkdir', return_value=True)
     @patch('facio.config.Config._error')
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def test_exception_if_directory_creation_fails(self, mock_working_dir,
                                                    mock_error,
-                                                   mock_os_mkdir):
+                                                   mock_os_mkdir,
+                                                   mock_pipeline_file):
         mock_working_dir.return_value = tempfile.gettempdir()
         tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
         tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
@@ -105,11 +113,15 @@ class TemplateTests(BaseTestCase):
         t = Template(self.config)
         self.assertEquals(t.vcs_cls.__class__.__name__, 'Mercurial')
 
+    @patch('facio.template.Template.has_pipeline_file',
+           new_callable=PropertyMock,
+           return_value=False)
     @patch('os.path.isdir', return_value=False)
     @patch('facio.config.Config._error')
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def test_copy_template_failes_if_dir_does_not_exist(
-            self, mock_working_dir, mock_error, mock_isdir):
+            self, mock_working_dir, mock_error, mock_isdir,
+            mock_pipeline_file):
         mock_working_dir.return_value = tempfile.gettempdir()
         tmp_dir = tempfile.mkdtemp(suffix=self.config.project_name, prefix='')
         tmp_dir_name = list(os.path.split(tmp_dir))[-1:][0]
@@ -119,8 +131,12 @@ class TemplateTests(BaseTestCase):
         self.config._error.assert_called_with(
             'Unable to copy template, directory does not exist')
 
+    @patch('facio.template.Template.has_pipeline_file',
+           new_callable=PropertyMock,
+           return_value=False)
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
-    def test_excluded_dirs_are_not_copied(self, mock_working_dir):
+    def test_excluded_dirs_are_not_copied(self, mock_working_dir,
+                                          mock_has_pipeline):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
         t.exclude_dirs.append('.exclude_this')
@@ -129,8 +145,12 @@ class TemplateTests(BaseTestCase):
                                                     '.exclude_this')))
         rmtree(t.project_root)
 
+    @patch('facio.template.Template.has_pipeline_file',
+           new_callable=PropertyMock,
+           return_value=False)
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
-    def test_copy_directory_tree_if_is_dir(self, mock_working_dir):
+    def test_copy_directory_tree_if_is_dir(self, mock_working_dir,
+                                           mock_pipeline_file):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
         t.exclude_dirs.append('.exclude_this')
@@ -139,9 +159,13 @@ class TemplateTests(BaseTestCase):
                                                    'should_copy_this')))
         rmtree(t.project_root)
 
+    @patch('facio.template.Template.has_pipeline_file',
+           new_callable=PropertyMock,
+           return_value=False)
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
     def test_directory_not_renamed_if_not_in_placeholders(self,
-                                                          mock_working_dir):
+                                                          mock_working_dir,
+                                                          mock_pipeline_file):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
         t.copy_template()
@@ -149,8 +173,12 @@ class TemplateTests(BaseTestCase):
                                                    '{{NOT_IN_PLACEHOLDERS}}')))
         rmtree(t.project_root)
 
+    @patch('facio.template.Template.has_pipeline_file',
+           new_callable=PropertyMock,
+           return_value=False)
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
-    def test_rename_files_in_placeholders(self, mock_working_dir):
+    def test_rename_files_in_placeholders(self, mock_working_dir,
+                                          mock_pipeline_file):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
         t.copy_template()
@@ -159,8 +187,11 @@ class TemplateTests(BaseTestCase):
             '%s.txt' % self.config.project_name)))
         rmtree(t.project_root)
 
+    @patch('facio.template.Template.has_pipeline_file',
+           new_callable=PropertyMock,
+           return_value=False)
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
-    def test_files_are_ignores(self, mock_working_dir):
+    def test_files_are_ignores(self, mock_working_dir, mock_pipeline_file):
         mock_working_dir.return_value = tempfile.gettempdir()
         self.config.ignore = ['*.gif', '*.png', 'i_dont_need_processing.txt']
         t = Template(self.config)
@@ -177,3 +208,30 @@ class TemplateTests(BaseTestCase):
                     with open(filepath, 'r', encoding='utf8') as f:
                         contents = f.read()
                     self.assertEqual(contents, '{{ PROJECT_NAME }}\n')
+
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
+    def test_detects_pipeline_file(self, mock_working_dir):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        t = Template(self.config)
+        self.assertTrue(t.has_pipeline_file)
+        self.assertEqual(
+            t.pipeline_file,
+            os.path.join(t.config._tpl, '.facio.pipeline.yml'))
+
+    @patch('os.path.isfile', return_value=False)
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
+    def test_false_no_pipeline_file(self, mock_working_dir, mock_isfile):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        t = Template(self.config)
+        self.assertFalse(t.has_pipeline_file)
+        self.assertFalse(hasattr(t, 'pipeline_file'))
+
+    @patch('facio.pipeline.Pipeline.run_before')
+    @patch('facio.pipeline.Pipeline.run_after')
+    @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
+    def test_runs_pipelines(self, mock_working_dir, mock_after, mock_before):
+        mock_working_dir.return_value = tempfile.gettempdir()
+        t = Template(self.config)
+        t.copy_template()
+        self.assertTrue(mock_before.called)
+        self.assertTrue(mock_after.called)

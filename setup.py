@@ -22,6 +22,10 @@ install_requires = [
     'six==1.3.0',
     'docopt==0.6.1'
 ]
+if sys.version_info[0] == 2 and sys.version_info[1] == 6:
+    install_requires = install_requires + [
+        'importlib',
+    ]
 
 test_requires = [
     'mock==1.0.1',
