@@ -5,3 +5,4 @@ from facio import Facio
 
 if __name__ == "__main__":
     facio = Facio()
+    facio.start()
