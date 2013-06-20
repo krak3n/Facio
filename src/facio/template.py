@@ -44,6 +44,15 @@ class Template(object):
         self.vcs()
 
     @property
+    def has_pipeline_file(self):
+        """ Detect if the template has a pipeline file. """
+
+        path = os.path.join(self.config._tpl, '.facio.pipeline.yml')
+        if os.path.isfile(path):
+            return True
+        return False
+
+    @property
     def working_dir(self):
         try:
             return self._working_dir
