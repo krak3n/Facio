@@ -17,6 +17,10 @@ class PipelineTest(BaseTestCase):
 
     def setUp(self):
         self.template = self._mock_template_class()
+        self._mock_clint_start()
+
+    def tearDown(self):
+        self._mock_clint_stop()
 
     def _mock_template_class(self):
         template = MagicMock(name='template')
@@ -24,6 +28,27 @@ class PipelineTest(BaseTestCase):
         template.config = MagicMock(name='config')
 
         return template
+
+    def _mock_clint_start(self):
+        """ Mock the clint.textui modules """
+
+        def effect(text):
+            return text
+
+        # clint.textui patches
+        self.puts_patcher = patch('facio.pipeline.puts', side_effect=effect)
+        self.red_patcher = patch('facio.pipeline.red', side_effect=effect)
+        self.blue_patcher = patch('facio.pipeline.blue', side_effect=effect)
+
+        # Start patches
+        self.mock_puts = self.puts_patcher.start()
+        self.mock_red = self.red_patcher.start()
+        self.mock_blue = self.blue_patcher.start()
+
+    def _mock_clint_stop(self):
+        self.puts_patcher.stop()
+        self.red_patcher.stop()
+        self.blue_patcher.stop()
 
     def _mock_open(self, data):
         if six.PY3:
@@ -61,9 +86,10 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
-        with patch('facio.pipeline.puts') as puts:
-            Pipeline(self.template)
-            puts.assert_called_with("Loading Pipeline")
+
+        Pipeline(self.template)
+        self.mock_puts.assert_called_with("Loading Pipeline")
+
         open_mock.stop()
 
     def test_yaml_load_error_output(self):
@@ -77,10 +103,10 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
-        with patch('facio.pipeline.puts') as puts:
-            Pipeline(self.template)
-            puts.assert_called_with("Error loading Pipeline - Is it correctly "
-                                    "formatted?")
+
+        Pipeline(self.template)
+        self.mock_puts.assert_called_with("Error loading Pipeline - Is it "
+                                          "correctly formatted?")
         open_mock.stop()
 
     def test_yaml_formatted_correctly_before(self):
@@ -91,10 +117,11 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
-        with patch('facio.pipeline.puts') as puts:
-            p = Pipeline(self.template)
-            self.assertFalse(p.has_before)
-            puts.assert_called_with('Ignoring before: should be a list')
+
+        p = Pipeline(self.template)
+        self.assertFalse(p.has_before)
+        self.mock_puts.assert_called_with('Ignoring before: should be a list')
+
         open_mock.stop()
 
     def test_yaml_formatted_correctly_after(self):
@@ -105,10 +132,11 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
-        with patch('facio.pipeline.puts') as puts:
-            p = Pipeline(self.template)
-            self.assertFalse(p.has_after)
-            puts.assert_called_with('Ignoring after: should be a list')
+
+        p = Pipeline(self.template)
+        self.assertFalse(p.has_after)
+        self.mock_puts.assert_called_with('Ignoring after: should be a list')
+
         open_mock.stop()
 
     def test_empty_pipeline_always_retuns_false(self):
@@ -129,8 +157,10 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
+
         p = Pipeline(self.template)
         self.assertTrue(p.has_before)
+
         open_mock.stop()
 
     def test_has_before_false(self):
@@ -140,8 +170,10 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
+
         p = Pipeline(self.template)
         self.assertFalse(p.has_before)
+
         open_mock.stop()
 
     def test_has_after_true(self):
@@ -151,8 +183,10 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
+
         p = Pipeline(self.template)
         self.assertTrue(p.has_after)
+
         open_mock.stop()
 
     def test_has_after_false(self):
@@ -162,25 +196,25 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
+
         p = Pipeline(self.template)
         self.assertFalse(p.has_after)
+
         open_mock.stop()
 
     @patch('facio.pipeline.Pipeline._parse', return_value=True)
     @patch('facio.pipeline.import_module', return_value=True)
     def test_import_success(self, mock_importlib, mock_parse):
         p = Pipeline(self.template)
-        with patch('facio.pipeline.puts') as puts:
-            p.import_module('path.to.module')
-            puts.assert_called_with('Loaded module: path.to.module')
+        p.import_module('path.to.module')
+        self.mock_puts.assert_called_with('Loaded module: path.to.module')
 
     @patch('facio.pipeline.Pipeline._parse', return_value=True)
     def test_import_module_failure(self, mock_parse):
         p = Pipeline(self.template)
-        with patch('facio.pipeline.puts') as puts:
-            p.import_module('pipeline_test_module')
-            puts.assert_called_with('Failed to Load module: '
-                                    'pipeline_test_module')
+        p.import_module('pipeline_test_module')
+        self.mock_puts.assert_called_with('Failed to Load module: '
+                                          'pipeline_test_module')
 
     @patch('facio.pipeline.Pipeline._parse', return_value=True)
     def test_run_module_success(self, mock_parse):
@@ -221,11 +255,10 @@ class PipelineTest(BaseTestCase):
 
         module.run = fake_run
         p = Pipeline(self.template)
-        with patch('facio.pipeline.puts') as puts:
-            p.run_module('foo.bar.baz')
+        p.run_module('foo.bar.baz')
         self.assertTrue(module.foo.called)
-        puts.assert_called_with('Exeption caught in module: '
-                                '\'Failed lookup\' line: 108')
+        self.mock_puts.assert_called_with('Exeption caught in module: '
+                                          '\'Failed lookup\' line: 111')
         mock = import_module_mock.stop()
 
     @patch('facio.pipeline.Pipeline._parse', return_value=True)
