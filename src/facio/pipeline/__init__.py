@@ -132,3 +132,15 @@ class Pipeline(object):
             return False
         else:
             return data[path]
+
+    def run_before(self):
+        """ Run the before modules. """
+
+        for path in self.pipeline.get('before', []):
+            self.run_module(path)
+
+    def run_after(self):
+        """ Run the after modules. """
+
+        for path in self.pipeline.get('after', []):
+            self.run_module(path)
