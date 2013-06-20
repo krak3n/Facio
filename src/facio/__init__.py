@@ -1,33 +1,32 @@
 """
-facio.__init__
---------------
-
-This kicks the whole thing off, fireing CLI option prompt and processing
-the template.
+.. module:: facio
+   :synopsis: Starts the Facio template process.
 """
 
 __version__ = '1.1.1'
 
+from .config import Config
+from .template import Template
+
+from clint.textui import puts, indent
+from clint.textui.colored import green
+
 
 class Facio(object):
 
-    def __init__(self):
-        '''Constructor, fires all required methods.'''
-
-        from .config import Config
-        from .template import Template
-
-        from clint.textui import puts, indent
-        from clint.textui.colored import green
-
-        # Basic Skeleton Generation
-        self.config = Config()
-
+    def start(self):
         with indent(4, quote=' >'):
             puts(green('Starting'))
 
-        self.template = Template(self.config)
-        self.template.copy_template()
+        self.load_config()
+        self.process_template()
 
         with indent(4, quote=' >'):
             puts(green('Done'))
+
+    def load_config(self):
+        self.config = Config()
+
+    def process_template(self):
+        self.template = Template(self.config)
+        self.template.copy_template()
