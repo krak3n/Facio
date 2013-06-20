@@ -15,9 +15,6 @@ from clint.textui.colored import green
 class Facio(object):
 
     def start(self):
-        with indent(4, quote=' >'):
-            puts(green('Starting'))
-
         self.load_config()
         self.process_template()
 
