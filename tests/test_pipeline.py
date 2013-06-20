@@ -240,7 +240,7 @@ class PipelineTest(BaseTestCase):
         p.run_module('foo.bar.baz')
         self.assertTrue(module.foo.called)
         self.mocked_facio_pipeline_puts.assert_called_with(
-            'Exeption caught in module: \'Failed lookup\' line: 111')
+            'Exeption caught in module: \'Failed lookup\' line: 116')
         mock = import_module_mock.stop()
 
     @patch('facio.pipeline.Pipeline._parse', return_value=True)

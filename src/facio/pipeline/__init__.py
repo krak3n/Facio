@@ -7,7 +7,7 @@ import sys
 import yaml
 
 from clint.textui import puts, indent
-from clint.textui.colored import blue, red
+from clint.textui.colored import blue, red, yellow
 from importlib import import_module
 from yaml.scanner import ScannerError
 
@@ -36,12 +36,14 @@ class Pipeline(object):
                     puts(red("Error loading Pipeline - Is it correctly "
                              "formatted?"))
             else:
-                puts(blue("Loading Pipeline"))
+                with indent(4, quote=' >'):
+                    puts(blue("Loading Pipeline"))
 
     def _validate_before(self):
         if 'before' in self.pipeline:
             if not type(self.pipeline.get('before')) == list:
-                puts('Ignoring before: should be a list')
+                with indent(4, quote=' >'):
+                    puts(yellow('Ignoring before: should be a list'))
                 return False
             else:
                 return True
@@ -50,7 +52,8 @@ class Pipeline(object):
     def _validate_after(self):
         if 'after' in self.pipeline:
             if not type(self.pipeline.get('after')) == list:
-                puts('Ignoring after: should be a list')
+                with indent(4, quote=' >'):
+                    puts(yellow('Ignoring after: should be a list'))
                 return False
             else:
                 return True
@@ -90,10 +93,12 @@ class Pipeline(object):
         try:
             module = import_module(path)
         except ImportError:
-            puts('Failed to Load module: {0}'.format(path))
+            with indent(4, quote=' >'):
+                puts(red('Failed to Load module: {0}'.format(path)))
             return False
         else:
-            puts('Loaded module: {0}'.format(path))
+            with indent(4, quote=' >'):
+                puts(blue('Loaded module: {0}'.format(path)))
             return module
 
     def run_module(self, path):
@@ -110,13 +115,15 @@ class Pipeline(object):
             try:
                 result = module.run()
             except AttributeError:
-                puts('Error Running Module: Missing run() method.')
+                with indent(4, quote=' >'):
+                    puts(red('Error Running Module: Missing run() method.'))
             except Exception:
                 e = sys.exc_info()[1]
                 traceback = sys.exc_info()[2]
-                puts('Exeption caught in module: {0} line: {1}'.format(
-                    e,
-                    traceback.tb_lineno))
+                with indent(4, quote=' >'):
+                    puts(red('Exeption caught in module: {0} line: {1}'.format(
+                        e,
+                        traceback.tb_lineno)))
             self.calls.append({path: result})
             return result
 
