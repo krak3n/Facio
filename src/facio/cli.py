@@ -9,7 +9,7 @@ import re
 import sys
 
 from docopt import docopt
-from facio import __version__
+from facio import __VERSION__
 
 
 class CLI(object):
@@ -41,7 +41,7 @@ class CLI(object):
     def __init__(self):
         self.arguments = docopt(
             self.__doc__,
-            version='Facio {0}'.format(__version__))
+            version='Facio {0}'.format(__VERSION__))
         self._validate_project_name()
 
     def _validate_project_name(self):

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from facio import Facio
+from facio.start import Start
 
 if __name__ == "__main__":
-    facio = Facio()
-    facio.start()
+    start = start()
+    start.start()
