@@ -183,6 +183,9 @@ class TemplateTests(BaseTestCase):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
         self.assertTrue(t.has_pipeline_file)
+        self.assertEqual(
+            t.pipeline_file,
+            os.path.join(t.working_dir, '.facio.pipeline.yml'))
 
     @patch('os.path.isfile', return_value=False)
     @patch('facio.template.Template.working_dir', new_callable=PropertyMock)
@@ -190,3 +193,4 @@ class TemplateTests(BaseTestCase):
         mock_working_dir.return_value = tempfile.gettempdir()
         t = Template(self.config)
         self.assertFalse(t.has_pipeline_file)
+        self.assertFalse(hasattr(t, 'pipeline_file'))
