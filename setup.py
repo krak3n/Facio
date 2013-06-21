@@ -8,7 +8,8 @@ from setuptools import setup, find_packages
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
-from facio import __VERSION__
+import facio
+version = facio.get_version()
 
 
 def read(fname):
@@ -45,7 +46,7 @@ dev_requires = test_requires + [
 
 setup(
     name='facio',
-    version=__VERSION__,
+    version=version,
     author='Christopher John Reeves',
     author_email='hello@chris.reeves.io',
     url='https://github.com/krak3n/facio',
