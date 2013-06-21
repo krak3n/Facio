@@ -9,7 +9,7 @@ from facio.pipeline import Pipeline
 from mock import MagicMock, mock_open, patch
 from random import choice
 
-from .base import BaseTestCase
+from . import BaseTestCase
 
 
 class PipelineTest(BaseTestCase):
