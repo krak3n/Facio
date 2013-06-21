@@ -4,5 +4,5 @@
 from facio.start import Start
 
 if __name__ == "__main__":
-    start = start()
+    start = Start()
     start.start()
