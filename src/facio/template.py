@@ -1,9 +1,9 @@
-"""
-facio.template
---------------
+# -*- coding: utf-8 -*-
 
-Process the users template using Jninja2 rendering it out into the current
-working directory.
+"""
+.. module:: facio.start
+   :synopsis: Process the users template using Jninja2 rendering it
+              out into the current working directory.
 """
 
 import glob

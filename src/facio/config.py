@@ -1,9 +1,8 @@
-"""
-facio.config
-------------
+# -*- coding: utf-8 -*-
 
-Sets up variables and configuration for Facio from command line and / or
-a configuration file.
+"""
+.. module:: facio.config
+   :synopsis: Facio configuration classes
 """
 
 import os
