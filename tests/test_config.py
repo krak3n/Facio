@@ -1,3 +1,8 @@
+"""
+.. module:: tests.test_config
+   :synopsis: Tests for the facio config module.
+"""
+
 import sys
 
 from docopt import DocoptExit
@@ -5,7 +10,7 @@ from facio import config
 from facio.config import Config
 from mock import PropertyMock, patch
 
-from .base import BaseTestCase
+from . import BaseTestCase
 
 
 class ConfigTests(BaseTestCase):

@@ -12,7 +12,7 @@ from facio.template import Template
 from mock import MagicMock, PropertyMock, patch
 from shutil import rmtree
 
-from .base import BaseTestCase
+from . import BaseTestCase
 
 
 class TemplateTests(BaseTestCase):

@@ -12,7 +12,7 @@ from mock import MagicMock, PropertyMock, patch
 from sh import hg
 from shutil import rmtree
 
-from ..base import BaseTestCase
+from .. import BaseTestCase
 
 
 class HgTests(BaseTestCase):
