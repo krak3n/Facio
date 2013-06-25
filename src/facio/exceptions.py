@@ -15,5 +15,6 @@ class FacioException(Exception):
 
     def __init__(self, message):
         with indent(4, quote=' >'):
-            puts(red(message))
+            puts(red('Error: {0}'.format(message)))
+            puts(red('Exiting'))
         sys.exit()
