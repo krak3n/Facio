@@ -3,10 +3,9 @@
    :synopsis: Tests for the facio pipeline module.
 """
 
-import six
 
 from facio.pipeline import Pipeline
-from mock import MagicMock, mock_open, patch
+from mock import MagicMock, patch
 from random import choice
 
 from . import BaseTestCase
@@ -28,15 +27,6 @@ class PipelineTest(BaseTestCase):
         template.config = MagicMock(name='config')
 
         return template
-
-    def _mock_open(self, data):
-        if six.PY3:
-            func = 'builtins.open'
-        else:
-            func = '__builtin__.open'
-        m = patch(func, mock_open(read_data=data),
-                  create=True)
-        return m
 
     def _module_factory(self, n):
         """ Generate n number of mocked pipeline modules.

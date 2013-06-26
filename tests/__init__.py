@@ -4,10 +4,11 @@
 """
 
 import os
+import six
 import sys
 import unittest
 
-from mock import patch
+from mock import patch, mock_open
 
 
 class BaseTestCase(unittest.TestCase):
@@ -66,6 +67,15 @@ class BaseTestCase(unittest.TestCase):
                     setattr(self, 'mocked_{0}'.format(name), patcher.start())
         except AttributeError:
             pass
+
+    def _mock_open(self, data):
+        if six.PY3:
+            func = 'builtins.open'
+        else:
+            func = '__builtin__.open'
+        patcher = patch(func, mock_open(read_data=data),
+                        create=True)
+        return patcher
 
     @property
     def empty_cfg(self):
