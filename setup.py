@@ -2,6 +2,7 @@
 
 import os
 import sys
+import multiprocessing  # NOQA
 
 from setuptools import setup, find_packages
 
