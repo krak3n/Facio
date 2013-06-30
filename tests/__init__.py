@@ -4,16 +4,16 @@
 """
 
 import os
-import six
-import sys
-import unittest
 
-from mock import patch, mock_open
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
+
+from mock import patch
 
 
 class BaseTestCase(unittest.TestCase):
-
-    IS_PY3 = sys.version_info[0] == 3
 
     test_tpl_path = os.path.join(
         os.path.abspath('.'),
@@ -21,34 +21,12 @@ class BaseTestCase(unittest.TestCase):
         'files',
         'template')
 
-    test_cfg_base_path = os.path.join(
-        os.path.abspath('.'),
-        'tests',
-        'files',
-        'configs')
-
-    test_pieplines_path = os.path.join(
-        os.path.abspath('.'),
-        'tests',
-        'files',
-        'pipelines')
-
     def _test_cfg_path(self, fname):
         return os.path.join(self.test_cfg_base_path, fname)
 
-    def _mock_std_out_in_err(self):
-        self.patched_std_out = patch('sys.stdout')
-        self.mocked_std_out = self.patched_std_out.start()
-        self.patched_std_err = patch('sys.stderr')
-        self.mocked_std_err = self.patched_std_err.start()
-        self.patched_std_in = patch('sys.stdin')
-        self.mocked_std_in = self.patched_std_in.start()
-
-    def _mock_clint_start(self):
+    def _patch_clint(self, paths=[]):
         """ Mock the clint.textui modules, clint_paths on self
         is required for this method to work. """
-
-        self._mock_std_out_in_err()
 
         def effect(self, text):
             return text
@@ -58,24 +36,15 @@ class BaseTestCase(unittest.TestCase):
         self.mocked_ColoredString = self.patched_ColoredString.start()
 
         try:
-            for x, path in enumerate(self.clint_paths):
+            for x, path in enumerate(paths):
                 name = path.replace('.', '_')
-                if x == 0:
-                    p = patch(path)
-                    setattr(self, 'patched_{0}'.format(name), p)
-                    patcher = getattr(self, 'patched_{0}'.format(name))
-                    setattr(self, 'mocked_{0}'.format(name), patcher.start())
+                p = patch(path)
+                self.addCleanup(p.stop)
+                setattr(self, 'patched_{0}'.format(name), p)
+                patcher = getattr(self, 'patched_{0}'.format(name))
+                setattr(self, 'mocked_{0}'.format(name), patcher.start())
         except AttributeError:
             pass
-
-    def _mock_open(self, data):
-        if six.PY3:
-            func = 'builtins.open'
-        else:
-            func = '__builtin__.open'
-        patcher = patch(func, mock_open(read_data=data),
-                        create=True)
-        return patcher
 
     @property
     def empty_cfg(self):
