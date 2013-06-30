@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 .. module:: tests.test_vcs.hg
    :synopsis: Unit tests for the hg vcs module
@@ -19,10 +21,9 @@ class HgTests(BaseTestCase):
     """ Mercurial Tests """
 
     def setUp(self):
-        self.clint_paths = [
+        self._patch_clint([
             'facio.vcs.hg.puts',
-        ]
-        self._mock_clint_start()
+        ])
         self.config = MagicMock(name='config')
         self.config.project_name = uuid.uuid4().hex  # Random project name
         self.config.django_secret_key = 'xxx'
