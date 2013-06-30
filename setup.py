@@ -29,7 +29,7 @@ if sys.version_info[0] == 2 and sys.version_info[1] == 6:
         'importlib',
     ]
 
-test_requires = install_requires + [
+test_requires = [
     'mock==1.0.1',
     'tox==1.4.3',
     'nose==1.3',
@@ -37,6 +37,10 @@ test_requires = install_requires + [
     'coverage==3.6',
     'coveralls == 0.2',
 ]
+if sys.version_info[0] == 2 and sys.version_info[1] == 6:
+    test_requires = test_requires + [
+        'unittest2',
+    ]
 
 dev_requires = test_requires + [
     'ipdb==0.7',
@@ -78,5 +82,5 @@ setup(
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    license='BSD',
+    license='BSD'
 )
