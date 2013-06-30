@@ -7,7 +7,6 @@
 
 import os
 import re
-import sys
 
 from clint.textui import puts, indent
 from clint.textui.colored import blue, red, yellow
@@ -15,6 +14,7 @@ from docopt import docopt
 from random import choice
 from six.moves import configparser as ConfigParser
 from six.moves import input
+from textwrap import dedent
 
 from facio import get_version
 from facio.exceptions import FacioException
@@ -51,14 +51,15 @@ class CommandLineInterface(object):
 
     def start(self):
         self.arguments = docopt(
-            self.__doc__,
+            dedent(self.__doc__),
             version='Facio {0}'.format(get_version()))
-        self._validate_project_name()
+        self.validate_project_name(self.arguments.get('<project_name>'))
 
-    def _validate_project_name(self):
-        if not re.match('^\w+$', self.arguments.get('<project_name>')):
-            sys.exit('Project names can only contain numbers letters and '
-                     'underscores')
+    def validate_project_name(self, name):
+        if not re.match('^\w+$', name):
+            raise FacioException('Project names can only contain numbers '
+                                 'letters and underscores')
+        return True
 
 
 class ConfigurationFile(object):
@@ -93,14 +94,12 @@ class ConfigurationFile(object):
             path = os.path.expanduser('~/{0}'.format(name))
             parser = ConfigParser.ConfigParser()
             try:
-                parser.read(path)
-            except ConfigParser.MissingSectionHeaderError:
-                raise FacioException('Unable to parse {0}'.format(path))
-            except ConfigParser.ParsingError:
+                parser.readfp(open(path))
+            except ConfigParser.Error:
                 raise FacioException('Unable to parse {0}'.format(path))
             else:
                 with indent(4, quote=' >'):
-                    puts(blue('Loaded ~/.facio.cfg'))
+                    puts(blue('Loaded {0}'.format(path)))
                 return parser
         return False
 
