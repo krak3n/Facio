@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 .. module:: tests.test_vcs.git
    :synopsis: Unit tests for the git vcs module
@@ -19,10 +21,9 @@ class GitTests(BaseTestCase):
     """ Git Tests """
 
     def setUp(self):
-        self.clint_paths = [
+        self._patch_clint([
             'facio.vcs.git.puts',
-        ]
-        self._mock_clint_start()
+        ])
         self.config = MagicMock(name='config')
         self.config.project_name = uuid.uuid4().hex  # Random project name
         self.config.django_secret_key = 'xxx'
