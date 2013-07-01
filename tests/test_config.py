@@ -8,8 +8,8 @@
 import os
 import six
 
-from mock import patch
-from facio.config import ConfigurationFile, CommandLineInterface
+from mock import MagicMock, patch, PropertyMock
+from facio.config import ConfigurationFile, CommandLineInterface, Settings
 from facio.exceptions import FacioException
 from six import StringIO
 from textwrap import dedent
@@ -145,6 +145,48 @@ class TestConfigurationFile(BaseTestCase):
         c = ConfigurationFile()
 
         self.assertFalse(c.read())
+
+
+class TestSettings(BaseTestCase):
+
+    def setUp(self):
+        self._patch_clint([
+            'facio.config.puts',
+            'facio.exceptions.puts',
+        ])
+        # Mocks for ConfigFile and CommandLineInterface classes
+        self.mock_interface()
+        self.config = MagicMock()
+
+    def mock_interface(self):
+        self.interface = MagicMock()
+        arguments = PropertyMock(return_value={
+            '<project_name>': 'foo'
+        })
+        type(self.interface).arguments = arguments
+
+    def test_attrs_set_on_init(self):
+        s = Settings(self.interface, self.config)
+
+        self.assertIsInstance(s.config, MagicMock)
+        self.assertIsInstance(s.interface, MagicMock)
+
+    def test_retreive_project_name(self):
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.project_name, 'foo')
+
+    @patch('sys.exit')
+    def test_exception_no_project_name(self, mock_exit):
+        s = Settings(self.interface, self.config)
+        arguments = PropertyMock(return_value={})
+        type(self.interface).arguments = arguments
+
+        with self.assertRaises(FacioException):
+            s.project_name
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            "Error: Project name not defined.")
+        self.assertTrue(mock_exit.called)
 
 
 #import sys
