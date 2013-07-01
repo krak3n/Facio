@@ -66,21 +66,6 @@ class ConfigurationFile(object):
     """ Load the ~/.facio.cfg ini style configuration file, providing an
     easily queryable dict representation of the config attributes. """
 
-    def exists(self, name):
-        """ Checks if the .facio.cfg file exists.
-
-        :param name: The file name to read in the users home dir
-        :type name: str
-
-        :returns: Bool -- file existence status
-        """
-
-        path = os.path.join(os.path.expanduser('~/{0}'.format(name)))
-        if os.path.isfile(path):
-            return True
-        else:
-            return False
-
     def read(self, name='.facio.cfg'):
         """ Parse the config file using ConfigParser module.
 
@@ -90,21 +75,26 @@ class ConfigurationFile(object):
         :returns: ConfirgParser or bool
         """
 
-        if self.exists(name):
-            path = os.path.expanduser('~/{0}'.format(name))
-            parser = ConfigParser.ConfigParser()
-            try:
-                parser.readfp(open(path))
-            except ConfigParser.Error:
-                raise FacioException('Unable to parse {0}'.format(path))
-            else:
-                with indent(4, quote=' >'):
-                    puts(blue('Loaded {0}'.format(path)))
-                return parser
-        return False
+        path = os.path.expanduser('~/{0}'.format(name))
+        parser = ConfigParser.ConfigParser()
+        try:
+            parser.readfp(open(path))
+        except IOError:
+            with indent(4, quote=' >'):
+                puts(yellow('Warning: {0} Not found'.format(path)))
+        except ConfigParser.Error:
+            raise FacioException('Unable to parse {0}'.format(path))
+        else:
+            with indent(4, quote=' >'):
+                puts(blue('Loaded {0}'.format(path)))
+        return parser
 
 
 class Settings(object):
+
+    default_template_path = os.path.join(os.path.dirname(
+        os.path.realpath(__file__)),
+        'default_template')
 
     def __init__(self, interface, config):
         """ Facio settings class. Taking aguments passed into the cli
@@ -140,6 +130,7 @@ class Settings(object):
         :returns: str or bool
         """
 
+        templates = []
         template = self.interface.arguments.get('--template', False)
         select = self.interface.arguments.get('--select', False)
 
@@ -149,8 +140,6 @@ class Settings(object):
             if select:
                 raise FacioException('Missing [template] section '
                                      'in Facio configuration file.')
-            else:
-                template = []
 
         # Path or template name alias
         if template:
@@ -163,32 +152,28 @@ class Settings(object):
 
         # Select template from configuration file
         if select:
-            if self.config:
-                tries = 5
-                with indent(4, quote=' >'):
-                    puts(yellow('Please select a template:'))
-                    for i, item in enumerate(templates, start=1):
-                        name, path = item
-                        puts(blue('{0}) {1}: {2}'.format(i, name, path)))
-                    for n in range(1, (tries + 1)):
-                        try:
-                            prompt = 'Please enter the number of '\
-                                     'the template ({0} of {1} tries'\
-                                     '): '.format(n, tries)
-                            num = int(input(' >  ' + yellow(prompt)))
-                            if num == 0:
-                                raise ValueError
-                            return templates[(num - 1)]
-                        except (ValueError, TypeError, IndexError):
-                            puts(red('Please enter a valid number'))
-                raise FacioException('A template was not selected')
-            else:
-                raise FacioException('You must create a Facio configuration '
-                                     'file to use --select')
+            tries = 5
+            with indent(4, quote=' >'):
+                puts(yellow('Please select a template:'))
+                for i, item in enumerate(templates, start=1):
+                    name, path = item
+                    puts(blue('{0}) {1}: {2}'.format(i, name, path)))
+                for n in range(1, (tries + 1)):
+                    try:
+                        prompt = 'Please enter the number of '\
+                                 'the template ({0} of {1} tries'\
+                                 '): '.format(n, tries)
+                        num = int(input(' >  ' + yellow(prompt)))
+                        if num == 0:
+                            raise ValueError
+                        name, path = templates[(num - 1)]
+                        return path
+                    except (ValueError, TypeError, IndexError):
+                        puts(red('Please enter a valid number'))
+            raise FacioException('A template was not selected')
 
         # Default template
-        return os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                            'default_template')
+        return Settings.default_template_path
 
     def get_variables(self):
         """ Returns variables passed into command line interface, if lookup

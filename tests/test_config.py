@@ -12,6 +12,7 @@ from mock import MagicMock, patch, PropertyMock
 from facio.config import ConfigurationFile, CommandLineInterface, Settings
 from facio.exceptions import FacioException
 from six import StringIO
+from six.moves import configparser as ConfigParser
 from textwrap import dedent
 
 from . import BaseTestCase
@@ -78,12 +79,6 @@ class TestConfigurationFile(BaseTestCase):
             'facio.exceptions.puts',
         ])
 
-    def _patch_exists(self):
-        patcher = patch('facio.config.ConfigurationFile.exists',
-                        return_value=True)
-        self.addCleanup(patcher.stop)
-        return patcher
-
     def _patch_open(self, data):
         if six.PY3:
             func = 'builtins.open'
@@ -94,15 +89,12 @@ class TestConfigurationFile(BaseTestCase):
         self.addCleanup(patcher.stop)
         return patcher
 
-    @patch('os.path.isfile', return_value=True)
-    def test_exists_file_exists(self, mock_isfile):
+    def test_warning_no_config_file(self):
         c = ConfigurationFile()
-        self.assertTrue(c.exists('somefile.cfg'))
+        c.read()
 
-    @patch('os.path.isfile', return_value=False)
-    def test_exists_file_does_not_exist(self, mock_isfile):
-        c = ConfigurationFile()
-        self.assertFalse(c.exists('somefile.cfg'))
+        self.mocked_facio_config_puts.assert_any_call(
+            "Warning: {0} Not found".format(self.config_path))
 
     @patch('sys.exit')
     def test_config_read_parse_error(self, exit_mock):
@@ -112,7 +104,6 @@ class TestConfigurationFile(BaseTestCase):
         correctly
         """)
 
-        self._patch_exists().start()
         patch_open = self._patch_open(config)
         patch_open.start()
 
@@ -130,7 +121,6 @@ class TestConfigurationFile(BaseTestCase):
         template2 = /baz/bar/foo
         """)
 
-        self._patch_exists().start()
         patch_open = self._patch_open(config)
         patch_open.start()
 
@@ -139,12 +129,6 @@ class TestConfigurationFile(BaseTestCase):
 
         self.mocked_facio_config_puts.assert_any_call(
             "Loaded {0}".format(self.config_path))
-
-    @patch('facio.config.ConfigurationFile.exists', return_value=False)
-    def test_config_read_false_not_exists(self, mock_exists):
-        c = ConfigurationFile()
-
-        self.assertFalse(c.read())
 
 
 class TestSettings(BaseTestCase):
@@ -178,9 +162,10 @@ class TestSettings(BaseTestCase):
 
     @patch('sys.exit')
     def test_exception_no_project_name(self, mock_exit):
-        s = Settings(self.interface, self.config)
         arguments = PropertyMock(return_value={})
         type(self.interface).arguments = arguments
+
+        s = Settings(self.interface, self.config)
 
         with self.assertRaises(FacioException):
             s.project_name
@@ -188,155 +173,110 @@ class TestSettings(BaseTestCase):
             "Error: Project name not defined.")
         self.assertTrue(mock_exit.called)
 
+    @patch('sys.exit')
+    def test_exception_raised_select_template_no_config(self, mock_exit):
+        arguments = PropertyMock(return_value={
+            '--select': True})
+        type(self.interface).arguments = arguments
+        self.config.items.side_effect = ConfigParser.NoSectionError('template')
 
-#import sys
-#
-#from docopt import DocoptExit
-#from facio import config
-#from facio.config import Config
-#from mock import PropertyMock, patch
-#
-#from . import BaseTestCase
-#
-#
-#class ConfigTests(BaseTestCase):
-#    """ Argument Passing & Config Tests. """
-#
-#    base_args = ['test_skeleton', ]
-#
-#    def setUp(self):
-#        """ Config Test Setup
-#        Mocking stdout / stdin / stderr """
-#
-#        self.clint_paths = [
-#            'facio.config.puts',
-#        ]
-#        self._mock_clint_start()
-#        sys.argv = ['facio', ]
-#        self._old_sys_argv = sys.argv
-#
-#    def tearDown(self):
-#        sys.argv = self._old_sys_argv
-#
-#    def _set_cli_args(self, args):
-#        sys.argv = ['facio', ] + args
-#        self.config = Config()
-#
-#    def test_exit_with_no_arguments(self):
-#        try:
-#            Config()
-#        except SystemExit:
-#            assert True
-#
-#    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-#    def test_cfg_is_not_loaded(self, mock_path):
-#        mock_path.return_value = '/this/does/not/exist.cfg'
-#        sys.argv = sys.argv + self.base_args
-#        c = Config()
-#
-#        self.assertFalse(c.file_args.cfg_loaded)
-#
-#    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-#    @patch('facio.config.blue')
-#    def test_cfg_is_loaded(self, mock_blue, mock_path):
-#        sys.argv = sys.argv + self.base_args
-#        mock_path.return_value = self.empty_cfg
-#        c = Config()
-#        mock_blue.assert_called_with('Loaded ~/.facio.cfg')
-#        self.assertTrue(c.file_args.cfg_loaded)
-#
-#    def test_valid_project_name(self):
-#        valid_names = ['this_is_valid', 'this1is_valid', 'Thisisvalid']
-#        for valid_name in valid_names:
-#            try:
-#                self._set_cli_args([valid_name, ])
-#                self.assertEquals(self.config.project_name, valid_name)
-#            except:
-#                import ipdb
-#                ipdb.set_trace()
-#
-#    def test_exit_on_invalid_name(self):
-#        invalid_names = ['this_is_not-valid', 'this_is not_valid',
-#                         '*this_is_not_valid']
-#        for invalid_name in invalid_names:
-#            try:
-#                self._set_cli_args([invalid_name, ])
-#            except (SystemExit, DocoptExit):
-#                assert True
-#            else:
-#                assert False
-#
-#    def test_template_var_is_set_from_cli(self):
-#        self._set_cli_args(self.base_args + ['--template',
-#                                             self.test_tpl_path])
-#        self.assertEquals(self.config.template, self.test_tpl_path)
-#
-#    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-#    def test_exit_if_facio_cfg_is_miss_configured(self, mock_path):
-#        cfgs = ['malformed_config1.cfg', 'malformed_config2.cfg']
-#        for cfg in cfgs:
-#            mock_path.return_value = self._test_cfg_path(cfg)
-#            self._set_cli_args(self.base_args)
-#            self.assertFalse(self.config.file_args.cfg_loaded)
-#
-#    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-#    def test_valid_template_is_chosen_from_config(self, mock_path):
-#        mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
-#        config.input = lambda _: '2'
-#        try:
-#            self._set_cli_args(self.base_args + ['-s', ])
-#            self.config = Config()
-#            self.assertEquals(self.config.template, '/path/to/template')
-#        except SystemExit:
-#            pass  # We allow a pass here because the template path is invalid
-#
-#    def test_fail_if_invalid_template_choice(self):
-#        config.input = lambda _: '8'
-#        try:
-#            self._set_cli_args(self.base_args + ['-s', ])
-#            self.config = Config()
-#        except SystemExit:
-#            assert True
-#
-#    def test_value_error_raised_on_zero_template_choice(self):
-#        config.input = lambda _: '0'
-#        try:
-#            self._set_cli_args(self.base_args + ['-s', ])
-#            self.config = Config()
-#        except SystemExit:
-#            assert True
-#
-#    @patch('os.path.isdir', return_value=True)
-#    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-#    def test_can_refernce_template_by_name_from_cli(
-#            self,
-#            mock_path,
-#            mock_isdir):
-#        mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
-#        try:
-#            self._set_cli_args(self.base_args + ['-t', 'foo'])
-#            self.config = Config()
-#            self.assertEquals(self.config.template, '/path/to/template/foo')
-#        except SystemExit:
-#            assert False
-#
-#    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-#    def test_can_refernce_template_by_name_from_cli_invalid(self, mock_path):
-#        mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
-#        try:
-#            self._set_cli_args(self.base_args + ['-t', 'not_valid_name'])
-#            Config()
-#        except SystemExit:
-#            assert True
-#
-#    def test_cache_django_secret_key(self):
-#        sys.argv = sys.argv + self.base_args
-#        self.config = Config()
-#        key = self.config.django_secret_key
-#        self.assertEquals(key, self.config.generated_django_secret_key)
-#
-#    def test_return_cached_version_of_secret_key(self):
-#        sys.argv = sys.argv + self.base_args
-#        self.config = Config()
-#        self.config.generated_django_secret_key = 'this_is_cached'
-#        self.assertEquals(self.config.django_secret_key, 'this_is_cached')
+        s = Settings(self.interface, self.config)
+
+        with self.assertRaises(FacioException):
+            with self.assertRaises(ConfigParser.NoSectionError):
+                s.get_template_path()
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: Missing [template] section in Facio configuration file.')
+        self.assertTrue(mock_exit.called)
+
+    @patch('sys.exit')
+    def test_default_template_returned_none_defined(self, mock_exit):
+        arguments = PropertyMock(return_value={
+            '--select': False})
+        type(self.interface).arguments = arguments
+
+        s = Settings(self.interface, self.config)
+        path = s.get_template_path()
+
+        self.assertEqual(Settings.default_template_path, path)
+
+    def test_path_returned_if_not_alias(self):
+        arguments = PropertyMock(return_value={
+            '--template': '/foo/bar/baz'})
+        type(self.interface).arguments = arguments
+
+        s = Settings(self.interface, self.config)
+        path = s.get_template_path()
+
+        self.assertEqual(path, '/foo/bar/baz')
+
+    def test_path_retuend_from_alias(self):
+        arguments = PropertyMock(return_value={
+            '--template': 'foobar'})
+        type(self.interface).arguments = arguments
+        self.config.items.return_value = [('foobar', '/foo/bar/baz')]
+
+        s = Settings(self.interface, self.config)
+        path = s.get_template_path()
+
+        self.assertEqual(path, '/foo/bar/baz')
+
+    @patch('facio.config.input')
+    def test_template_selection_input_success(self, mock_input):
+        arguments = PropertyMock(return_value={
+            '--select': True})
+        type(self.interface).arguments = arguments
+        self.config.items.return_value = [
+            ('foo', '/foo'),
+            ('bar', '/bar'),
+            ('baz', '/baz'),
+        ]
+        mock_input.return_value = 1
+
+        s = Settings(self.interface, self.config)
+        path = s.get_template_path()
+
+        self.assertEqual(path, '/foo')
+
+    @patch('sys.exit')
+    @patch('facio.config.input')
+    def test_template_selection_input_error(self, mock_input, mock_exit):
+        arguments = PropertyMock(return_value={
+            '--select': True})
+        type(self.interface).arguments = arguments
+        self.config.items.return_value = [
+            ('foo', '/foo'),
+        ]
+        mock_input.return_value = 0
+
+        s = Settings(self.interface, self.config)
+
+        with self.assertRaises(FacioException):
+            with self.assertRaises(ValueError):
+                s.get_template_path()
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: A template was not selected')
+        self.assertTrue(mock_exit.called)
+
+    def test_get_variables_from_cli(self):
+        arguments = PropertyMock(return_value={
+            '--vars': 'foo=bar'})
+        type(self.interface).arguments = arguments
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.get_variables(), 'foo=bar')
+
+    def test_empty_ignores_not_configured(self):
+        self.config.get.side_effect = ConfigParser.NoSectionError('misc')
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.get_file_ignores(), [])
+
+    def test_ignores_returned_as_list(self):
+        self.config.get.return_value = 'foo=bar,baz=foo'
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.get_file_ignores(), ['foo=bar', 'baz=foo'])
