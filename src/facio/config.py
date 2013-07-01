@@ -128,7 +128,10 @@ class Settings(object):
         :returns: str -- The project name
         """
 
-        return self.interface.arguments.get('<project_name>')
+        try:
+            return self.interface.arguments['<project_name>']
+        except KeyError:
+            raise FacioException('Project name not defined.')
 
     def get_template_path(self):
         """ Obtain the template with from the command line interface or from
