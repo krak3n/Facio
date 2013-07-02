@@ -111,8 +111,7 @@ class Settings(object):
         self.interface = interface
         self.config = config
 
-    @property
-    def project_name(self):
+    def get_project_name(self):
         """ Get the project name from the command line interface.
 
         :returns: str -- The project name
@@ -184,7 +183,7 @@ class Settings(object):
 
         return self.interface.arguments.get('--vars')
 
-    def get_file_ignores(self):
+    def get_ignore_globs(self):
         """ Returns list of of file ignore globs from configuration file.
 
         :returns: list

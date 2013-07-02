@@ -158,7 +158,7 @@ class TestSettings(BaseTestCase):
     def test_retreive_project_name(self):
         s = Settings(self.interface, self.config)
 
-        self.assertEqual(s.project_name, 'foo')
+        self.assertEqual(s.get_project_name(), 'foo')
 
     @patch('sys.exit')
     def test_exception_no_project_name(self, mock_exit):
@@ -168,7 +168,7 @@ class TestSettings(BaseTestCase):
         s = Settings(self.interface, self.config)
 
         with self.assertRaises(FacioException):
-            s.project_name
+            s.get_project_name()
         self.mocked_facio_exceptions_puts.assert_any_call(
             "Error: Project name not defined.")
         self.assertTrue(mock_exit.called)
@@ -272,11 +272,11 @@ class TestSettings(BaseTestCase):
 
         s = Settings(self.interface, self.config)
 
-        self.assertEqual(s.get_file_ignores(), [])
+        self.assertEqual(s.get_ignore_globs(), [])
 
     def test_ignores_returned_as_list(self):
         self.config.get.return_value = 'foo=bar,baz=foo'
 
         s = Settings(self.interface, self.config)
 
-        self.assertEqual(s.get_file_ignores(), ['foo=bar', 'baz=foo'])
+        self.assertEqual(s.get_ignore_globs(), ['foo=bar', 'baz=foo'])
