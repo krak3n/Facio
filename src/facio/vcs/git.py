@@ -5,12 +5,10 @@ facio.vcs.git
 Git Version Control Template Cloning.
 """
 
-import os
 import tempfile
 
 from clint.textui import puts, indent
 from clint.textui.colored import blue
-from shutil import rmtree
 
 
 class Git(object):
@@ -47,7 +45,7 @@ class Git(object):
         except Exception:
             raise Exception  # TODO: Custom exception
 
-        rmtree(os.path.join(self.tmp_dir, '.git'))
-
         with indent(4, quote=' >'):
             puts(blue('Clone complete'))
+
+        return self.tmp_dir
