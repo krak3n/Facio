@@ -5,12 +5,10 @@
    :synopsis: Mercurial repository template cloning.
 """
 
-import os
 import tempfile
 
 from clint.textui import puts, indent
 from clint.textui.colored import blue
-from shutil import rmtree
 
 
 class Mercurial(object):
@@ -46,7 +44,7 @@ class Mercurial(object):
         except Exception:
             raise Exception  # TODO: Custom exception
 
-        rmtree(os.path.join(self.tmp_dir, '.hg'))
-
         with indent(4, quote=' >'):
             puts(blue('Clone complete'))
+
+        return self.tmp_dir
