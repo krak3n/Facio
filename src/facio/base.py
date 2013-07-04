@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-.. module:: facio.facio
+.. module:: facio.base
    :synopsis: Base facio classes.
 """
 
