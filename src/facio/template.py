@@ -14,6 +14,7 @@ import shutil
 from codecs import open
 from sh import pwd
 
+from facio import Facio
 from facio.exceptions import FacioException
 from facio.vcs import GitVCS, MercurialVCS
 
@@ -27,7 +28,7 @@ except ImportError:
 get_var_name_pattern = re.compile(r'\{\{(\w+)\}\}')
 
 
-class Template(object):
+class Template(Facio):
 
     def __init__(self, name, path):
         """ Constructor for Template Class, sets the project name, template
@@ -311,5 +312,5 @@ class Template(object):
                     except:  # Catch all exceptions in rendering the template
                         import sys
                         e = sys.exc_info()[1]
-                        self.out('Warning: Failed to render {0}: {1}'.format(
-                            path, e), color=yellow)
+                        self.warning('Failed to render {0}: {1}'.format(
+                            path, e))
