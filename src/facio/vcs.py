@@ -7,10 +7,11 @@
 
 import tempfile
 
+from facio import Facio
 from facio.exceptions import FacioException
 
 
-class BaseVCS(object):
+class BaseVCS(Facio):
     """ Base Version Control System Class all VCS related classes should extend
     from, provides common API. """
 
@@ -60,7 +61,7 @@ class GitVCS(BaseVCS):
 
         try:
             git = git.bake(_cwd=temp_diretory)
-            git.clone(self.path, self.tmp_dir)
+            git.clone(self.path, temp_diretory)
             git.fetch('--all')
             git.checkout('master')
         except:
