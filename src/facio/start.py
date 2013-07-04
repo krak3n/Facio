@@ -9,7 +9,7 @@ from .config import Settings, CommandLineInterface, ConfigurationFile
 from .template import Template
 
 from clint.textui import puts, indent
-from clint.textui.colored import blue, green
+from clint.textui.colored import green
 
 
 class Start(object):
@@ -29,11 +29,12 @@ class Start(object):
             settings.get_template_path()
         )
 
-        template.update_ignore_globs(settings.get_variables())
+        template.update_context_variables(settings.get_variables())
         template.update_ignore_globs(settings.get_ignore_globs())
 
         template.copy()
         template.rename()
+        template.write()
 
         with indent(4, quote=' >'):
             puts(green('Done'))

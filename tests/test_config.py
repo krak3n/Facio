@@ -265,7 +265,7 @@ class TestSettings(BaseTestCase):
 
         s = Settings(self.interface, self.config)
 
-        self.assertEqual(s.get_variables(), 'foo=bar')
+        self.assertEqual(s.get_variables(), {'foo': 'bar'})
 
     def test_empty_ignores_not_configured(self):
         self.config.get.side_effect = ConfigParser.NoSectionError('misc')

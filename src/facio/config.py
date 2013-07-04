@@ -175,19 +175,18 @@ class Settings(object):
         return Settings.default_template_path
 
     def get_variables(self):
-        """ Returns list of variables passed into command line interface, list
-        contains tuple key value pairs.
+        """ Returns dict of variables passed into command line interface.
 
-        :returns: list
+        :returns: dict
         """
 
-        variable_list = []
+        variable_dict = {}
         variables = self.interface.arguments.get('--vars')
         if variables:
             for pair in variables.split(','):
                 key, value = pair.split('=')
-                variable_list.append((key, value))
-        return variable_list
+                variable_dict[key] = value
+        return variable_dict
 
     def get_ignore_globs(self):
         """ Returns list of of file ignore globs from configuration file.
