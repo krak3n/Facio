@@ -22,11 +22,10 @@ class BaseVCS(Facio):
         :type path: str
         """
 
-        vcs, path = path.split('+', 1)
-        self.path = path
+        self.vcs, self.path = path.split('+', 1)
 
     def get_temp_directory(self):
-        """ Create a temporary directory to clone the template too.
+        """ Create a temporary directory to clone the template to.
 
         :returns: str -- Temp directory path
         """
@@ -55,9 +54,11 @@ class GitVCS(BaseVCS):
             from sh import git
         except ImportError:
             raise FacioException('Git must be installed to use git+ '
-                                 'template paths.')
+                                 'template paths')
 
         temp_diretory = self.get_temp_directory()
+
+        self.out('Git Cloning {0} to {1}'.format(self.path, temp_diretory))
 
         try:
             git = git.bake(_cwd=temp_diretory)
@@ -65,10 +66,8 @@ class GitVCS(BaseVCS):
             git.fetch('--all')
             git.checkout('master')
         except:
-            import sys
-            e = sys.exc_info()[1]
-            raise FacioException('Failed to clone git repository: '
-                                 '{0}'.format(e))
+            raise FacioException('Failed to clone git repository '
+                                 'at {0}'.format(self.path))
 
 
 class MercurialVCS(BaseVCS):
@@ -80,16 +79,17 @@ class MercurialVCS(BaseVCS):
         try:
             from sh import hg
         except ImportError:
-            raise FacioException('Git must be installed to use git+ '
-                                 'template paths.')
+            raise FacioException('Mercurial must be installed to use hg+ '
+                                 'template paths')
 
         temp_diretory = self.get_temp_directory()
+
+        self.out('Mercurial Cloning {0} to {1}'.format(self.path,
+                                                       temp_diretory))
 
         try:
             hg = hg.bake(_cwd=temp_diretory)
             hg.clone(self.path, temp_diretory)
         except:
-            import sys
-            e = sys.exc_info()[1]
-            raise FacioException('Failed to clone hg repository: '
-                                 '{0}'.format(e))
+            raise FacioException('Failed to clone hg repository '
+                                 'at {0}'.format(self.path))
