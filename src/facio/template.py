@@ -11,8 +11,6 @@ import os
 import re
 import shutil
 
-from clint.textui import puts, indent
-from clint.textui.colored import blue, yellow
 from codecs import open
 from sh import pwd
 
@@ -57,21 +55,6 @@ class Template(object):
             '.svn',
             '*.pyc',
         ])
-
-    def out(self, message, color=blue):
-        """ Print message out to user using clint.
-
-        :param message: Message to print to user
-        :type message: str
-
-        ** Optional Key Word Arguments **
-
-        :param color: Clint color function to use
-        :type: function -- default blue
-        """
-
-        with indent(4, quote=' >'):
-            puts(color(message))
 
     def get_working_directory(self):
         """ Use the ``sh`` library to return the current working directory
