@@ -21,9 +21,6 @@ class BaseTestCase(unittest.TestCase):
         'files',
         'template')
 
-    def _test_cfg_path(self, fname):
-        return os.path.join(self.test_cfg_base_path, fname)
-
     def _patch_clint(self, paths=[]):
         """ Mock the clint.textui modules, clint_paths on self
         is required for this method to work. """
@@ -45,15 +42,3 @@ class BaseTestCase(unittest.TestCase):
                 setattr(self, 'mocked_{0}'.format(name), patcher.start())
         except AttributeError:
             pass
-
-    @property
-    def empty_cfg(self):
-        return self._test_cfg_path('empty.cfg')
-
-    @property
-    def multiple_templates_cfg(self):
-        return self._test_cfg_path('multiple_templates.cfg')
-
-    @property
-    def malformed_cfg(self):
-        return self._test_cfg_path('malformed_config.cfg')
