@@ -7,7 +7,6 @@
 """
 
 import fnmatch
-import glob
 import os
 import re
 import shutil
@@ -17,10 +16,13 @@ from clint.textui.colored import blue, yellow
 from codecs import open
 from sh import pwd
 
-from .exceptions import FacioException
-from .pipeline import Pipeline
-from .vcs.git import Git
-from .vcs.hg import Mercurial
+from facio.exceptions import FacioException
+from facio.vcs import GitVCS, MercurialVCS
+
+try:
+    from jinja2 import Environment, FileSystemLoader
+except ImportError:
+    raise FacioException('Jinja2 must be installed to use Facio')
 
 
 # Regex for extracting context variable name from file or directory name
@@ -44,9 +46,9 @@ class Template(object):
         self.path = path
 
         # Update context variables to contain PROJECT_NAME
-        self.update_context_variables([
-            ('PROJECT_NAME', name)
-        ])
+        self.update_context_variables({
+            'PROJECT_NAME': name
+        })
 
         # Update ignore globs with standard ignore patterns
         self.update_ignore_globs([
@@ -89,35 +91,37 @@ class Template(object):
 
         return os.path.join(self.get_working_directory(), self.name)
 
-    def update_context_variables(self, var_list):
-        """ Update the context varaibles list with new key value tuple
-        pairs.
+    def update_context_variables(self, dictionary):
+        """ Update the context varaibles dict with new values.
 
         ** Usage: **
 
         .. code-block:: python
 
             from facio.template import Template
-            var_list = [
-                ('bar': 'baz'),
-                ('fib': 'fab'),
-            ]
+            dictionary = {
+                'bar': 'baz',
+                'fib': 'fab',
+            }
             t = Template('foo', '/path/to/foo')
-            t.update_context_variables(var_list)
+            t.update_context_variables(dictionary)
 
-        :param var_list: list of key value tuples
-        :type var_list: list
+        :param dictionary: Dictionary of new key values
+        :type dictionary: dict
         """
 
         try:
-            self.context_variables += var_list
+            dict1 = self.context_variables
         except AttributeError:
-            if not isinstance(var_list, list):
-                var_list = []
-            self.context_variables = var_list
-        except TypeError:
-            raise FacioException('Failed to add {0} to variables '
-                                 'list'.format(var_list))
+            self.context_variables = {}
+            dict1 = self.context_variables
+        dict2 = dictionary
+
+        if isinstance(dict1, dict) and isinstance(dict2, dict):
+            dict1.update(dict2)
+            self.context_variables = dict1
+        else:
+            raise FacioException('Variable update failed')
 
     def get_context_variables(self):
         """ Returns the current context variables at time of call.
@@ -128,7 +132,7 @@ class Template(object):
         try:
             return self.context_variables
         except AttributeError:
-            return []
+            return {}
 
     def get_context_varable(self, name):
         """ Return a specific context variable value.
@@ -140,11 +144,7 @@ class Template(object):
         """
 
         variables = self.get_context_variables()
-        try:
-            name, value = filter(lambda t: t[0] == name, variables)[0]
-            return value
-        except IndexError:
-            return None
+        return variables.get(name, None)
 
     def update_ignore_globs(self, ignore_list):
         """ Update the ignore glob patterns to include the list provided.
@@ -186,6 +186,23 @@ class Template(object):
         except AttributeError:
             return []
 
+    def get_ignore_files(self, files):
+        """ Returns a list of files to ignore based on ``get_ignore_globs``
+        patterns.
+
+        :param files: List of files to check against
+        :type files: list
+
+        :returns: list -- list of filenames
+        """
+
+        ignores = []
+        for pattern in self.get_ignore_globs():
+            for filename in fnmatch.filter(files, pattern):
+                ignores.append(filename)
+
+        return ignores
+
     def copy(self):
         """ Copy template from origin path to ``self.get_project_root()``.
 
@@ -212,8 +229,8 @@ class Template(object):
             if not os.path.isdir(self.get_project_root()):
 
                 supported_vcs = [
-                    ('git+', Git),
-                    ('hg+', Mercurial),
+                    ('git+', GitVCS),
+                    ('hg+', MercurialVCS),
                 ]
 
                 for prefix, cls in supported_vcs:
@@ -290,51 +307,26 @@ class Template(object):
         for old, new in self.rename_files():
             self.out('Renaming {0} to {1}'.format(old, new))
 
-#    @property
-#    def has_pipeline_file(self):
-#        """ Detect if the template has a pipeline file. """
-#
-#        path = os.path.join(self.config._tpl, '.facio.pipeline.yml')
-#        if os.path.isfile(path):
-#            self.pipeline_file = path
-#            self.pipeline = Pipeline(self)
-#            return True
-#        return False
-#
-#    def swap_placeholders(self):
-#        '''Swap placeholders for real values.'''
-#
-#        try:
-#            from jinja2 import Environment, FileSystemLoader
-#        except ImportError:  # pragma: no cover
-#            self.config._error('Jinja2 is required for tempalte processing, '
-#                               'please install it.')
-#
-#        cwd = os.getcwd()
-#
-#        for root, dirs, files in os.walk(self.project_root):
-#            jinja_tpl_loader = FileSystemLoader(root)
-#            jinja_env = Environment(loader=jinja_tpl_loader)
-#            os.chdir(root)
-#            ignore_list = self._ignore_list()
-#            for f in files:
-#                filepath = os.path.join(root, f)
-#                exclude = False
-#                dirs = filepath.split('/')
-#                for d in dirs:
-#                    if d in self.exclude_dirs:
-#                        exclude = True  # pragma: no cover
-#                if not exclude and f not in ignore_list:
-#                    try:
-#                        tpl = jinja_env.get_template(f)
-#                        file_contents = tpl.render(self.place_holders)
-#                        with open(filepath, 'w', encoding='utf8') as f:
-#                            f.write(file_contents)
-#                    except Exception:
-#                        import sys
-#                        e = sys.exc_info()[1]
-#                        with indent(4, quote=' >'):
-#                            puts(yellow(
-#                                'Warning: Failed to process '
-#                                '{0}: {1}'.format(f, e)))
-#        os.chdir(cwd)
+    def write(self):
+        """ Reads the template and uses Jinja 2 to replace context variables
+        with their real values.
+        """
+
+        variables = self.get_context_variables()
+        for root, dirs, files in os.walk(self.get_project_root()):
+            jinja_loader = FileSystemLoader(root)
+            jinja_environment = Environment(loader=jinja_loader)
+            ignores = self.get_ignore_files(files)
+            for filename in files:
+                if filename not in ignores:
+                    path = os.path.join(root, filename)
+                    template = jinja_environment.get_template(filename)
+                    try:
+                        rendered = template.render(variables)
+                        with open(path, 'w', encoding='utf8') as handler:
+                            handler.write(rendered)
+                    except:  # Catch all exceptions in rendering the template
+                        import sys
+                        e = sys.exc_info()[1]
+                        self.out('Warning: Failed to render {0}: {1}'.format(
+                            path, e), color=yellow)
