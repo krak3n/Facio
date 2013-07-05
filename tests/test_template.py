@@ -5,6 +5,51 @@
    :synopsis: Unit tests for template module
 """
 
+from facio.exceptions import FacioException
+from facio.template import Template
+from mock import patch
+
+from . import BaseTestCase
+
+
+class TemplateTests(BaseTestCase):
+    """ Template Tests """
+
+    def setUp(self):
+        self._patch_clint([
+            'facio.base.puts',
+            'facio.exceptions.puts',
+        ])
+
+    def test_path_and_name_set(self):
+        instance = Template('foo', '/foo/bar')
+
+        self.assertEqual(instance.name, 'foo')
+        self.assertEqual(instance.path, '/foo/bar')
+
+    @patch('facio.template.pwd', return_value='/foo')
+    def test_return_current_working_dir(self, mock_pwd):
+        instance = Template('foo', '/foo/bar')
+
+        self.assertEqual(instance.get_working_directory(), '/foo')
+
+    @patch('facio.template.pwd', return_value='/bar')
+    def test_return_project_root(self, mock_pwd):
+        instance = Template('foo', '/foo/bar')
+
+        self.assertEqual(instance.get_project_root(), '/bar/foo')
+
+    @patch('sys.exit')
+    def test_update_context_variables_must_take_dict(self, mock_exit):
+        instance = Template('foo', '/foo/bar')
+
+        with self.assertRaises(FacioException):
+            instance.update_context_variables([1, 2, 3])
+        self.assertTrue(mock_exit.called)
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: Variable update failed')
+
+
 #import os
 #import tempfile
 #import uuid
