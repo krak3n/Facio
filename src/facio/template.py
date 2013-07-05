@@ -20,7 +20,7 @@ from facio.vcs import GitVCS, MercurialVCS
 
 try:
     from jinja2 import Environment, FileSystemLoader
-except ImportError:
+except ImportError:  # pragma: no cover
     raise FacioException('Jinja2 must be installed to use Facio')
 
 
