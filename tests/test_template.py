@@ -85,6 +85,24 @@ class TemplateTests(BaseTestCase):
             'Error: Failed to add 1 to ignore globs list')
         self.assertTrue(mock_exit.called)
 
+    def test_get_ignore_globs_empty_list(self):
+        instance = Template('foo', '/foo/bar')
+        del(instance.ignore_globs)
+
+        self.assertEqual(instance.get_ignore_globs(), [])
+
+    def test_get_ignore_globs(self):
+        instance = Template('foo', '/foo/bar')
+        instance.update_ignore_globs(['*.png', '*.gif'])
+
+        self.assertEqual(instance.get_ignore_globs(), [
+            '.git',
+            '.hg',
+            '.svn',
+            '*.pyc',
+            '*.png',
+            '*.gif'
+        ])
 
 #import os
 #import tempfile
