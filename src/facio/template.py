@@ -30,6 +30,9 @@ get_var_name_pattern = re.compile(r'\{\{(\w+)\}\}')
 
 class Template(Facio):
 
+    COPY_ATTEMPT_LIMIT = 5
+    COPY_ATTEMPT = 1
+
     def __init__(self, name, path):
         """ Constructor for Template Class, sets the project name, template
         path, and takes several key word arguments.
@@ -230,7 +233,12 @@ class Template(Facio):
                         self.path))
 
                 # The loop broke so we can call self.copy again
-                self.copy()
+                if self.COPY_ATTEMPT <= self.COPY_ATTEMPT_LIMIT:
+                    self.COPY_ATTEMPT += 1
+                    self.copy()
+                else:
+                    raise FacioException('Failed to copy template after '
+                                         '5 attempts')
 
             else:
                 # project root exists, raise exception
