@@ -7,7 +7,7 @@
 
 from facio.exceptions import FacioException
 from facio.template import Template
-from mock import patch
+from mock import MagicMock, patch
 from shutil import Error as ShutilError
 
 from . import BaseTestCase
@@ -129,7 +129,72 @@ class TemplateTests(BaseTestCase):
             instance.copy()
         self.assertTrue(mock_exit.called)
         self.mocked_facio_exceptions_puts.assert_any_call(
-                'Error: Failed to copy /foo/bar to /tmp/foo')
+            'Error: Failed to copy /foo/bar to /tmp/foo')
+
+    @patch('sys.exit')
+    @patch('facio.template.os.path.isdir', return_value=True)
+    @patch('facio.template.pwd', return_value='/tmp')
+    @patch('facio.template.shutil.copytree', side_effect=OSError)
+    def test_copy_shutil_oserror_raise_exception(
+            self,
+            mock_copy_tree,
+            mock_pwd,
+            mock_isdir,
+            mock_exit):
+
+        instance = Template('foo', '/foo/bar')
+
+        with self.assertRaises(FacioException):
+            instance.copy()
+        mock_isdir.assert_called_with('/tmp/foo')
+        self.assertTrue(mock_exit.called)
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: /tmp/foo already exists')
+
+    @patch('sys.exit')
+    @patch('facio.template.os.path.isdir', return_value=False)
+    @patch('facio.template.pwd', return_value='/tmp')
+    @patch('facio.template.shutil.copytree', side_effect=OSError)
+    def test_copy_oserror_not_vcs_path_exception(
+            self,
+            mock_copy_tree,
+            mock_pwd,
+            mock_isdir,
+            mock_exit):
+
+        instance = Template('foo', '/foo/bar')
+
+        with self.assertRaises(FacioException):
+            instance.copy()
+        mock_isdir.assert_called_with('/tmp/foo')
+        self.assertTrue(mock_exit.called)
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: /foo/bar does not exist')
+
+    @patch('sys.exit')
+    @patch('facio.template.GitVCS', new_callable=MagicMock)
+    @patch('facio.template.os.path.isdir', return_value=False)
+    @patch('facio.template.pwd', return_value='/tmp')
+    @patch('facio.template.shutil.copytree', side_effect=OSError)
+    def test_copy_oserror_vcs_path(
+            self,
+            mock_copy_tree,
+            mock_pwd,
+            mock_isdir,
+            mock_gitvcs,
+            mock_exit):
+
+        instance = Template('foo', 'git+/foo/bar')
+        instance.COPY_ATTEMPT_LIMIT = 0  # Block the next copy call
+
+        try:
+            instance.copy()
+        except:
+            pass  # We don't care
+
+        mock_gitvcs.assert_called_with('git+/foo/bar')
+
+
 
 #import os
 #import tempfile
