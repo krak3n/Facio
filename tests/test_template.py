@@ -49,6 +49,42 @@ class TemplateTests(BaseTestCase):
         self.mocked_facio_exceptions_puts.assert_any_call(
             'Error: Variable update failed')
 
+    @patch('facio.template.Template.__init__', return_value=None)
+    def test_get_context_variables_empty(self, mock_init):
+        instance = Template('foo', '/foo/bar')
+
+        self.assertEqual(instance.get_context_variables(), {})
+
+    def test_get_context_variables(self):
+        instance = Template('foo', '/foo/bar')
+
+        self.assertEqual(instance.get_context_variables(), {
+            'PROJECT_NAME': 'foo'})
+
+    def test_get_context_variable(self):
+        instance = Template('foo', '/foo/bar')
+
+        self.assertEqual(instance.get_context_variable('PROJECT_NAME'), 'foo')
+        self.assertFalse(instance.get_context_variable('not_created'), 'foo')
+
+    def test_update_ignore_globs_empty_wrong_type(self):
+        instance = Template('foo', '/foo/bar')
+        del(instance.ignore_globs)
+
+        instance.update_ignore_globs({'foo': 'bar'})
+
+        self.assertEqual(instance.ignore_globs, [])
+
+    @patch('sys.exit')
+    def test_exception_setting_ignore_globs_not_iterable(self, mock_exit):
+        instance = Template('foo', '/foo/bar')
+
+        with self.assertRaises(FacioException):
+            instance.update_ignore_globs(1)
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: Failed to add 1 to ignore globs list')
+        self.assertTrue(mock_exit.called)
+
 
 #import os
 #import tempfile

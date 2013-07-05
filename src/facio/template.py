@@ -118,7 +118,7 @@ class Template(Facio):
         except AttributeError:
             return {}
 
-    def get_context_varable(self, name):
+    def get_context_variable(self, name):
         """ Return a specific context variable value.
 
         :param name: Context variable name
@@ -154,7 +154,8 @@ class Template(Facio):
         except AttributeError:
             if not isinstance(ignore_list, list):
                 self.ignore_globs = []
-            self.ignore_globs = ignore_list
+            else:
+                self.ignore_globs = ignore_list
         except TypeError:
             raise FacioException('Failed to add {0} to ignore globs '
                                  'list'.format(ignore_list))
@@ -252,7 +253,7 @@ class Template(Facio):
                 except IndexError:
                     pass
                 else:
-                    var_value = self.get_context_varable(var_name)
+                    var_value = self.get_context_variable(var_name)
                     if var_value:
                         old_path = os.path.join(root, directory)
                         new_path = os.path.join(root, var_value)
@@ -273,7 +274,7 @@ class Template(Facio):
                 except IndexError:
                     pass
                 else:
-                    var_value = self.get_context_varable(var_name)
+                    var_value = self.get_context_variable(var_name)
                     if var_value:
                         name, ext = os.path.splitext(filename)
                         old_path = os.path.join(root, filename)
