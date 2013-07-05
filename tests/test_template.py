@@ -8,6 +8,7 @@
 from facio.exceptions import FacioException
 from facio.template import Template
 from mock import patch
+from shutil import Error as ShutilError
 
 from . import BaseTestCase
 
@@ -103,6 +104,32 @@ class TemplateTests(BaseTestCase):
             '*.png',
             '*.gif'
         ])
+
+    def test_get_ignore_files(self):
+        instance = Template('foo', '/foo/bar')
+        instance.update_ignore_globs(['*.png', '*.gif'])
+        files = ['setup.py', 'setup.pyc', 'foo.png', '.git', 'index.html']
+
+        ignores = instance.get_ignore_files(files)
+
+        self.assertEqual(ignores, ['.git', 'setup.pyc', 'foo.png'])
+
+    @patch('sys.exit')
+    @patch('facio.template.pwd', return_value='/tmp')
+    @patch('facio.template.shutil.copytree', side_effect=ShutilError)
+    def test_copy_shutil_error_raise_exception(
+            self,
+            mock_copy_tree,
+            mock_pwd,
+            mock_exit):
+
+        instance = Template('foo', '/foo/bar')
+
+        with self.assertRaises(FacioException):
+            instance.copy()
+        self.assertTrue(mock_exit.called)
+        self.mocked_facio_exceptions_puts.assert_any_call(
+                'Error: Failed to copy /foo/bar to /tmp/foo')
 
 #import os
 #import tempfile
@@ -266,7 +293,8 @@ class TemplateTests(BaseTestCase):
 #        t = Template(self.config)
 #        t.copy_template()
 #        self.assertTrue(os.path.isdir(os.path.join(t.project_root,
-#                                                   '{{NOT_IN_PLACEHOLDERS}}')))
+#                                                   '{{NOT_IN_PLACEHOLDERS}}'))
+#                                                    )
 #        rmtree(t.project_root)
 #
 #    @patch('facio.template.Template.has_pipeline_file',
