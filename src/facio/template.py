@@ -257,17 +257,13 @@ class Template(BaseFacio):
 
         for root, dirs, files in os.walk(self.get_project_root()):
             for directory in fnmatch.filter(dirs, '*{{*}}*'):
-                try:
-                    var_name = get_var_name_pattern.findall(directory)[0]
-                except IndexError:
-                    pass
-                else:
-                    var_value = self.get_context_variable(var_name)
-                    if var_value:
-                        old_path = os.path.join(root, directory)
-                        new_path = os.path.join(root, var_value)
-                        shutil.move(old_path, new_path)
-                        yield (old_path, new_path)
+                var_name = get_var_name_pattern.findall(directory)[0]
+                var_value = self.get_context_variable(var_name)
+                if var_value:
+                    old_path = os.path.join(root, directory)
+                    new_path = os.path.join(root, var_value)
+                    shutil.move(old_path, new_path)
+                    yield (old_path, new_path)
 
     def rename_files(self):
         """ Rename files that are named after context variables, for example:
