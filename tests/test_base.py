@@ -5,7 +5,7 @@
    :synopsis: Tests for Facio base class
 """
 
-from facio import Facio
+from facio.base import Facio
 
 from . import BaseTestCase
 
@@ -39,4 +39,4 @@ class TestFacio(BaseTestCase):
         f = Facio()
         f.success('Foo')
 
-        self.mocked_facio_base_puts.called_once_with('Error: Foo')
+        self.mocked_facio_base_puts.called_once_with('Success: Foo')
