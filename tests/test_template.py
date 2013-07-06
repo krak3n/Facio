@@ -21,6 +21,7 @@ class TemplateTests(BaseTestCase):
         self._patch_clint([
             'facio.base.puts',
             'facio.exceptions.puts',
+            'facio.template.Template.out',
             'facio.template.Template.warning',
         ])
 
@@ -247,6 +248,24 @@ class TemplateTests(BaseTestCase):
             mock_move.assert_called_with(old, new)
             self.assertEqual(old, '/foo/{{PROJECT_NAME}}.html')
             self.assertEqual(new, '/foo/foo.html')
+
+    @patch('os.walk')
+    @patch('facio.template.shutil.move', new_callable=MagicMock)
+    def test_rename(self, mock_move, mock_walk):
+        mock_walk.return_value = [(
+            '/foo',  # Root
+            ['{{PROJECT_NAME}}', 'baz'],  # Dirs
+            ['bar.py', '{{PROJECT_NAME}}.png', 'baz.gif'],  # Files
+        )]
+
+        instance = Template('foo', '/foo/bar')
+        instance.rename()
+
+        self.assertEqual(self.mocked_facio_template_Template_out.call_count, 2)
+        self.mocked_facio_template_Template_out.has_any_call(
+            'Renaming /foo/{{PROJECT_NAME}} to /foo/foo')
+        self.mocked_facio_template_Template_out.has_any_call(
+            'Renaming /foo/{{PROJECT_NAME}}.png to /foo/foo.png')
 
     @patch('os.walk')
     @patch('facio.template.FileSystemLoader.get_source')
