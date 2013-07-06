@@ -18,7 +18,7 @@ def read(fname):
 
 
 install_requires = [
-    'Jinja2==2.6',
+    'Jinja2==2.6',  # For python >= 3.2
     'clint2==0.3.2',
     'sh==1.08',
     'six==1.3.0',
