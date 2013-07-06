@@ -9,7 +9,7 @@ from clint.textui import puts, indent
 from clint.textui.colored import blue, green, red, yellow
 
 
-class Facio(object):
+class BaseFacio(object):
 
     def out(self, message, color=blue):
         """ Print message information to user (Blue)

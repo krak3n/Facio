@@ -249,9 +249,8 @@ class TemplateTests(BaseTestCase):
             self.assertEqual(new, '/foo/foo.html')
 
     @patch('os.walk')
-    @patch('facio.base.Facio.warning')
     @patch('facio.template.FileSystemLoader.get_source')
-    def test_write(self, mock_get_source, mock_warning, mock_walk):
+    def test_write(self, mock_get_source, mock_walk):
 
         # Mock Setups - Fake file contents and open writer
         files_map = {

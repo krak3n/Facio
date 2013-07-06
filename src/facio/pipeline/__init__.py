@@ -6,12 +6,12 @@
 import sys
 import yaml
 
-from facio import Facio
+from facio.base import BaseFacio
 from importlib import import_module
 from yaml.scanner import ScannerError
 
 
-class Pipeline(Facio):
+class Pipeline(BaseFacio):
 
     def __init__(self):
         """ Pipeline class instanctiation. """

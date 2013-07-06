@@ -5,7 +5,7 @@
    :synopsis: Tests for Facio base class
 """
 
-from facio.base import Facio
+from facio.base import BaseFacio
 
 from . import BaseTestCase
 
@@ -18,25 +18,25 @@ class TestFacio(BaseTestCase):
         ])
 
     def test_out(self):
-        f = Facio()
+        f = BaseFacio()
         f.out('Foo')
 
         self.mocked_facio_base_puts.called_once_with('Foo')
 
     def test_warning(self):
-        f = Facio()
+        f = BaseFacio()
         f.warning('Foo')
 
         self.mocked_facio_base_puts.called_once_with('Warning: Foo')
 
     def test_error(self):
-        f = Facio()
+        f = BaseFacio()
         f.error('Foo')
 
         self.mocked_facio_base_puts.called_once_with('Error: Foo')
 
     def test_success(self):
-        f = Facio()
+        f = BaseFacio()
         f.success('Foo')
 
         self.mocked_facio_base_puts.called_once_with('Success: Foo')

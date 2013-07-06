@@ -7,11 +7,11 @@
 
 import tempfile
 
-from facio import Facio
+from facio.base import BaseFacio
 from facio.exceptions import FacioException
 
 
-class BaseVCS(Facio):
+class BaseVCS(BaseFacio):
     """ Base Version Control System Class all VCS related classes should extend
     from, provides common API. """
 

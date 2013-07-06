@@ -5,9 +5,6 @@
    :synopsis: Provides version number and exposes base facio class.
 """
 
-from facio.base import Facio  # noqa
-
-
 __VERSION__ = (1, 2, 0, 'dev', 0)
 
 

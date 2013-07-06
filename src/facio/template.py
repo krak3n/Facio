@@ -14,7 +14,7 @@ import shutil
 from codecs import open
 from sh import pwd
 
-from facio import Facio
+from facio.base import BaseFacio
 from facio.exceptions import FacioException
 from facio.vcs import GitVCS, MercurialVCS
 
@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover
 get_var_name_pattern = re.compile(r'\{\{(\w+)\}\}')
 
 
-class Template(Facio):
+class Template(BaseFacio):
 
     COPY_ATTEMPT_LIMIT = 5
     COPY_ATTEMPT = 1
