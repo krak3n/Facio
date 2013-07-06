@@ -238,7 +238,8 @@ class Template(Facio):
                     self.copy()
                 else:
                     raise FacioException('Failed to copy template after '
-                                         '5 attempts')
+                                         '{0} attempts'.format(
+                                             self.COPY_ATTEMPT))
 
             else:
                 # project root exists, raise exception
@@ -277,19 +278,15 @@ class Template(Facio):
 
         for root, dirs, files in os.walk(self.get_project_root()):
             for filename in fnmatch.filter(files, '*{{*}}*'):
-                try:
-                    var_name = get_var_name_pattern.findall(filename)[0]
-                except IndexError:
-                    pass
-                else:
-                    var_value = self.get_context_variable(var_name)
-                    if var_value:
-                        name, ext = os.path.splitext(filename)
-                        old_path = os.path.join(root, filename)
-                        new_path = os.path.join(root, '{0}{1}'.format(
-                            var_value, ext))
-                        shutil.move(old_path, new_path)
-                        yield (old_path, new_path)
+                var_name = get_var_name_pattern.findall(filename)[0]
+                var_value = self.get_context_variable(var_name)
+                if var_value:
+                    name, ext = os.path.splitext(filename)
+                    old_path = os.path.join(root, filename)
+                    new_path = os.path.join(root, '{0}{1}'.format(
+                        var_value, ext))
+                    shutil.move(old_path, new_path)
+                    yield (old_path, new_path)
 
     def rename(self):
         """ Runs the two rename files and rename directories methods. """
