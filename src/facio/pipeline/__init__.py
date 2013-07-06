@@ -29,7 +29,7 @@ class Pipeline(Facio):
             try:
                 self.pipeline = yaml.load(f.read())
             except ScannerError:
-                self.warning('Error {0} Pipeline - Is it correctly '
+                self.warning('Error loading {0} pipeline - Is it correctly '
                              'formatted?'.format(path))
             else:
                 self.out('Loading Pipeline')

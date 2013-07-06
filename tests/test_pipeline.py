@@ -19,16 +19,11 @@ class PipelineTest(BaseTestCase):
 
     def setUp(self):
         self._patch_clint([
-            'facio.pipeline.puts',
+            'facio.base.puts',
+            'facio.pipeline.Pipeline.out',
+            'facio.pipeline.Pipeline.warning',
+            'facio.pipeline.Pipeline.error',
         ])
-        self.template = self._mock_template_class()
-
-    def _mock_template_class(self):
-        template = MagicMock(name='template')
-        template.pipeline_file = 'mocked.yml'
-        template.config = MagicMock(name='config')
-
-        return template
 
     def _mock_open(self, data):
         if six.PY3:
@@ -69,8 +64,10 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        Pipeline(self.template)
-        self.mocked_facio_pipeline_puts.assert_called_with("Loading Pipeline")
+        p = Pipeline()
+        p.load('/foo/bar.yml')
+        self.mocked_facio_pipeline_Pipeline_out.assert_called_with(
+            'Loading Pipeline')
 
         open_mock.stop()
 
@@ -86,9 +83,10 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        Pipeline(self.template)
-        self.mocked_facio_pipeline_puts.assert_called_with(
-            "Error loading Pipeline - Is it correctly formatted?")
+        p = Pipeline()
+        p.load('/foo/bar.yml')
+        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
+            "Error loading /foo/bar.yml pipeline - Is it correctly formatted?")
         open_mock.stop()
 
     def test_yaml_formatted_correctly_before(self):
@@ -100,9 +98,10 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         self.assertFalse(p.has_before)
-        self.mocked_facio_pipeline_puts.assert_called_with(
+        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
             'Ignoring before: should be a list')
 
         open_mock.stop()
@@ -116,9 +115,10 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         self.assertFalse(p.has_after)
-        self.mocked_facio_pipeline_puts.assert_called_with(
+        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
             'Ignoring after: should be a list')
 
         open_mock.stop()
@@ -128,7 +128,8 @@ class PipelineTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
 
         self.assertFalse(p.has_before)
         self.assertFalse(p.has_after)
@@ -142,7 +143,8 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         self.assertTrue(p.has_before)
 
         open_mock.stop()
@@ -155,7 +157,8 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         self.assertFalse(p.has_before)
 
         open_mock.stop()
@@ -168,7 +171,8 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         self.assertTrue(p.has_after)
 
         open_mock.stop()
@@ -181,29 +185,33 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         self.assertFalse(p.has_after)
 
         open_mock.stop()
 
-    @patch('facio.pipeline.Pipeline._parse', return_value=True)
+    @patch('facio.pipeline.Pipeline.load', return_value=True)
     @patch('facio.pipeline.import_module', return_value=True)
-    def test_import_success(self, mock_importlib, mock_parse):
-        p = Pipeline(self.template)
+    def test_import_success(self, mock_importlib, mockload):
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         p.import_module('path.to.module')
-        self.mocked_facio_pipeline_puts.assert_called_with(
+        self.mocked_facio_pipeline_Pipeline_out.assert_called_with(
             'Loaded module: path.to.module')
 
-    @patch('facio.pipeline.Pipeline._parse', return_value=True)
-    def test_import_module_failure(self, mock_parse):
-        p = Pipeline(self.template)
+    @patch('facio.pipeline.Pipeline.load', return_value=True)
+    def test_import_module_failure(self, mockload):
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         p.import_module('pipeline_test_module')
-        self.mocked_facio_pipeline_puts.assert_called_with(
+        self.mocked_facio_pipeline_Pipeline_error.assert_called_with(
             'Failed to Load module: pipeline_test_module')
 
-    @patch('facio.pipeline.Pipeline._parse', return_value=True)
-    def test_run_module_success(self, mock_parse):
-        p = Pipeline(self.template)
+    @patch('facio.pipeline.Pipeline.load', return_value=True)
+    def test_run_module_success(self, mockload):
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         import_module_mock = patch('facio.pipeline.import_module')
         mock = import_module_mock.start()
         module = MagicMock()
@@ -214,9 +222,10 @@ class PipelineTest(BaseTestCase):
         self.assertTrue(rtn)
         mock = import_module_mock.stop()
 
-    @patch('facio.pipeline.Pipeline._parse', return_value=True)
-    def test_run_module_failure(self, mock_parse):
-        p = Pipeline(self.template)
+    @patch('facio.pipeline.Pipeline.load', return_value=True)
+    def test_run_module_failure(self, mockload):
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         import_module_mock = patch('facio.pipeline.import_module')
         mock = import_module_mock.start()
         module = MagicMock()
@@ -227,8 +236,8 @@ class PipelineTest(BaseTestCase):
         self.assertFalse(rtn)
         mock = import_module_mock.stop()
 
-    @patch('facio.pipeline.Pipeline._parse', return_value=True)
-    def test_module_exception_caught(self, mock_parse):
+    @patch('facio.pipeline.Pipeline.load', return_value=True)
+    def test_module_exception_caught(self, mockload):
         import_module_mock = patch('facio.pipeline.import_module')
         mock = import_module_mock.start()
         module = MagicMock()
@@ -239,16 +248,18 @@ class PipelineTest(BaseTestCase):
             module.foo()
 
         module.run = fake_run
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         p.run_module('foo.bar.baz')
         self.assertTrue(module.foo.called)
-        self.mocked_facio_pipeline_puts.assert_called_with(
-            'Exeption caught in module: \'Failed lookup\' line: 116')
+        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
+            'Exeption caught in module: \'Failed lookup\' line: 107')
         mock = import_module_mock.stop()
 
-    @patch('facio.pipeline.Pipeline._parse', return_value=True)
+    @patch('facio.pipeline.Pipeline.load', return_value=True)
     def test_store_pipeline_states(self, return_value=True):
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         import_module_mock = patch('facio.pipeline.import_module')
         mock_import = import_module_mock.start()
         mocked_modules = self._module_factory(3)
@@ -265,9 +276,10 @@ class PipelineTest(BaseTestCase):
 
         mock_import = import_module_mock.stop()
 
-    @patch('facio.pipeline.Pipeline._parse', return_value=True)
+    @patch('facio.pipeline.Pipeline.load', return_value=True)
     def test_pipeline_call_history_retrival(self, return_value=True):
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         import_module_mock = patch('facio.pipeline.import_module')
         mock_import = import_module_mock.start()
         mocked_modules = self._module_factory(10)
@@ -291,7 +303,8 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         p.run_before()
 
         self.assertTrue(mock_module.run.called)
@@ -312,7 +325,8 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline(self.template)
+        p = Pipeline()
+        p.load('/foo/bar.yml')
         p.run_after()
 
         self.assertTrue(mock_module.run.called)
