@@ -187,12 +187,64 @@ class TemplateTests(BaseTestCase):
         instance = Template('foo', 'git+/foo/bar')
         instance.COPY_ATTEMPT_LIMIT = 0  # Block the next copy call
 
-        try:
+        with self.assertRaises(FacioException):
             instance.copy()
-        except:
-            pass  # We don't care
-
         mock_gitvcs.assert_called_with('git+/foo/bar')
+
+    @patch('sys.exit')
+    @patch('facio.template.GitVCS', new_callable=MagicMock)
+    @patch('facio.template.os.path.isdir', return_value=False)
+    @patch('facio.template.pwd', return_value='/tmp')
+    @patch('facio.template.shutil.copytree', side_effect=OSError)
+    def test_copy_oserror_vcs_path_recursion_limit(
+            self,
+            mock_copy_tree,
+            mock_pwd,
+            mock_isdir,
+            mock_gitvcs,
+            mock_exit):
+
+        instance = Template('foo', 'git+/foo/bar')
+        with self.assertRaises(FacioException):
+            instance.copy()
+        self.assertTrue(mock_exit.called)
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: Failed to copy template after 6 attempts')
+
+    @patch('facio.template.shutil.copytree', new_callable=MagicMock)
+    def test_copy_returns_true(self, mock_copy_tree):
+        instance = Template('foo', '/foo/bar')
+
+        self.assertTrue(instance.copy())
+
+    @patch('os.walk')
+    @patch('facio.template.shutil.move', new_callable=MagicMock)
+    def test_rename_directories(self, mock_move, mock_walk):
+        mock_walk.return_value = [
+            ('/foo', ['bar', '{{UNKNOWN}}', '{{PROJECT_NAME}}', 'baz'], [])
+        ]
+        instance = Template('foo', '/foo/bar')
+
+        for index, value in enumerate(instance.rename_direcories()):
+            old, new = value
+            mock_move.assert_called_with(old, new)
+            self.assertEqual(old, '/foo/{{PROJECT_NAME}}')
+            self.assertEqual(new, '/foo/foo')
+
+    @patch('os.walk')
+    @patch('facio.template.shutil.move', new_callable=MagicMock)
+    def test_rename_files(self, mock_move, mock_walk):
+        mock_walk.return_value = [
+            ('/foo', [], ['bar.py', '{{UNKNOWN}}.png',
+                          '{{PROJECT_NAME}}.html', 'baz.gif'])
+        ]
+        instance = Template('foo', '/foo/bar')
+
+        for index, value in enumerate(instance.rename_files()):
+            old, new = value
+            mock_move.assert_called_with(old, new)
+            self.assertEqual(old, '/foo/{{PROJECT_NAME}}.html')
+            self.assertEqual(new, '/foo/foo.html')
 
 
 
