@@ -310,13 +310,14 @@ class Template(Facio):
             for filename in files:
                 if filename not in ignores:
                     path = os.path.join(root, filename)
-                    template = jinja_environment.get_template(filename)
                     try:
+                        template = jinja_environment.get_template(filename)
                         rendered = template.render(variables)
-                        with open(path, 'w', encoding='utf8') as handler:
-                            handler.write(rendered)
-                    except:  # Catch all exceptions in rendering the template
+                    except:
                         import sys
                         e = sys.exc_info()[1]
                         self.warning('Failed to render {0}: {1}'.format(
                             path, e))
+                    else:
+                        with open(path, 'w', encoding='utf8') as handler:
+                            handler.write(rendered)
