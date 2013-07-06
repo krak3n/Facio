@@ -3,8 +3,6 @@
    :synopsis: Base test class.
 """
 
-import os
-
 try:
     import unittest2 as unittest
 except ImportError:
@@ -14,12 +12,6 @@ from mock import patch
 
 
 class BaseTestCase(unittest.TestCase):
-
-    test_tpl_path = os.path.join(
-        os.path.abspath('.'),
-        'tests',
-        'files',
-        'template')
 
     def _patch_clint(self, paths=[]):
         """ Mock the clint.textui modules, clint_paths on self
