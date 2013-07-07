@@ -5,14 +5,15 @@
    :synopsis: Starts the Facio template process.
 """
 
-from .config import Settings, CommandLineInterface, ConfigurationFile
-from .template import Template
+import os
 
-from clint.textui import puts, indent
-from clint.textui.colored import green
+from facio.base import BaseFacio
+from facio.config import Settings, CommandLineInterface, ConfigurationFile
+from facio.template import Template
+from facio.pipeline import Pipeline
 
 
-class Start(object):
+class Start(BaseFacio):
 
     def start(self):
 
@@ -33,8 +34,20 @@ class Start(object):
         template.update_ignore_globs(settings.get_ignore_globs())
 
         template.copy()
+
+        pipeline = Pipeline()
+        pipeline.load(os.path.join(
+            template.get_project_root(),
+            '.facio.pipeline.yml'
+        ))
+
+        if pipeline.has_before():
+            pipeline.run_before()
+
         template.rename()
         template.write()
 
-        with indent(4, quote=' >'):
-            puts(green('Done'))
+        if pipeline.has_after():
+            pipeline.run_after()
+
+        self.success('Done')
