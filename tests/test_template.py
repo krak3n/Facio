@@ -283,8 +283,13 @@ class TemplateTests(BaseTestCase):
             """ Overriding Jinja2 FileSystemLoader get_source
             function so we can return our own source. """
 
+            if template == 'foo.png':
+                raise Exception('\'utf8\' codec can\'t decode byte '
+                                '0x89 in position 0: invalid start '
+                                'byte')
+
             contents = files_map[template]
-            return contents.decode(), template, True
+            return contents, template, True
 
         mock_get_source.side_effect = get_source
         mock_walk.return_value = [
@@ -306,8 +311,8 @@ class TemplateTests(BaseTestCase):
         handle.write.assert_any_call('foo')
         handle.write.assert_any_call('<h1>Hello World</h1>')
         self.mocked_facio_template_Template_warning.assert_called_with(
-            'Failed to render /foo/foo.png: \'ascii\' codec can\'t decode '
-            'byte 0xc2 in position 0: ordinal not in range(128)')
+            'Failed to render /foo/foo.png: \'utf8\' codec can\'t '
+            'decode byte 0x89 in position 0: invalid start byte')
 
         # Stop the open patch
         open_patcher.stop()
