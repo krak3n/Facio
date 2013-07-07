@@ -91,8 +91,7 @@ class ConfigurationFile(BaseFacio):
 class Settings(BaseFacio):
 
     default_template_path = os.path.join(os.path.dirname(
-        os.path.realpath(__file__)),
-        'default_template')
+        os.path.realpath(__file__)), 'default')
 
     def __init__(self, interface, config):
         """ Facio settings class. Taking aguments passed into the cli
