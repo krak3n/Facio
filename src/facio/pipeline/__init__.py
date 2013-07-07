@@ -6,60 +6,61 @@
 import sys
 import yaml
 
-from clint.textui import puts, indent
-from clint.textui.colored import blue, red, yellow
+from facio.base import BaseFacio
 from importlib import import_module
 from yaml.scanner import ScannerError
 
 
-class Pipeline(object):
+class Pipeline(BaseFacio):
 
-    def __init__(self, tpl_class):
-        """ Pipeline class instanctiation.
-
-        :param tpl_class: Template class instance,
-        :type tpl_class: Object
-        """
+    def __init__(self):
+        """ Pipeline class instanctiation. """
 
         self.calls = []
-        self.tpl = tpl_class
-        self._parse()
 
-    def _parse(self):
-        """ Parse the pipeline file. """
+    def load(self, path):
+        """ Parse the pipeline file.
 
-        with open(self.tpl.pipeline_file) as f:
-            try:
-                self.pipeline = yaml.load(f.read())
-            except ScannerError:
-                with indent(4, quote=' >'):
-                    puts(red("Error loading Pipeline - Is it correctly "
-                             "formatted?"))
-            else:
-                with indent(4, quote=' >'):
-                    puts(blue("Loading Pipeline"))
+        :param path: Path to pipeline file, locally
+        :type path: str
+        """
+
+        try:
+            with open(path) as f:
+                try:
+                    self.pipeline = yaml.load(f.read())
+                except ScannerError:
+                    self.warning('Error loading {0} pipeline - Is it '
+                                 'correctly formatted?'.format(path))
+                else:
+                    self.out('Loading Pipeline')
+        except IOError:
+            self.warning('{0} not found'.format(path))
 
     def _validate_before(self):
-        if 'before' in self.pipeline:
-            if not type(self.pipeline.get('before')) == list:
-                with indent(4, quote=' >'):
-                    puts(yellow('Ignoring before: should be a list'))
-                return False
-            else:
-                return True
-        return False
+        try:
+            if 'before' in self.pipeline:
+                if not type(self.pipeline.get('before')) == list:
+                    self.warning('Ignoring before: should be a list')
+                    return False
+                else:
+                    return True
+            return False
+        except AttributeError:
+            return False
 
     def _validate_after(self):
-        if 'after' in self.pipeline:
-            if not type(self.pipeline.get('after')) == list:
-                with indent(4, quote=' >'):
-                    puts(yellow('Ignoring after: should be a list'))
-                return False
-            else:
-                return True
-        return False
+        try:
+            if 'after' in self.pipeline:
+                if not type(self.pipeline.get('after')) == list:
+                    self.warning('Ignoring after: should be a list')
+                    return False
+                else:
+                    return True
+            return False
+        except AttributeError:
+            return False
 
-    @property
     def has_before(self):
         """ Does the pipeline contain a before module list.
 
@@ -71,7 +72,6 @@ class Pipeline(object):
         except TypeError:
             return False
 
-    @property
     def has_after(self):
         """ Does the pipeline contain a after module list.
 
@@ -93,12 +93,10 @@ class Pipeline(object):
         try:
             module = import_module(path)
         except ImportError:
-            with indent(4, quote=' >'):
-                puts(red('Failed to Load module: {0}'.format(path)))
+            self.error('Failed to Load module: {0}'.format(path))
             return False
         else:
-            with indent(4, quote=' >'):
-                puts(blue('Loaded module: {0}'.format(path)))
+            self.out('Loaded module: {0}'.format(path))
             return module
 
     def run_module(self, path):
@@ -115,15 +113,13 @@ class Pipeline(object):
             try:
                 result = module.run()
             except AttributeError:
-                with indent(4, quote=' >'):
-                    puts(red('Error Running Module: Missing run() method.'))
+                self.error('Error Running Module: Missing run() method.')
             except Exception:
                 e = sys.exc_info()[1]
                 traceback = sys.exc_info()[2]
-                with indent(4, quote=' >'):
-                    puts(red('Exeption caught in module: {0} line: {1}'.format(
-                        e,
-                        traceback.tb_lineno)))
+                self.warning('Exeption caught in module: {0} line: {1}'.format(
+                    e,
+                    traceback.tb_lineno))
             self.calls.append({path: result})
             return result
 

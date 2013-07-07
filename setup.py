@@ -2,13 +2,15 @@
 
 import os
 import sys
+import multiprocessing  # NOQA
 
 from setuptools import setup, find_packages
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
-from facio import __VERSION__
+import facio
+version = facio.get_version()
 
 
 def read(fname):
@@ -16,7 +18,7 @@ def read(fname):
 
 
 install_requires = [
-    'Jinja2==2.6',
+    'Jinja2==2.6',  # For python >= 3.2
     'clint2==0.3.2',
     'sh==1.08',
     'six==1.3.0',
@@ -27,7 +29,7 @@ if sys.version_info[0] == 2 and sys.version_info[1] == 6:
         'importlib',
     ]
 
-test_requires = install_requires + [
+test_requires = [
     'mock==1.0.1',
     'tox==1.4.3',
     'nose==1.3',
@@ -35,6 +37,10 @@ test_requires = install_requires + [
     'coverage==3.6',
     'coveralls == 0.2',
 ]
+if sys.version_info[0] == 2 and sys.version_info[1] == 6:
+    test_requires = test_requires + [
+        'unittest2',
+    ]
 
 dev_requires = test_requires + [
     'ipdb==0.7',
@@ -45,7 +51,7 @@ dev_requires = test_requires + [
 
 setup(
     name='facio',
-    version=__VERSION__,
+    version=version,
     author='Christopher John Reeves',
     author_email='hello@chris.reeves.io',
     url='https://github.com/krak3n/facio',
@@ -76,5 +82,5 @@ setup(
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    license='BSD',
+    license='BSD'
 )
