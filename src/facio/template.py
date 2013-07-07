@@ -238,7 +238,7 @@ class Template(BaseFacio):
                 # The loop broke so we can call self.copy again
                 if self.COPY_ATTEMPT <= self.COPY_ATTEMPT_LIMIT:
                     self.COPY_ATTEMPT += 1
-                    self.copy()
+                    self.copy(callback=vcs.remove_tmp_dir)
                 else:
                     raise FacioException('Failed to copy template after '
                                          '{0} attempts'.format(

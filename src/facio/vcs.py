@@ -5,6 +5,7 @@
    :synopsis: Classes for cloning remote templates from VCS repositories
 """
 
+import shutil
 import tempfile
 
 from facio.base import BaseFacio
@@ -42,6 +43,12 @@ class BaseVCS(BaseFacio):
 
         raise FacioException('The clone method on BaseVCS needs to be '
                              'overridden.')
+
+    def remove_tmp_dir(self, origin, destination):
+        """ Template.copy callback function to remove created temp directory.
+        """
+
+        shutil.rmtree(origin)
 
 
 class GitVCS(BaseVCS):

@@ -5,6 +5,8 @@
    :synopsis: Tests for the Facio vcs module.
 """
 
+import os
+
 from facio.exceptions import FacioException
 from facio.vcs import BaseVCS, GitVCS, MercurialVCS
 from mock import patch
@@ -43,6 +45,14 @@ class TestBaseVCS(BaseTestCase):
             instance.clone()
         self.mocked_facio_exceptions_puts.assert_any_call(
             'Error: The clone method on BaseVCS needs to be overridden.')
+
+    def test_rm_temp_dir(self):
+        instance = BaseVCS('git+/foo/bar')
+        d = instance.get_temp_directory()
+
+        instance.remove_tmp_dir(d, '/foo/bar')
+
+        self.assertFalse(os.path.isdir(d))
 
 
 class TestGitVCS(BaseTestCase):
