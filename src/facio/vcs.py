@@ -76,6 +76,8 @@ class GitVCS(BaseVCS):
             raise FacioException('Failed to clone git repository '
                                  'at {0}'.format(self.path))
 
+        return temp_diretory
+
 
 class MercurialVCS(BaseVCS):
     """ Mercurial Version Control System for cloning hg repositories. """
@@ -100,3 +102,5 @@ class MercurialVCS(BaseVCS):
         except:
             raise FacioException('Failed to clone hg repository '
                                  'at {0}'.format(self.path))
+
+        return temp_diretory
