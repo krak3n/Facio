@@ -25,6 +25,11 @@ class TemplateTests(BaseTestCase):
             'facio.template.Template.warning',
         ])
 
+        patcher = patch('facio.vcs.tempfile.mkdtemp',
+                        return_vale='/tmp/tmpAGmDfZfacio')
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_path_and_name_set(self):
         instance = Template('foo', '/foo/bar')
 
@@ -193,6 +198,27 @@ class TemplateTests(BaseTestCase):
         with self.assertRaises(FacioException):
             instance.copy()
         mock_gitvcs.assert_called_with('git+/foo/bar')
+
+    @patch('sys.exit')
+    @patch('facio.template.GitVCS.clone', return_value=False)
+    @patch('facio.template.os.path.isdir', return_value=False)
+    @patch('facio.template.pwd', return_value='/tmp')
+    @patch('facio.template.shutil.copytree', side_effect=OSError)
+    def test_copy_oserror_vcs_clone_returns_not_path(
+            self,
+            mock_copy_tree,
+            mock_pwd,
+            mock_isdir,
+            mock_gitvcs,
+            mock_exit):
+
+        instance = Template('foo', 'git+/foo/bar')
+        instance.COPY_ATTEMPT_LIMIT = 0  # Block the next copy call
+
+        with self.assertRaises(FacioException):
+            instance.copy()
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: New path to template not returned by GitVCS.clone()')
 
     @patch('sys.exit')
     @patch('facio.template.GitVCS', new_callable=MagicMock)

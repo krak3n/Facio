@@ -63,6 +63,11 @@ class TestGitVCS(BaseTestCase):
             'facio.exceptions.puts',
         ])
 
+        patcher = patch('facio.vcs.tempfile.mkdtemp',
+                        return_vale='/tmp/tmpAGmDfZfacio')
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     @patch('sys.exit')
     @patch('sh.Environment.__getitem__', side_effect=ImportError)
     def test_git_not_installed_clone_exception(self, mock_sh, mock_exit):
@@ -100,6 +105,11 @@ class TestMercurialVCS(BaseTestCase):
             'facio.base.puts',
             'facio.exceptions.puts',
         ])
+
+        patcher = patch('facio.vcs.tempfile.mkdtemp',
+                        return_vale='/tmp/tmpAGmDfZfacio')
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     @patch('sys.exit')
     @patch('sh.Environment.__getitem__', side_effect=ImportError)

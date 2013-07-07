@@ -227,7 +227,12 @@ class Template(BaseFacio):
                 for prefix, cls in supported_vcs:
                     if self.path.startswith(prefix):
                         vcs = cls(self.path)
-                        self.path = vcs.clone()
+                        new_path = vcs.clone()
+                        if not new_path:
+                            raise FacioException(
+                                'New path to template not returned by '
+                                '{0}.clone()'.format(vcs.__class__.__name__))
+                        self.path = new_path
                         break
                 else:
                     # Loop feel through so path is not prefixed with git+ or
