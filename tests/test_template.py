@@ -220,6 +220,16 @@ class TemplateTests(BaseTestCase):
 
         self.assertTrue(instance.copy())
 
+    @patch('facio.template.shutil.copytree', new_callable=MagicMock)
+    def test_copy_callback_call(self, mock_copy_tree):
+        instance = Template('foo', '/foo/bar')
+        callback = MagicMock()
+
+        self.assertTrue(instance.copy(callback=callback))
+        callback.assert_called_once_with(
+            origin=instance.path,
+            destination=instance.get_project_root())
+
     @patch('os.walk')
     @patch('facio.template.shutil.move', new_callable=MagicMock)
     def test_rename_directories(self, mock_move, mock_walk):

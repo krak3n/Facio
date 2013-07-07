@@ -191,8 +191,11 @@ class Template(BaseFacio):
 
         return ignores
 
-    def copy(self):
+    def copy(self, callback=None):
         """ Copy template from origin path to ``self.get_project_root()``.
+
+        :param callback: A callback function to be called after copy is comlete
+        :type callback: function -- default None
 
         :returns: bool
         """
@@ -245,6 +248,12 @@ class Template(BaseFacio):
                 # project root exists, raise exception
                 raise FacioException('{0} already exists'.format(
                     self.get_project_root()))
+
+        # Call callback if callable
+        if callable(callback):
+            callback(
+                origin=self.path,
+                destination=self.get_project_root())
 
         return True
 
