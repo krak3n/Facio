@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-.. module:: facio.start
-   :synopsis: Starts the Facio template process.
+.. module:: facio.run
+   :synopsis: Runs the Facio template process.
 """
 
 import os
@@ -13,9 +13,10 @@ from facio.template import Template
 from facio.pipeline import Pipeline
 
 
-class Start(BaseFacio):
+class Run(BaseFacio):
 
-    def start(self):
+    def run(self):
+        """ Run the Facio processes. """
 
         interface = CommandLineInterface()
         interface.start()
