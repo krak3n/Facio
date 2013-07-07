@@ -25,34 +25,42 @@ class Pipeline(BaseFacio):
         :type path: str
         """
 
-        with open(path) as f:
-            try:
-                self.pipeline = yaml.load(f.read())
-            except ScannerError:
-                self.warning('Error loading {0} pipeline - Is it correctly '
-                             'formatted?'.format(path))
-            else:
-                self.out('Loading Pipeline')
+        try:
+            with open(path) as f:
+                try:
+                    self.pipeline = yaml.load(f.read())
+                except ScannerError:
+                    self.warning('Error loading {0} pipeline - Is it '
+                                 'correctly formatted?'.format(path))
+                else:
+                    self.out('Loading Pipeline')
+        except IOError:
+            self.warning('{0} not found'.format(path))
 
     def _validate_before(self):
-        if 'before' in self.pipeline:
-            if not type(self.pipeline.get('before')) == list:
-                self.warning('Ignoring before: should be a list')
-                return False
-            else:
-                return True
-        return False
+        try:
+            if 'before' in self.pipeline:
+                if not type(self.pipeline.get('before')) == list:
+                    self.warning('Ignoring before: should be a list')
+                    return False
+                else:
+                    return True
+            return False
+        except AttributeError:
+            return False
 
     def _validate_after(self):
-        if 'after' in self.pipeline:
-            if not type(self.pipeline.get('after')) == list:
-                self.warning('Ignoring after: should be a list')
-                return False
-            else:
-                return True
-        return False
+        try:
+            if 'after' in self.pipeline:
+                if not type(self.pipeline.get('after')) == list:
+                    self.warning('Ignoring after: should be a list')
+                    return False
+                else:
+                    return True
+            return False
+        except AttributeError:
+            return False
 
-    @property
     def has_before(self):
         """ Does the pipeline contain a before module list.
 
@@ -64,7 +72,6 @@ class Pipeline(BaseFacio):
         except TypeError:
             return False
 
-    @property
     def has_after(self):
         """ Does the pipeline contain a after module list.
 
