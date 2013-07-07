@@ -21,3 +21,11 @@ class TestState(BaseTestCase):
         self.assertEqual(s1, s2.state)
         self.assertNotEqual(s1, s3)
         self.assertEqual(s1, s3.state)
+
+    def test_get_set_project_name(self):
+        from facio.state import state as s1
+        from facio.state import state as s2
+
+        s1.set_project_name('foo')
+
+        self.assertEqual(s2.get_project_name(), 'foo')
