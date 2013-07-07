@@ -100,7 +100,7 @@ class PipelineTest(BaseTestCase):
 
         p = Pipeline()
         p.load('/foo/bar.yml')
-        self.assertFalse(p.has_before)
+        self.assertFalse(p.has_before())
         self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
             'Ignoring before: should be a list')
 
@@ -117,7 +117,7 @@ class PipelineTest(BaseTestCase):
 
         p = Pipeline()
         p.load('/foo/bar.yml')
-        self.assertFalse(p.has_after)
+        self.assertFalse(p.has_after())
         self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
             'Ignoring after: should be a list')
 
@@ -131,8 +131,8 @@ class PipelineTest(BaseTestCase):
         p = Pipeline()
         p.load('/foo/bar.yml')
 
-        self.assertFalse(p.has_before)
-        self.assertFalse(p.has_after)
+        self.assertFalse(p.has_before())
+        self.assertFalse(p.has_after())
         open_mock.stop()
 
     def test_has_before_true(self):
@@ -145,7 +145,7 @@ class PipelineTest(BaseTestCase):
 
         p = Pipeline()
         p.load('/foo/bar.yml')
-        self.assertTrue(p.has_before)
+        self.assertTrue(p.has_before())
 
         open_mock.stop()
 
@@ -159,7 +159,7 @@ class PipelineTest(BaseTestCase):
 
         p = Pipeline()
         p.load('/foo/bar.yml')
-        self.assertFalse(p.has_before)
+        self.assertFalse(p.has_before())
 
         open_mock.stop()
 
@@ -173,7 +173,7 @@ class PipelineTest(BaseTestCase):
 
         p = Pipeline()
         p.load('/foo/bar.yml')
-        self.assertTrue(p.has_after)
+        self.assertTrue(p.has_after())
 
         open_mock.stop()
 
@@ -187,7 +187,7 @@ class PipelineTest(BaseTestCase):
 
         p = Pipeline()
         p.load('/foo/bar.yml')
-        self.assertFalse(p.has_after)
+        self.assertFalse(p.has_after())
 
         open_mock.stop()
 
@@ -253,7 +253,7 @@ class PipelineTest(BaseTestCase):
         p.run_module('foo.bar.baz')
         self.assertTrue(module.foo.called)
         self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
-            'Exeption caught in module: \'Failed lookup\' line: 107')
+            'Exeption caught in module: \'Failed lookup\' line: 114')
         mock = import_module_mock.stop()
 
     @patch('facio.pipeline.Pipeline.load', return_value=True)
