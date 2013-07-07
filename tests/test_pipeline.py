@@ -89,6 +89,21 @@ class PipelineTest(BaseTestCase):
             "Error loading /foo/bar.yml pipeline - Is it correctly formatted?")
         open_mock.stop()
 
+    def test_load_ioerror(self):
+        open_mock = self._mock_open('')
+        m = open_mock.start()
+        m.side_effect = IOError
+
+        p = Pipeline()
+        p.load('/foo/bar.yml')
+
+        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
+            "/foo/bar.yml not found")
+        self.assertFalse(p._validate_before())
+        self.assertFalse(p._validate_after())
+
+        open_mock.stop()
+
     def test_yaml_formatted_correctly_before(self):
         data = """
         before:
