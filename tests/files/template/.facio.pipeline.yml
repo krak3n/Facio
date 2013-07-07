@@ -1,4 +1,0 @@
-before:
-    - foo.bar.baz
-after:
-    - baz.bar.foo
