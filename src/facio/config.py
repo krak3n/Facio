@@ -8,9 +8,9 @@
 import os
 import re
 
-from clint.textui import puts, indent
-from clint.textui.colored import blue, red, yellow
+from clint.textui.colored import yellow
 from docopt import docopt
+from facio.base import BaseFacio
 from random import choice
 from six.moves import configparser as ConfigParser
 from six.moves import input
@@ -62,7 +62,7 @@ class CommandLineInterface(object):
         return True
 
 
-class ConfigurationFile(object):
+class ConfigurationFile(BaseFacio):
     """ Load the ~/.facio.cfg ini style configuration file, providing an
     easily queryable dict representation of the config attributes. """
 
@@ -80,17 +80,15 @@ class ConfigurationFile(object):
         try:
             parser.readfp(open(path))
         except IOError:
-            with indent(4, quote=' >'):
-                puts(yellow('Warning: {0} Not found'.format(path)))
+            self.warning('{0} Not found'.format(path))
         except ConfigParser.Error:
             raise FacioException('Unable to parse {0}'.format(path))
         else:
-            with indent(4, quote=' >'):
-                puts(blue('Loaded {0}'.format(path)))
+            self.out('Loaded {0}'.format(path))
         return parser
 
 
-class Settings(object):
+class Settings(BaseFacio):
 
     default_template_path = os.path.join(os.path.dirname(
         os.path.realpath(__file__)),
@@ -152,23 +150,22 @@ class Settings(object):
         # Select template from configuration file
         if select:
             tries = 5
-            with indent(4, quote=' >'):
-                puts(yellow('Please select a template:'))
-                for i, item in enumerate(templates, start=1):
-                    name, path = item
-                    puts(blue('{0}) {1}: {2}'.format(i, name, path)))
-                for n in range(1, (tries + 1)):
-                    try:
-                        prompt = 'Please enter the number of '\
-                                 'the template ({0} of {1} tries'\
-                                 '): '.format(n, tries)
-                        num = int(input(' >  ' + yellow(prompt)))
-                        if num == 0:
-                            raise ValueError
-                        name, path = templates[(num - 1)]
-                        return path
-                    except (ValueError, TypeError, IndexError):
-                        puts(red('Please enter a valid number'))
+            self.out('Please select a template:')
+            for i, item in enumerate(templates, start=1):
+                name, path = item
+                self.out('{0}) {1}: {2}'.format(i, name, path))
+            for n in range(1, (tries + 1)):
+                try:
+                    prompt = 'Please enter the number of '\
+                             'the template ({0} of {1} tries'\
+                             '): '.format(n, tries)
+                    num = int(input(' >  ' + yellow(prompt)))
+                    if num == 0:
+                        raise ValueError
+                    name, path = templates[(num - 1)]
+                    return path
+                except (ValueError, TypeError, IndexError):
+                    self.error('Please enter a valid number')
             raise FacioException('A template was not selected')
 
         # Default template

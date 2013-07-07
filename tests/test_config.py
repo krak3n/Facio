@@ -75,8 +75,9 @@ class TestConfigurationFile(BaseTestCase):
 
     def setUp(self):
         self._patch_clint([
-            'facio.config.puts',
             'facio.exceptions.puts',
+            'facio.config.ConfigurationFile.out',
+            'facio.config.ConfigurationFile.warning',
         ])
 
     def _patch_open(self, data):
@@ -93,8 +94,8 @@ class TestConfigurationFile(BaseTestCase):
         c = ConfigurationFile()
         c.read()
 
-        self.mocked_facio_config_puts.assert_any_call(
-            "Warning: {0} Not found".format(self.config_path))
+        self.mocked_facio_config_ConfigurationFile_warning.assert_any_call(
+            "{0} Not found".format(self.config_path))
 
     @patch('sys.exit')
     def test_config_read_parse_error(self, exit_mock):
@@ -127,7 +128,7 @@ class TestConfigurationFile(BaseTestCase):
         c = ConfigurationFile()
         c.read()
 
-        self.mocked_facio_config_puts.assert_any_call(
+        self.mocked_facio_config_ConfigurationFile_out.assert_any_call(
             "Loaded {0}".format(self.config_path))
 
 
@@ -135,8 +136,10 @@ class TestSettings(BaseTestCase):
 
     def setUp(self):
         self._patch_clint([
-            'facio.config.puts',
             'facio.exceptions.puts',
+            'facio.config.Settings.out',
+            'facio.config.Settings.warning',
+            'facio.config.Settings.error',
         ])
         # Mocks for ConfigFile and CommandLineInterface classes
         self.mock_interface()
