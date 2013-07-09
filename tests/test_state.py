@@ -68,10 +68,16 @@ class TestState(BaseTestCase):
         state = State()
 
         state.pipeline_save_call('foo.bar', 'baz')
-        calls = state.pipeline_save_call('baz.foo', 'bar')
+        state.pipeline_save_call('baz.foo', 'bar')
+        calls = state.pipeline_save_call('foo.bar', 'baz')
 
-    def test_get_set_project_name(self):
+        self.assertEqual(calls, [('foo.bar', 'baz'), ('baz.foo', 'bar')])
+
+    def test_pipeline_get_call(self):
         state = State()
-        state.set_project_name('foo')
 
-        self.assertEqual(state.get_project_name(), 'foo')
+        state.pipeline_save_call('foo.bar', 'baz')
+        state.pipeline_save_call('baz.foo', 'bar')
+
+        self.assertEqual(state.pipeline_get_call_result('foo.bar'), 'baz')
+        self.assertEqual(state.pipeline_get_call_result('baz.foo'), 'bar')

@@ -99,6 +99,27 @@ class State(BaseFacio):
 
         return self.state.project_name
 
+    def pipeline_get_call_result(self, module_path):
+        """ Returns a pipeline call result, else returns false if the module
+        path is not in the pipeline call list.
+
+        :param module_path: The python dotted path to the module
+        :type module_path: str
+
+        :returns: Call result
+        """
+
+        try:
+            calls = self.state.pipeline_calls
+        except AttributeError:
+            calls = []
+
+        try:
+            module, result = [(m, r) for m, r in calls if m == module_path][0]
+        except IndexError:
+            return None
+
+        return result
 
     def pipeline_save_call(self, module_path, result):
         """ Saves a pipeline call to state
@@ -117,8 +138,9 @@ class State(BaseFacio):
         except AttributeError:
             calls = []
 
-        calls.append((module_path, result))
-        self.state.pipeline_calls = calls
+        if not self.pipeline_get_call_result(module_path):
+            calls.append((module_path, result))
+            self.state.pipeline_calls = calls
 
         return calls
 
