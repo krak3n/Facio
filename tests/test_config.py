@@ -29,6 +29,7 @@ class TestCommandLintInterface(BaseTestCase):
                         new_callable=PropertyMock,
                         create=True)
         self.mock_state = patcher.start()
+        self.mock_state.context_variables = {}
         self.addCleanup(patcher.stop)
 
     @patch('facio.config.docopt')
@@ -57,6 +58,8 @@ class TestCommandLintInterface(BaseTestCase):
         for name in valid_names:
             i.validate_project_name(name)
             self.assertEqual(name, self.mock_state.project_name)
+            self.assertEqual({'PROJECT_NAME': name},
+                             self.mock_state.context_variables)
 
     @patch('sys.exit')
     def test_invalid_project_name(self, mock_exit):
