@@ -100,4 +100,27 @@ class State(BaseFacio):
         return self.state.project_name
 
 
+    def pipeline_save_call(self, module_path, result):
+        """ Saves a pipeline call to state
+
+        :param module_path: The python dotted path to the module
+        :type module_path: str
+
+        :param result: The result of the module run() function
+        :type result: Anything
+
+        :returns: list -- The call list or tuples
+        """
+
+        try:
+            calls = self.state.pipeline_calls
+        except AttributeError:
+            calls = []
+
+        calls.append((module_path, result))
+        self.state.pipeline_calls = calls
+
+        return calls
+
+
 state = State()

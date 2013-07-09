@@ -23,6 +23,18 @@ class TestState(BaseTestCase):
     def tearDown(self):
         del(builtins.__facio__)
 
+    def test_same_instance_always_returned(self):
+        s1 = State()
+        s2 = State()
+
+        self.assertEqual(s1.state, s2.state)
+
+    def test_get_set_project_name(self):
+        state = State()
+        state.set_project_name('foo')
+
+        self.assertEqual(state.get_project_name(), 'foo')
+
     def test_update_context_variables(self):
         state = State()
 
@@ -52,11 +64,11 @@ class TestState(BaseTestCase):
         self.assertEqual(state.get_context_variable('PROJECT_NAME'), 'foo')
         self.assertNotEqual(state.get_context_variable('not_created'), 'foo')
 
-    def test_same_instance_always_returned(self):
-        s1 = State()
-        s2 = State()
+    def test_pipeline_call_save(self):
+        state = State()
 
-        self.assertEqual(s1.state, s2.state)
+        state.pipeline_save_call('foo.bar', 'baz')
+        calls = state.pipeline_save_call('baz.foo', 'bar')
 
     def test_get_set_project_name(self):
         state = State()
