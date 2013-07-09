@@ -27,7 +27,6 @@ class Run(BaseFacio):
         settings = Settings(interface, parsed)
 
         template = Template(
-            settings.get_project_name(),
             settings.get_template_path()
         )
 

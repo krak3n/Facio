@@ -10,14 +10,14 @@ import re
 
 from clint.textui.colored import yellow
 from docopt import docopt
+from facio import get_version
 from facio.base import BaseFacio
+from facio.exceptions import FacioException
+from facio.state import state
 from random import choice
 from six.moves import configparser as ConfigParser
 from six.moves import input
 from textwrap import dedent
-
-from facio import get_version
-from facio.exceptions import FacioException
 
 
 class CommandLineInterface(object):
@@ -59,7 +59,8 @@ class CommandLineInterface(object):
         if not re.match('^\w+$', name):
             raise FacioException('Project names can only contain numbers '
                                  'letters and underscores')
-        return True
+        else:
+            state.set_project_name(name)
 
 
 class ConfigurationFile(BaseFacio):
@@ -107,17 +108,6 @@ class Settings(BaseFacio):
 
         self.interface = interface
         self.config = config
-
-    def get_project_name(self):
-        """ Get the project name from the command line interface.
-
-        :returns: str -- The project name
-        """
-
-        try:
-            return self.interface.arguments['<project_name>']
-        except KeyError:
-            raise FacioException('Project name not defined.')
 
     def get_template_path(self):
         """ Obtain the template with from the command line interface or from

@@ -25,6 +25,12 @@ class TestCommandLintInterface(BaseTestCase):
             'facio.exceptions.puts',
         ])
 
+        patcher = patch('facio.config.state.state',
+                        new_callable=PropertyMock,
+                        create=True)
+        self.mock_state = patcher.start()
+        self.addCleanup(patcher.stop)
+
     @patch('facio.config.docopt')
     @patch('facio.config.CommandLineInterface.validate_project_name')
     def test_project_name_should_be_validated(
@@ -49,7 +55,8 @@ class TestCommandLintInterface(BaseTestCase):
         i = CommandLineInterface()
 
         for name in valid_names:
-            self.assertTrue(i.validate_project_name(name))
+            i.validate_project_name(name)
+            self.assertEqual(name, self.mock_state.project_name)
 
     @patch('sys.exit')
     def test_invalid_project_name(self, mock_exit):
@@ -157,24 +164,6 @@ class TestSettings(BaseTestCase):
 
         self.assertIsInstance(s.config, MagicMock)
         self.assertIsInstance(s.interface, MagicMock)
-
-    def test_retreive_project_name(self):
-        s = Settings(self.interface, self.config)
-
-        self.assertEqual(s.get_project_name(), 'foo')
-
-    @patch('sys.exit')
-    def test_exception_no_project_name(self, mock_exit):
-        arguments = PropertyMock(return_value={})
-        type(self.interface).arguments = arguments
-
-        s = Settings(self.interface, self.config)
-
-        with self.assertRaises(FacioException):
-            s.get_project_name()
-        self.mocked_facio_exceptions_puts.assert_any_call(
-            "Error: Project name not defined.")
-        self.assertTrue(mock_exit.called)
 
     @patch('sys.exit')
     def test_exception_raised_select_template_no_config(self, mock_exit):
