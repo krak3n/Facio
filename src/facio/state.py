@@ -88,6 +88,7 @@ class State(BaseFacio):
         :type name: str
         """
 
+        self.update_context_variables({'PROJECT_NAME': name})
         self.state.project_name = name
 
     def get_project_name(self):
