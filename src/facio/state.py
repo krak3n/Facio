@@ -6,7 +6,10 @@
               the template generation process.
 """
 
+import os
+
 from facio.base import BaseFacio
+from sh import pwd
 from six.moves import builtins
 
 
@@ -25,6 +28,43 @@ class State(BaseFacio):
         except AttributeError:
             builtins.__facio__ = self
             self.state = builtins.__facio__
+
+    def set_project_name(self, name):
+        """ Set the project name to the state.
+
+        :param name: The project name from facio.config.CommandLineInterface
+        :type name: str
+        """
+
+        self.update_context_variables({'PROJECT_NAME': name})
+        self.state.project_name = name
+
+    def get_project_name(self):
+        """ Return the project name stored in the state.
+
+        :returns: str
+        """
+
+        return self.state.project_name
+
+    def get_working_directory(self):
+        """ Use the ``sh`` library to return the current working directory
+        using the unix command ``pwd``.
+
+        :returns: str
+        """
+
+        return '{0}'.format(pwd()).strip()
+
+    def get_project_root(self):
+        """ Return the project root, which is the current working directory
+        plus the project name.
+
+        :returns: str
+        """
+
+        return os.path.join(self.get_working_directory(),
+                            self.get_project_name())
 
     def update_context_variables(self, dictionary):
         """ Update the context varaibles dict with new values.
@@ -80,24 +120,6 @@ class State(BaseFacio):
 
         variables = self.get_context_variables()
         return variables.get(name, None)
-
-    def set_project_name(self, name):
-        """ Set the project name to the state.
-
-        :param name: The project name from facio.config.CommandLineInterface
-        :type name: str
-        """
-
-        self.update_context_variables({'PROJECT_NAME': name})
-        self.state.project_name = name
-
-    def get_project_name(self):
-        """ Return the project name stored in the state.
-
-        :returns: str
-        """
-
-        return self.state.project_name
 
     def pipeline_get_call_result(self, module_path):
         """ Returns a pipeline call result, else returns false if the module

@@ -6,6 +6,7 @@
 """
 
 from facio.state import State
+from mock import patch
 from six.moves import builtins
 
 from . import BaseTestCase
@@ -34,6 +35,20 @@ class TestState(BaseTestCase):
         state.set_project_name('foo')
 
         self.assertEqual(state.get_project_name(), 'foo')
+
+    @patch('facio.state.pwd', return_value='/foo')
+    def test_return_current_working_dir(self, mock_pwd):
+        state = State()
+        state.set_project_name('foo')
+
+        self.assertEqual(state.get_working_directory(), '/foo')
+
+    @patch('facio.state.pwd', return_value='/bar')
+    def test_return_project_root(self, mock_pwd):
+        state = State()
+        state.set_project_name('foo')
+
+        self.assertEqual(state.get_project_root(), '/bar/foo')
 
     def test_update_context_variables(self):
         state = State()

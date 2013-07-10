@@ -47,18 +47,6 @@ class TemplateTests(BaseTestCase):
 
         self.assertEqual(instance.origin, '/foo/bar')
 
-    @patch('facio.template.pwd', return_value='/foo')
-    def test_return_current_working_dir(self, mock_pwd):
-        instance = Template('/foo/bar')
-
-        self.assertEqual(instance.get_working_directory(), '/foo')
-
-    @patch('facio.template.pwd', return_value='/bar')
-    def test_return_project_root(self, mock_pwd):
-        instance = Template('/foo/bar')
-
-        self.assertEqual(instance.get_project_root(), '/bar/foo')
-
     def test_update_ignore_globs_empty_wrong_type(self):
         instance = Template('/foo/bar')
         del(instance.ignore_globs)
@@ -106,7 +94,7 @@ class TemplateTests(BaseTestCase):
         self.assertEqual(ignores, ['.git', 'setup.pyc', 'foo.png'])
 
     @patch('sys.exit')
-    @patch('facio.template.pwd', return_value='/tmp')
+    @patch('facio.state.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=ShutilError)
     def test_copy_shutil_error_raise_exception(
             self,
@@ -123,14 +111,14 @@ class TemplateTests(BaseTestCase):
             'Error: Failed to copy /foo/bar to /tmp/foo')
 
     @patch('sys.exit')
+    @patch('facio.state.pwd', return_value='/tmp')
     @patch('facio.template.os.path.isdir', return_value=True)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_shutil_oserror_raise_exception(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
+            mock_pwd,
             mock_exit):
 
         instance = Template('/foo/bar')
@@ -143,14 +131,14 @@ class TemplateTests(BaseTestCase):
             'Error: /tmp/foo already exists')
 
     @patch('sys.exit')
+    @patch('facio.state.pwd', return_value='/tmp')
     @patch('facio.template.os.path.isdir', return_value=False)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_oserror_not_vcs_path_exception(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
+            mock_pwd,
             mock_exit):
 
         instance = Template('/foo/bar')
@@ -165,12 +153,10 @@ class TemplateTests(BaseTestCase):
     @patch('sys.exit')
     @patch('facio.template.GitVCS', new_callable=MagicMock)
     @patch('facio.template.os.path.isdir', return_value=False)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_oserror_vcs_path(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
             mock_gitvcs,
             mock_exit):
@@ -185,12 +171,10 @@ class TemplateTests(BaseTestCase):
     @patch('sys.exit')
     @patch('facio.template.GitVCS.clone', return_value=False)
     @patch('facio.template.os.path.isdir', return_value=False)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_oserror_vcs_clone_returns_not_path(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
             mock_gitvcs,
             mock_exit):
@@ -206,12 +190,10 @@ class TemplateTests(BaseTestCase):
     @patch('sys.exit')
     @patch('facio.template.GitVCS', new_callable=MagicMock)
     @patch('facio.template.os.path.isdir', return_value=False)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_oserror_vcs_path_recursion_limit(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
             mock_gitvcs,
             mock_exit):
@@ -229,15 +211,17 @@ class TemplateTests(BaseTestCase):
 
         self.assertTrue(instance.copy())
 
+    @patch('facio.state.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', new_callable=MagicMock)
-    def test_copy_callback_call(self, mock_copy_tree):
+    def test_copy_callback_call(self, mock_copy_tree, mock_pwd):
+        from facio.state import state
         instance = Template('/foo/bar')
         callback = MagicMock()
 
         self.assertTrue(instance.copy(callback=callback))
         callback.assert_called_once_with(
             origin=instance.origin,
-            destination=instance.get_project_root())
+            destination=state.get_project_root())
 
     @patch('os.walk')
     @patch('facio.template.shutil.move', new_callable=MagicMock)

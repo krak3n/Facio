@@ -12,8 +12,6 @@ import re
 import shutil
 
 from codecs import open
-from sh import pwd
-
 from facio.base import BaseFacio
 from facio.exceptions import FacioException
 from facio.state import state
@@ -51,25 +49,6 @@ class Template(BaseFacio):
             '.svn',
             '*.pyc',
         ])
-
-    def get_working_directory(self):
-        """ Use the ``sh`` library to return the current working directory
-        using the unix command ``pwd``.
-
-        :returns: str
-        """
-
-        return '{0}'.format(pwd()).strip()
-
-    def get_project_root(self):
-        """ Return the project root, which is the current working directory
-        plus the project name.
-
-        :returns: str
-        """
-
-        return os.path.join(self.get_working_directory(),
-                            state.get_project_name())
 
     def update_ignore_globs(self, ignore_list):
         """ Update the ignore glob patterns to include the list provided.
@@ -130,7 +109,7 @@ class Template(BaseFacio):
         return ignores
 
     def copy(self, callback=None):
-        """ Copy template from origin path to ``self.get_project_root()``.
+        """ Copy template from origin path to ``state.get_project_root()``.
 
         :param callback: A callback function to be called after copy is comlete
         :type callback: function -- default None
@@ -140,23 +119,23 @@ class Template(BaseFacio):
 
         self.out('Copying {0} to {1}'.format(
             self.origin,
-            self.get_project_root()))
+            state.get_project_root()))
 
         ignore = shutil.ignore_patterns(*self.get_ignore_globs())
         try:
-            shutil.copytree(self.origin, self.get_project_root(),
+            shutil.copytree(self.origin, state.get_project_root(),
                             ignore=ignore)
         except shutil.Error:
             raise FacioException('Failed to copy {0} to {1}'.format(
                 self.origin,
-                self.get_project_root()))
+                state.get_project_root()))
         except OSError:
             # If we get an OSError either the template path does not exist or
             # the project root already exists. Check the later first and then
             # check if the template path is git+ or hg+ and clone, finally
             # raising exceptions
 
-            if not os.path.isdir(self.get_project_root()):
+            if not os.path.isdir(state.get_project_root()):
 
                 supported_vcs = [
                     ('git+', GitVCS),
@@ -191,13 +170,13 @@ class Template(BaseFacio):
             else:
                 # project root exists, raise exception
                 raise FacioException('{0} already exists'.format(
-                    self.get_project_root()))
+                    state.get_project_root()))
 
         # Call callback if callable
         if callable(callback):
             callback(
                 origin=self.origin,
-                destination=self.get_project_root())
+                destination=state.get_project_root())
 
         return True
 
@@ -208,7 +187,7 @@ class Template(BaseFacio):
         :returns: generator
         """
 
-        for root, dirs, files in os.walk(self.get_project_root()):
+        for root, dirs, files in os.walk(state.get_project_root()):
             for directory in fnmatch.filter(dirs, '*{{*}}*'):
                 var_name = get_var_name_pattern.findall(directory)[0]
                 var_value = state.get_context_variable(var_name)
@@ -225,7 +204,7 @@ class Template(BaseFacio):
         :returns: generator
         """
 
-        for root, dirs, files in os.walk(self.get_project_root()):
+        for root, dirs, files in os.walk(state.get_project_root()):
             for filename in fnmatch.filter(files, '*{{*}}*'):
                 var_name = get_var_name_pattern.findall(filename)[0]
                 var_value = state.get_context_variable(var_name)
@@ -252,7 +231,7 @@ class Template(BaseFacio):
         """
 
         variables = state.get_context_variables()
-        for root, dirs, files in os.walk(self.get_project_root()):
+        for root, dirs, files in os.walk(state.get_project_root()):
             jinja_loader = FileSystemLoader(root)
             jinja_environment = Environment(loader=jinja_loader)
             ignores = self.get_ignore_files(files)
