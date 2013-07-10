@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 .. module:: facio.pipeline
    :synopsis: Pipeline detection and execution.
@@ -122,6 +124,7 @@ class Pipeline(BaseFacio):
                     e,
                     traceback.tb_lineno))
             self.calls.append({path: result})
+            state.pipeline_save_call(path, result)
             return result
 
     def has_run(self, path):
@@ -144,12 +147,10 @@ class Pipeline(BaseFacio):
         """ Run the before modules. """
 
         for path in self.pipeline.get('before', []):
-            result = self.run_module(path)
-            state.pipeline_save_call(path, result)
+            self.run_module(path)
 
     def run_after(self):
         """ Run the after modules. """
 
         for path in self.pipeline.get('after', []):
-            result = self.run_module(path)
-            state.pipeline_save_call(path, result)
+            self.run_module(path)
