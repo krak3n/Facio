@@ -9,8 +9,9 @@ import os
 
 from facio.base import BaseFacio
 from facio.config import Settings, CommandLineInterface, ConfigurationFile
-from facio.template import Template
 from facio.pipeline import Pipeline
+from facio.template import Template
+from facio.state import state
 
 
 class Run(BaseFacio):
@@ -25,21 +26,18 @@ class Run(BaseFacio):
         parsed = config.read()
 
         settings = Settings(interface, parsed)
+        state.update_context_variables(settings.get_variables())
 
         template = Template(
-            settings.get_project_name(),
             settings.get_template_path()
         )
 
-        template.update_context_variables(settings.get_variables())
         template.update_ignore_globs(settings.get_ignore_globs())
-
         template.copy()
 
         pipeline = Pipeline()
         pipeline.load(os.path.join(
-            template.get_project_root(),
-            '.facio.pipeline.yml'
+            state.get_project_root(), '.facio.pipeline.yml'
         ))
 
         if pipeline.has_before():

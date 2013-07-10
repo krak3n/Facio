@@ -7,6 +7,7 @@ import sys
 import yaml
 
 from facio.base import BaseFacio
+from facio.state import state
 from importlib import import_module
 from yaml.scanner import ScannerError
 
@@ -143,10 +144,12 @@ class Pipeline(BaseFacio):
         """ Run the before modules. """
 
         for path in self.pipeline.get('before', []):
-            self.run_module(path)
+            result = self.run_module(path)
+            state.pipeline_save_call(path, result)
 
     def run_after(self):
         """ Run the after modules. """
 
         for path in self.pipeline.get('after', []):
-            self.run_module(path)
+            result = self.run_module(path)
+            state.pipeline_save_call(path, result)

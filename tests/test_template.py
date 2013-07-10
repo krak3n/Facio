@@ -5,11 +5,12 @@
    :synopsis: Unit tests for template module
 """
 
+import six
+
 from facio.exceptions import FacioException
 from facio.template import Template
-from mock import MagicMock, mock_open, patch
+from mock import MagicMock, mock_open, PropertyMock, patch
 from shutil import Error as ShutilError
-from six import iteritems
 
 from . import BaseTestCase
 
@@ -25,59 +26,29 @@ class TemplateTests(BaseTestCase):
             'facio.template.Template.warning',
         ])
 
+        # Temp Directory Patch
         patcher = patch('facio.vcs.tempfile.mkdtemp',
                         return_vale='/tmp/tmpAGmDfZfacio')
         patcher.start()
         self.addCleanup(patcher.stop)
 
-    def test_path_and_name_set(self):
-        instance = Template('foo', '/foo/bar')
+        # Mocking State
+        patcher = patch('facio.template.state.state',
+                        new_callable=PropertyMock,
+                        create=True)
+        self.mock_state = patcher.start()
+        self.mock_state.project_name = 'foo'
+        self.mock_state.context_variables = {
+            'PROJECT_NAME': 'foo'}
+        self.addCleanup(patcher.stop)
 
-        self.assertEqual(instance.name, 'foo')
-        self.assertEqual(instance.path, '/foo/bar')
+    def test_set_origin(self):
+        instance = Template('/foo/bar')
 
-    @patch('facio.template.pwd', return_value='/foo')
-    def test_return_current_working_dir(self, mock_pwd):
-        instance = Template('foo', '/foo/bar')
-
-        self.assertEqual(instance.get_working_directory(), '/foo')
-
-    @patch('facio.template.pwd', return_value='/bar')
-    def test_return_project_root(self, mock_pwd):
-        instance = Template('foo', '/foo/bar')
-
-        self.assertEqual(instance.get_project_root(), '/bar/foo')
-
-    @patch('sys.exit')
-    def test_update_context_variables_must_take_dict(self, mock_exit):
-        instance = Template('foo', '/foo/bar')
-
-        with self.assertRaises(FacioException):
-            instance.update_context_variables([1, 2, 3])
-        self.assertTrue(mock_exit.called)
-        self.mocked_facio_exceptions_puts.assert_any_call(
-            'Error: Variable update failed')
-
-    @patch('facio.template.Template.__init__', return_value=None)
-    def test_get_context_variables_empty(self, mock_init):
-        instance = Template('foo', '/foo/bar')
-
-        self.assertEqual(instance.get_context_variables(), {})
-
-    def test_get_context_variables(self):
-        instance = Template('foo', '/foo/bar')
-
-        self.assertEqual(instance.get_context_variables(), {
-            'PROJECT_NAME': 'foo'})
-
-    def test_get_context_variable(self):
-        instance = Template('foo', '/foo/bar')
-
-        self.assertEqual(instance.get_context_variable('PROJECT_NAME'), 'foo')
-        self.assertFalse(instance.get_context_variable('not_created'), 'foo')
+        self.assertEqual(instance.origin, '/foo/bar')
 
     def test_update_ignore_globs_empty_wrong_type(self):
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
         del(instance.ignore_globs)
 
         instance.update_ignore_globs({'foo': 'bar'})
@@ -86,7 +57,7 @@ class TemplateTests(BaseTestCase):
 
     @patch('sys.exit')
     def test_exception_setting_ignore_globs_not_iterable(self, mock_exit):
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
 
         with self.assertRaises(FacioException):
             instance.update_ignore_globs(1)
@@ -95,13 +66,13 @@ class TemplateTests(BaseTestCase):
         self.assertTrue(mock_exit.called)
 
     def test_get_ignore_globs_empty_list(self):
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
         del(instance.ignore_globs)
 
         self.assertEqual(instance.get_ignore_globs(), [])
 
     def test_get_ignore_globs(self):
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
         instance.update_ignore_globs(['*.png', '*.gif'])
 
         self.assertEqual(instance.get_ignore_globs(), [
@@ -114,7 +85,7 @@ class TemplateTests(BaseTestCase):
         ])
 
     def test_get_ignore_files(self):
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
         instance.update_ignore_globs(['*.png', '*.gif'])
         files = ['setup.py', 'setup.pyc', 'foo.png', '.git', 'index.html']
 
@@ -123,7 +94,7 @@ class TemplateTests(BaseTestCase):
         self.assertEqual(ignores, ['.git', 'setup.pyc', 'foo.png'])
 
     @patch('sys.exit')
-    @patch('facio.template.pwd', return_value='/tmp')
+    @patch('facio.state.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=ShutilError)
     def test_copy_shutil_error_raise_exception(
             self,
@@ -131,7 +102,7 @@ class TemplateTests(BaseTestCase):
             mock_pwd,
             mock_exit):
 
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
 
         with self.assertRaises(FacioException):
             instance.copy()
@@ -140,17 +111,17 @@ class TemplateTests(BaseTestCase):
             'Error: Failed to copy /foo/bar to /tmp/foo')
 
     @patch('sys.exit')
+    @patch('facio.state.pwd', return_value='/tmp')
     @patch('facio.template.os.path.isdir', return_value=True)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_shutil_oserror_raise_exception(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
+            mock_pwd,
             mock_exit):
 
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
 
         with self.assertRaises(FacioException):
             instance.copy()
@@ -160,17 +131,17 @@ class TemplateTests(BaseTestCase):
             'Error: /tmp/foo already exists')
 
     @patch('sys.exit')
+    @patch('facio.state.pwd', return_value='/tmp')
     @patch('facio.template.os.path.isdir', return_value=False)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_oserror_not_vcs_path_exception(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
+            mock_pwd,
             mock_exit):
 
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
 
         with self.assertRaises(FacioException):
             instance.copy()
@@ -182,17 +153,15 @@ class TemplateTests(BaseTestCase):
     @patch('sys.exit')
     @patch('facio.template.GitVCS', new_callable=MagicMock)
     @patch('facio.template.os.path.isdir', return_value=False)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_oserror_vcs_path(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
             mock_gitvcs,
             mock_exit):
 
-        instance = Template('foo', 'git+/foo/bar')
+        instance = Template('git+/foo/bar')
         instance.COPY_ATTEMPT_LIMIT = 0  # Block the next copy call
 
         with self.assertRaises(FacioException):
@@ -202,17 +171,15 @@ class TemplateTests(BaseTestCase):
     @patch('sys.exit')
     @patch('facio.template.GitVCS.clone', return_value=False)
     @patch('facio.template.os.path.isdir', return_value=False)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_oserror_vcs_clone_returns_not_path(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
             mock_gitvcs,
             mock_exit):
 
-        instance = Template('foo', 'git+/foo/bar')
+        instance = Template('git+/foo/bar')
         instance.COPY_ATTEMPT_LIMIT = 0  # Block the next copy call
 
         with self.assertRaises(FacioException):
@@ -223,17 +190,15 @@ class TemplateTests(BaseTestCase):
     @patch('sys.exit')
     @patch('facio.template.GitVCS', new_callable=MagicMock)
     @patch('facio.template.os.path.isdir', return_value=False)
-    @patch('facio.template.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', side_effect=OSError)
     def test_copy_oserror_vcs_path_recursion_limit(
             self,
             mock_copy_tree,
-            mock_pwd,
             mock_isdir,
             mock_gitvcs,
             mock_exit):
 
-        instance = Template('foo', 'git+/foo/bar')
+        instance = Template('git+/foo/bar')
         with self.assertRaises(FacioException):
             instance.copy()
         self.assertTrue(mock_exit.called)
@@ -242,19 +207,21 @@ class TemplateTests(BaseTestCase):
 
     @patch('facio.template.shutil.copytree', new_callable=MagicMock)
     def test_copy_returns_true(self, mock_copy_tree):
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
 
         self.assertTrue(instance.copy())
 
+    @patch('facio.state.pwd', return_value='/tmp')
     @patch('facio.template.shutil.copytree', new_callable=MagicMock)
-    def test_copy_callback_call(self, mock_copy_tree):
-        instance = Template('foo', '/foo/bar')
+    def test_copy_callback_call(self, mock_copy_tree, mock_pwd):
+        from facio.state import state
+        instance = Template('/foo/bar')
         callback = MagicMock()
 
         self.assertTrue(instance.copy(callback=callback))
         callback.assert_called_once_with(
-            origin=instance.path,
-            destination=instance.get_project_root())
+            origin=instance.origin,
+            destination=state.get_project_root())
 
     @patch('os.walk')
     @patch('facio.template.shutil.move', new_callable=MagicMock)
@@ -262,7 +229,7 @@ class TemplateTests(BaseTestCase):
         mock_walk.return_value = [
             ('/foo', ['bar', '{{UNKNOWN}}', '{{PROJECT_NAME}}', 'baz'], [])
         ]
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
 
         for index, value in enumerate(instance.rename_direcories()):
             old, new = value
@@ -277,7 +244,7 @@ class TemplateTests(BaseTestCase):
             ('/foo', [], ['bar.py', '{{UNKNOWN}}.png',
                           '{{PROJECT_NAME}}.html', 'baz.gif'])
         ]
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
 
         for index, value in enumerate(instance.rename_files()):
             old, new = value
@@ -294,7 +261,7 @@ class TemplateTests(BaseTestCase):
             ['bar.py', '{{PROJECT_NAME}}.png', 'baz.gif'],  # Files
         )]
 
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
         instance.rename()
 
         self.assertEqual(self.mocked_facio_template_Template_out.call_count, 2)
@@ -329,7 +296,7 @@ class TemplateTests(BaseTestCase):
 
         mock_get_source.side_effect = get_source
         mock_walk.return_value = [
-            ('/foo', [], [k for k, v in iteritems(files_map)])
+            ('/foo', [], [k for k, v in six.iteritems(files_map)])
         ]
 
         open_mock = mock_open()
@@ -337,7 +304,7 @@ class TemplateTests(BaseTestCase):
         open_patcher.start()
 
         # Call the write method on facio.Template
-        instance = Template('foo', '/foo/bar')
+        instance = Template('/foo/bar')
         instance.update_ignore_globs(['*.gif', ])
         instance.write()
 
