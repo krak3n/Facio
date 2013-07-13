@@ -14,7 +14,6 @@ from facio import get_version
 from facio.base import BaseFacio
 from facio.exceptions import FacioException
 from facio.state import state
-from random import choice
 from six.moves import configparser as ConfigParser
 from six.moves import input
 from textwrap import dedent
@@ -186,15 +185,3 @@ class Settings(BaseFacio):
             return []
         else:
             return globs.split(',')
-
-    @property
-    def django_secret_key(self):
-        '''Generate a secret key for Django Projects.'''
-
-        if hasattr(self, 'generated_django_secret_key'):
-            return self.generated_django_secret_key
-        else:
-            choice_str = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-            key = ''.join([choice(choice_str) for i in range(50)])
-            self.generated_django_secret_key = key
-            return key
