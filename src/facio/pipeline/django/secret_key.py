@@ -6,12 +6,12 @@
               a DJANGO_SECRET_KEY value.
 """
 
-from facio.base import FacioBase
+from facio.base import BaseFacio
 from facio.state import state
 from random import choice
 
 
-class GenerateDjangoSecretKey(FacioBase):
+class GenerateDjangoSecretKey(BaseFacio):
 
     characters = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 
