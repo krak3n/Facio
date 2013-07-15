@@ -16,6 +16,12 @@ from .. import BaseTestCase
 class TestPythonVirtualenv(BaseTestCase):
 
     def setUp(self):
+        self._patch_clint([
+            'facio.base.puts',
+            'facio.pipeline.python.virtualenv.Virtualenv.warning',
+            'facio.pipeline.python.virtualenv.Virtualenv.error',
+        ])
+
         # Mocking State
         patcher = patch('facio.state.state.state',
                         new_callable=PropertyMock,
@@ -66,3 +72,45 @@ class TestPythonVirtualenv(BaseTestCase):
         path = i.get_path()
 
         self.assertEqual(path, os.path.join(user_dir, '.virtualenvs', 'baz'))
+
+    @patch('sh.virtualenv')
+    @patch('facio.base.input')
+    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_path', create=True)
+    def test_create(self, mock_get_path, mock_input, mock_virtualenv):
+        mock_get_path.return_value = '/foo/bar/baz'
+        mock_input.return_value = ''
+
+        i = Virtualenv()
+        path = i.create()
+
+        mock_virtualenv.assert_called_with('/foo/bar/baz --no-site-packages')
+        self.assertEqual(path, '/foo/bar/baz')
+
+    @patch('sh.Environment.__getitem__', side_effect=ImportError)
+    def test_create_import_error(self, mock_sh_import):
+        mock_sh_import.side_effect = ImportError
+
+        i = Virtualenv()
+        path = i.create()
+        warn = self.mocked_facio_pipeline_python_virtualenv_Virtualenv_warning
+
+        self.assertEqual(path, None)
+        warn.assert_called_with("Please install virtualenv to use the "
+                                "python virtualenv pipeline")
+
+    @patch('sh.virtualenv')
+    @patch('facio.base.input')
+    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_path', create=True)
+    def test_create_venv_exception(self, mock_get_path, mock_input,
+                                   mock_virtualenv):
+        mock_get_path.return_value = '/foo/bar/baz'
+        mock_virtualenv.side_effect = Exception
+
+        i = Virtualenv()
+        path = i.create()
+        err = self.mocked_facio_pipeline_python_virtualenv_Virtualenv_error
+
+        self.assertEqual(path, None)
+        err.assert_called_with("Failed to create virtual "
+                               "environment with: /foo/bar/baz "
+                               "--no-site-packages")
