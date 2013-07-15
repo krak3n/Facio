@@ -8,14 +8,12 @@
 import os
 import re
 
-from clint.textui.colored import yellow
 from docopt import docopt
 from facio import get_version
 from facio.base import BaseFacio
 from facio.exceptions import FacioException
 from facio.state import state
 from six.moves import configparser as ConfigParser
-from six.moves import input
 from textwrap import dedent
 
 
@@ -147,7 +145,7 @@ class Settings(BaseFacio):
                     prompt = 'Please enter the number of '\
                              'the template ({0} of {1} tries'\
                              '): '.format(n, tries)
-                    num = int(input(' >  ' + yellow(prompt)))
+                    num = int(self.gather(prompt))
                     if num == 0:
                         raise ValueError
                     name, path = templates[(num - 1)]

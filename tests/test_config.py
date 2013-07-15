@@ -216,7 +216,7 @@ class TestSettings(BaseTestCase):
 
         self.assertEqual(path, '/foo/bar/baz')
 
-    @patch('facio.config.input')
+    @patch('facio.base.input')
     def test_template_selection_input_success(self, mock_input):
         arguments = PropertyMock(return_value={
             '--select': True})
@@ -234,7 +234,7 @@ class TestSettings(BaseTestCase):
         self.assertEqual(path, '/foo')
 
     @patch('sys.exit')
-    @patch('facio.config.input')
+    @patch('facio.base.input')
     def test_template_selection_input_error(self, mock_input, mock_exit):
         arguments = PropertyMock(return_value={
             '--select': True})

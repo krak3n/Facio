@@ -7,6 +7,7 @@
 
 from clint.textui import puts, indent
 from clint.textui.colored import blue, green, red, yellow
+from six.moves import input
 
 
 class BaseFacio(object):
@@ -54,3 +55,12 @@ class BaseFacio(object):
 
         message = 'Error: {0}'.format(message)
         return self.out(message, color=red)
+
+    def gather(self, message):
+        """ Common message prompting for gathering input form the end user.
+
+        :param message: Message to print to user
+        :type message: str
+        """
+
+        return input(' >  ' + yellow(message))
