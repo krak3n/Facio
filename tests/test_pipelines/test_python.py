@@ -5,6 +5,8 @@
    :synopsis: Tests for bundled python pipelines
 """
 
+import os
+
 from facio.pipeline.python.virtualenv import Virtualenv
 from mock import patch, PropertyMock
 
@@ -41,3 +43,26 @@ class TestPythonVirtualenv(BaseTestCase):
         name = i.get_name()
 
         self.assertEqual(name, 'foo')
+
+    @patch('facio.base.input')
+    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_name', create=True)
+    def test_get_path(self, mock_get_name, mock_input):
+        mock_get_name.return_value = 'baz'
+        mock_input.return_value = '/foo/bar'
+
+        i = Virtualenv()
+        path = i.get_path()
+
+        self.assertEqual(path, '/foo/bar/baz')
+
+    @patch('facio.base.input')
+    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_name', create=True)
+    def test_get_path_default(self, mock_get_name, mock_input):
+        mock_get_name.return_value = 'baz'
+        mock_input.return_value = ''
+        user_dir = os.path.expanduser('~')
+
+        i = Virtualenv()
+        path = i.get_path()
+
+        self.assertEqual(path, os.path.join(user_dir, '.virtualenvs', 'baz'))
