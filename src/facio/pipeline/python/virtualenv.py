@@ -76,4 +76,5 @@ def run():
     :returns: str -- Path to the created virtual environment
     """
 
-    pass
+    env = Virtualenv()
+    return env.create()
