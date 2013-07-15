@@ -7,7 +7,7 @@
 
 import os
 
-from facio.pipeline.python.virtualenv import Virtualenv
+from facio.pipeline.python.virtualenv import Virtualenv, run as venv_run
 from mock import patch, PropertyMock
 
 from .. import BaseTestCase
@@ -114,3 +114,14 @@ class TestPythonVirtualenv(BaseTestCase):
         err.assert_called_with("Failed to create virtual "
                                "environment with: /foo/bar/baz "
                                "--no-site-packages")
+
+    @patch('sh.virtualenv')
+    @patch('facio.base.input')
+    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_path', create=True)
+    def test_run(self, mock_get_path, mock_input, mock_virtualenv):
+        mock_get_path.return_value = '/foo/bar/baz'
+        mock_input.return_value = 'n'
+
+        path = venv_run()
+
+        self.assertEqual(path, '/foo/bar/baz')
