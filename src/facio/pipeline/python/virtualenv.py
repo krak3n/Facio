@@ -5,6 +5,8 @@
    :synopsis: Bundled pipeline for creating python virtual environments.
 """
 
+import os
+
 from facio.base import BaseFacio
 from facio.state import state
 
@@ -30,9 +32,18 @@ class Virtualenv(BaseFacio):
     def get_path(self):
         """ The path to where the virtual environment should be created, the
         user is prompted to input this path, default will be ~/.virtualenvs.
+
+        :returns: str -- The path to where the virtual environment
         """
 
-        pass
+        name = self.get_name()
+        prompt = "Please enter the path of where to create the virtual "\
+                 "environment or leave blank to create it in ~/.virtualenvs: "
+        path = self.gather(prompt)
+        if not path:
+            path = os.path.join(os.path.expanduser('~'), '.virtualenvs')
+
+        return os.path.join(path, name)
 
     def create(self):
         """ Creates a python virtual environment. """
