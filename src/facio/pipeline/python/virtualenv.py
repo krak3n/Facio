@@ -56,15 +56,15 @@ class Virtualenv(BaseFacio):
             return None
         else:
             path = self.get_path()
-            cmd = '{0}'.format(path)
             prompt = "No site packages (--no-site-packages) [Y/n]: "
-            if not self.gather(prompt).lower() == 'n':
-                cmd += ' --no-site-packages'
             try:
-                venv(cmd)
+                if self.gather(prompt).lower() == 'n':
+                    venv(path)
+                else:
+                    venv(path, '--no-site-packages')
             except:
                 self.error("Failed to create virtual "
-                           "environment with: {0}".format(cmd))
+                           "environment at: {0}".format(path))
                 return None
             else:
                 return path

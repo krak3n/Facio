@@ -83,7 +83,8 @@ class TestPythonVirtualenv(BaseTestCase):
         i = Virtualenv()
         path = i.create()
 
-        mock_virtualenv.assert_called_with('/foo/bar/baz --no-site-packages')
+        mock_virtualenv.assert_called_with('/foo/bar/baz',
+                                           '--no-site-packages')
         self.assertEqual(path, '/foo/bar/baz')
 
     @patch('sh.Environment.__getitem__', side_effect=ImportError)
@@ -112,8 +113,7 @@ class TestPythonVirtualenv(BaseTestCase):
 
         self.assertEqual(path, None)
         err.assert_called_with("Failed to create virtual "
-                               "environment with: /foo/bar/baz "
-                               "--no-site-packages")
+                               "environment at: /foo/bar/baz")
 
     @patch('sh.virtualenv')
     @patch('facio.base.input')
