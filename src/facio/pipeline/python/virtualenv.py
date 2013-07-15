@@ -48,7 +48,26 @@ class Virtualenv(BaseFacio):
     def create(self):
         """ Creates a python virtual environment. """
 
-        pass
+        try:
+            from sh import virtualenv as venv
+        except ImportError:
+            self.warning("Please install virtualenv to use the python "
+                         "virtualenv pipeline")
+            return None
+        else:
+            path = self.get_path()
+            cmd = '{0}'.format(path)
+            prompt = "No site packages (--no-site-packages) [Y/n]: "
+            if not self.gather(prompt).lower() == 'n':
+                cmd += ' --no-site-packages'
+            try:
+                venv(cmd)
+            except:
+                self.error("Failed to create virtual "
+                           "environment with: {0}".format(cmd))
+                return None
+            else:
+                return path
 
 
 def run():
