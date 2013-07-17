@@ -10,14 +10,26 @@ from facio.base import BaseFacio
 
 class Setup(BaseFacio):
 
-    def get_install_type(self):
-        """ Gets the install type from the user, for example
+    def get_install_arg(self):
+        """ Gets the install args from the user, for example
         setup.py install or develop.
 
         :returns: str -- The install type
         """
 
-        pass
+        prompt = "Please enter the setyup.py args (install or develop) "\
+                 "[{0}/{1} tries]: "
+        valid_args = ['install', 'develop']
+
+        for x in range(1, 6):
+            arg = self.gather(prompt.format(x, 5))
+            if arg in valid_args:
+                break
+        else:
+            self.error("You did not enter a valid setup.py arg")
+            return None
+
+        return arg
 
     def get_path_to_python(self):
         """ Gets the path to python to run setup.py against.
