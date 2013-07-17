@@ -6,6 +6,7 @@
 """
 
 import os
+import sys
 
 from facio.pipeline.python.setup import Setup
 from facio.pipeline.python.virtualenv import Virtualenv, run as venv_run
@@ -166,3 +167,19 @@ class TestSetup(BaseTestCase):
 
         self.assertEqual(arg, None)
         e.assert_called_with("You did not enter a valid setup.py arg")
+
+    def test_get_default_python_path_current(self):
+        i = Setup()
+        path = i.get_default_path_to_pyth()
+
+        self.assertEqual(sys.executable, path)
+
+    def test_get_default_path_virtualenv(self):
+        self.mock_state.pipeline_calls = [(
+            'facio.pipeline.python.virtualenv', '/foo/bar/python'
+        )]
+
+        i = Setup()
+        path = i.get_default_path_to_pyth()
+
+        self.assertEqual('/foo/bar/python', path)
