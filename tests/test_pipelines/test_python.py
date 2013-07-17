@@ -176,13 +176,13 @@ class TestSetup(BaseTestCase):
 
     def test_get_default_path_virtualenv(self):
         self.mock_state.pipeline_calls = [(
-            'facio.pipeline.python.virtualenv', '/foo/bar/python'
+            'facio.pipeline.python.virtualenv', '/foo/bar'
         )]
 
         i = Setup()
         path = i.get_default_path_to_python()
 
-        self.assertEqual('/foo/bar/python', path)
+        self.assertEqual('/foo/bar/bin/python', path)
 
     @patch('facio.pipeline.python.setup.Setup.get_default_path_to_python')
     @patch('facio.base.input')
