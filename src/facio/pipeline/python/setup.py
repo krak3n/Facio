@@ -5,6 +5,8 @@
    :synopsis: Bundled pipeline for running python setup.py
 """
 
+import os
+import subprocess
 import sys
 
 from facio.base import BaseFacio
@@ -12,6 +14,23 @@ from facio.state import state
 
 
 class Setup(BaseFacio):
+
+    def log_errors(self, errors):
+        """ Called with errors are encountered running setup.py and are logged
+        to a setup.error.log.
+
+        :param errors: Errors from setup.py
+        :type errors: str
+        """
+
+        project_root = state.get_project_root()
+        log_path = os.path.join(project_root, 'setup.error.log')
+
+        with open(log_path, 'a') as handler:
+            handler.write(errors)
+
+        self.error('Errors detected with running setup.py, '
+                   'please check {0}'.format(log_path))
 
     def get_install_arg(self):
         """ Gets the install args from the user, for example
@@ -47,7 +66,7 @@ class Setup(BaseFacio):
             'facio.pipeline.python.virtualenv')
 
         if call:
-            return call
+            return os.path.join(call, 'bin', 'python')
         else:
             return sys.executable
 
@@ -73,11 +92,33 @@ class Setup(BaseFacio):
 
     def run(self):
         """ Runs the python setup.py command.
+
+        :returns: bool -- Based on return code subprocess call return code
         """
 
-        pass
+        project_root = state.get_project_root()
+        working_dir = state.get_working_directory()
+
+        python = self.get_path_to_python()
+        setup = os.path.join(project_root, 'setup.py')
+        arg = self.get_install_arg()
+
+        self.out('Running: {0} ...'.format(' '.join([python, setup, arg])))
+
+        os.chdir(project_root)
+        call = subprocess.Popen([python, setup, arg],
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+        output, errors = call.communicate()
+        os.chdir(working_dir)
+
+        if call.returncode:
+            self.log_errors(errors)
+            return False
+
+        return True
 
 
 def run():
-
-    pass
+    setup = Setup()
+    setup.run()
