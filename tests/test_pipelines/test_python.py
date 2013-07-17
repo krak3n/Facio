@@ -170,7 +170,7 @@ class TestSetup(BaseTestCase):
 
     def test_get_default_python_path_current(self):
         i = Setup()
-        path = i.get_default_path_to_pyth()
+        path = i.get_default_path_to_python()
 
         self.assertEqual(sys.executable, path)
 
@@ -180,6 +180,26 @@ class TestSetup(BaseTestCase):
         )]
 
         i = Setup()
-        path = i.get_default_path_to_pyth()
+        path = i.get_default_path_to_python()
 
         self.assertEqual('/foo/bar/python', path)
+
+    @patch('facio.pipeline.python.setup.Setup.get_default_path_to_python')
+    @patch('facio.base.input')
+    def test_get_python_path_default(self, mock_input, mock_default):
+        mock_input.return_value = ''
+        mock_default.return_value = '/foo/bar/python'
+
+        i = Setup()
+        path = i.get_path_to_python()
+
+        self.assertEqual(path, '/foo/bar/python')
+
+    @patch('facio.base.input')
+    def test_get_python_path_input(self, mock_input):
+        mock_input.return_value = '/foo/bar/python'
+
+        i = Setup()
+        path = i.get_path_to_python()
+
+        self.assertEqual(path, '/foo/bar/python')
