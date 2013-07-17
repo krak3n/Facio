@@ -7,6 +7,7 @@
 
 import os
 
+from facio.pipeline.python.setup import Setup
 from facio.pipeline.python.virtualenv import Virtualenv, run as venv_run
 from mock import patch, PropertyMock
 
@@ -125,3 +126,43 @@ class TestPythonVirtualenv(BaseTestCase):
         path = venv_run()
 
         self.assertEqual(path, '/foo/bar/baz')
+
+
+class TestSetup(BaseTestCase):
+
+    def setUp(self):
+        self._patch_clint([
+            'facio.base.puts',
+            'facio.pipeline.python.setup.Setup.warning',
+            'facio.pipeline.python.setup.Setup.error',
+        ])
+
+        # Mocking State
+        patcher = patch('facio.state.state.state',
+                        new_callable=PropertyMock,
+                        create=True)
+        self.mock_state = patcher.start()
+        self.mock_state.project_name = 'foo'
+        self.mock_state.context_variables = {
+            'PROJECT_NAME': 'foo'}
+        self.addCleanup(patcher.stop)
+
+    @patch('facio.base.input')
+    def test_get_install_arg(self, mock_input):
+        mock_input.return_value = 'develop'
+
+        i = Setup()
+        arg = i.get_install_arg()
+
+        self.assertEqual(arg, 'develop')
+
+    @patch('facio.base.input')
+    def test_get_install_arg_input_error(self, mock_input):
+        mock_input.return_value = 'foo'
+
+        i = Setup()
+        arg = i.get_install_arg()
+        e = self.mocked_facio_pipeline_python_setup_Setup_error
+
+        self.assertEqual(arg, None)
+        e.assert_called_with("You did not enter a valid setup.py arg")
