@@ -34,7 +34,7 @@ class Setup(BaseFacio):
 
         return arg
 
-    def get_default_path_to_pyth(self):
+    def get_default_path_to_python(self):
         """ Returns the default path to python, if virtualenv pipeline
         has been called use that path, else use the current executing
         python, this should be the systems python in most cases.
@@ -60,7 +60,16 @@ class Setup(BaseFacio):
         :returns: str -- The path to python
         """
 
-        pass
+        default = self.get_default_path_to_python()
+
+        prompt = "Please enter the path to the python executable for running "\
+                 "setup.py, leave blank to use: {0}: ".format(default)
+
+        path = self.gather(prompt)
+        if not path:
+            path = default
+
+        return path
 
     def run(self):
         """ Runs the python setup.py command.
