@@ -10,7 +10,7 @@ import sys
 
 from facio.pipeline.python.setup import Setup
 from facio.pipeline.python.virtualenv import Virtualenv, run as venv_run
-from mock import patch, PropertyMock
+from mock import mock_open, patch, PropertyMock
 
 from .. import BaseTestCase
 
@@ -203,3 +203,17 @@ class TestSetup(BaseTestCase):
         path = i.get_path_to_python()
 
         self.assertEqual(path, '/foo/bar/python')
+
+    def test_log_errors(self):
+        patcher = patch('facio.pipeline.python.setup.open',
+                        mock_open(),
+                        create=True)
+        m = patcher.start()
+
+        i = Setup()
+        i.log_errors("I am an error")
+
+        handler = m.return_value.__enter__.return_value
+        handler.write.assert_called_with("I am an error")
+
+        patcher.stop()
