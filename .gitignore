@@ -42,3 +42,4 @@ build
 _build
 .tox
 .vagrant
+.tmuxinator
