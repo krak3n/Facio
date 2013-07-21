@@ -8,5 +8,5 @@ base:
     - packages
     - python
     - facio
-    # Local developer states - unique to you - mounted at ~/.salt-dev
-    - developer
+    # Local states - unique to you - mounted at ~/.salt
+    - local

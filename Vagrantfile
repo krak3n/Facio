@@ -37,9 +37,9 @@ Vagrant.configure("2") do |config|
 
     # Local Developer States - Not in version control, this is for the developer to manage, e.g Git / Vim Configs
     # Developers should symlink this locally to ~/.salt-dev
-    local_developer_states = File.join(File.expand_path('~'), '.salt-dev')
+    local_developer_states = File.join(File.expand_path('~'), '.salt')
     if File.directory?(local_developer_states)
-        config.vm.synced_folder local_developer_states, "/home/vagrant/.salt-dev"
+        config.vm.synced_folder local_developer_states, "/home/vagrant/.salt"
     else
         $stdout.write "Vagrant: Warning: You do not have any local states\n"
     end
