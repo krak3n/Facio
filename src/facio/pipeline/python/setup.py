@@ -120,5 +120,11 @@ class Setup(BaseFacio):
 
 
 def run():
+    """ Called by pipeline runner, runs the setup class and returns Bool on
+    status of the run command.
+
+    :returns: bool -- The state of running setup.py
+    """
+
     setup = Setup()
-    setup.run()
+    return setup.run()
