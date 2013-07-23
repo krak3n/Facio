@@ -13,12 +13,6 @@ Vagrant.configure("2") do |config|
     config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
     #
-    # Port Forwarding / Assign static IP
-    #
-
-    config.vm.network :private_network, ip: "10.10.10.10"
-
-    #
     # Virutalbox Settings
     #
     config.vm.provider :virtualbox do |v|
