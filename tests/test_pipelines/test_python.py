@@ -10,7 +10,7 @@ import sys
 
 from facio.pipeline.python.setup import Setup
 from facio.pipeline.python.virtualenv import Virtualenv, run as venv_run
-from mock import mock_open, patch, PropertyMock
+from mock import MagicMock, mock_open, patch, PropertyMock
 
 from .. import BaseTestCase
 
@@ -217,3 +217,69 @@ class TestSetup(BaseTestCase):
         handler.write.assert_called_with("I am an error")
 
         patcher.stop()
+
+    @patch('facio.pipeline.python.setup.os.chdir')
+    @patch('facio.base.input')
+    @patch('facio.pipeline.python.setup.Setup.get_path_to_python')
+    @patch('facio.pipeline.python.setup.subprocess.Popen')
+    @patch('facio.state.pwd')
+    def test_run_zero_exit_code(
+            self,
+            mock_pwd,
+            mock_popen,
+            mock_get_path_to_python,
+            mock_input,
+            mock_chdir):
+        mock_pwd.return_value = '/bar'
+        mock_get_path_to_python.return_value = '/foo/python'
+        mock_input.return_value = 'develop'
+
+        mock_attrs = {
+            'communicate.return_value': ('', ''),
+            'returncode': 0
+        }
+
+        mock_popen.return_value = MagicMock(**mock_attrs)
+
+        i = Setup()
+        r = i.run()
+
+        self.assertTrue(r)
+        mock_popen.assert_any_call(
+            ['/foo/python', '/bar/foo/setup.py', 'develop'],
+            stderr=-1,
+            stdout=-1)
+
+    @patch('facio.pipeline.python.setup.Setup.log_errors')
+    @patch('facio.pipeline.python.setup.os.chdir')
+    @patch('facio.base.input')
+    @patch('facio.pipeline.python.setup.Setup.get_path_to_python')
+    @patch('facio.pipeline.python.setup.subprocess.Popen')
+    @patch('facio.state.pwd')
+    def test_run_non_zero_exit_code(
+            self,
+            mock_pwd,
+            mock_popen,
+            mock_get_path_to_python,
+            mock_input,
+            mock_chdir,
+            mock_log_errors):
+        mock_pwd.return_value = '/bar'
+        mock_get_path_to_python.return_value = '/foo/python'
+        mock_input.return_value = 'develop'
+
+        mock_attrs = {
+            'communicate.return_value': ('', ''),
+            'returncode': 1
+        }
+
+        mock_popen.return_value = MagicMock(**mock_attrs)
+
+        i = Setup()
+        r = i.run()
+
+        self.assertFalse(r)
+        mock_popen.assert_any_call(
+            ['/foo/python', '/bar/foo/setup.py', 'develop'],
+            stderr=-1,
+            stdout=-1)
