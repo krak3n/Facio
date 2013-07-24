@@ -26,14 +26,9 @@ class PipelineTest(BaseTestCase):
         ])
 
     def _mock_open(self, data):
-        if six.PY3:
-            func = 'builtins.open'
-        else:
-            func = '__builtin__.open'
-        patcher = patch(
-            func,
-            mock_open(read_data=data),
-            create=True)
+        patcher = patch('facio.pipeline.open',
+                        mock_open(read_data=data),
+                        create=True)
         return patcher
 
     def _module_factory(self, n):
