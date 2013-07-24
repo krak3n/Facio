@@ -8,7 +8,7 @@
 import os
 import sys
 
-from facio.pipeline.python.setup import Setup
+from facio.pipeline.python.setup import Setup, run as setup_run
 from facio.pipeline.python.virtualenv import Virtualenv, run as venv_run
 from mock import MagicMock, mock_open, patch, PropertyMock
 
@@ -283,3 +283,30 @@ class TestSetup(BaseTestCase):
             ['/foo/python', '/bar/foo/setup.py', 'develop'],
             stderr=-1,
             stdout=-1)
+
+    @patch('facio.pipeline.python.setup.os.chdir')
+    @patch('facio.base.input')
+    @patch('facio.pipeline.python.setup.Setup.get_path_to_python')
+    @patch('facio.pipeline.python.setup.subprocess.Popen')
+    @patch('facio.state.pwd')
+    def test_run(
+            self,
+            mock_pwd,
+            mock_popen,
+            mock_get_path_to_python,
+            mock_input,
+            mock_chdir):
+        mock_pwd.return_value = '/bar'
+        mock_get_path_to_python.return_value = '/foo/python'
+        mock_input.return_value = 'develop'
+
+        mock_attrs = {
+            'communicate.return_value': ('', ''),
+            'returncode': 0
+        }
+
+        mock_popen.return_value = MagicMock(**mock_attrs)
+
+        result = setup_run()
+
+        self.assertTrue(result)
