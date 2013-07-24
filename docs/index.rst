@@ -20,6 +20,7 @@ Documentation
     about
     install
     start
+    configuration
     templates
     developing
     changelog
