@@ -23,6 +23,21 @@ Facio aims to hopefully fix your standard project skeleton woes.
 
     facio my_new_project -t django_skeleton
 
+Features
+--------
+
+* Support for multiple templates
+* Store templates in ``git`` or ``mercurial`` repositories
+* Add template logic using ``Jinja2``
+* Ability to add before and after hooks or pipelines called before or after the
+  project is created.
+* Add extra context-variables to your templates
+* Bundled pipelines include:
+
+  * Create python virtual environments
+  * Run python ``setup.py install | develop``
+  * Generate Django Secret key for usage in Django settings modules
+
 License
 -------
 
