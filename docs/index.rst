@@ -19,7 +19,7 @@ Documentation
 
     about
     install
-    usage
+    start
     templates
     developing
     changelog
