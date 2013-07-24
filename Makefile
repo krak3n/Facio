@@ -5,6 +5,10 @@
 clean_pyc:
 	find . -name \*.pyc -delete
 
+documentation:
+	make -C docs clean
+	make -C docs html
+
 #
 # Install for development
 #
