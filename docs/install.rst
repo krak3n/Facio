@@ -8,6 +8,14 @@ Facio can be installed on system using the standard python package installers
 
     ``sudo`` is used in the following commands for system wide installation.
 
+Requirements
+------------
+
+Facio is written in python, the only requirement you need is to have one of the
+following python versions installed.
+
+* Python 2.6, 2.7, 3.2, 3.3
+
 Pip or Easy Install
 -------------------
 
