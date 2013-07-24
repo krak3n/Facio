@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
     #
 
     config.vm.provision :salt do |s|
-        s.run_highstate = true                           # Always run the Salt Proviosining System
+        s.run_highstate = true                           # Always run the Salt provisioning system
         s.minion_config = "salt/config/minion.conf"      # Where the minion config lives
         s.install_type = "stable"
     end
