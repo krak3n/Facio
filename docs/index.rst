@@ -18,7 +18,7 @@ Documentation
     :maxdepth: 3
 
     about
-    installing
+    install
     usage
     templates
     developing

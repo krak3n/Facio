@@ -8,18 +8,21 @@ Facio can be installed on system using the standard python package installers
 
     ``sudo`` is used in the following commands for system wide installation.
 
-Easy Install
-------------
+Pip or Easy Install
+-------------------
 
-``sudo easy_install facio``
+.. code-block:: none
 
-Pip
----
+    sudo easy_install facio
 
-``sudo pip install facio``
+or
 
-Manual
-------
+.. code-block:: none
+
+    sudo pip install facio
+
+Manually
+--------
 
 .. code-block:: none
 
