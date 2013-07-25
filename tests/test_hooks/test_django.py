@@ -6,7 +6,7 @@
 """
 
 
-from facio.hooks.django.secret_key import GenerateDjangoSecretKey, run
+from facio.hooks.django.secret import GenerateDjangoSecretKey, run
 from facio.state import state
 from mock import patch
 from six.moves import builtins
@@ -19,7 +19,7 @@ class TestDjangoSecretKey(BaseTestCase):
     def setUp(self):
         self._patch_clint([
             'facio.base.puts',
-            'facio.hooks.django.secret_key.GenerateDjangoSecretKey.out',
+            'facio.hooks.django.secret.GenerateDjangoSecretKey.out',
         ])
 
     def tearDown(self):
@@ -28,24 +28,25 @@ class TestDjangoSecretKey(BaseTestCase):
         except AttributeError:
             pass
 
-    @patch('facio.hook.django.secret_key.choice', create=True)
-    @patch('facio.hook.django.secret_key.range', create=True)
+    @patch('facio.hook.django.secret.choice', create=True)
+    @patch('facio.hook.django.secret.range', create=True)
     def test_generate_key(self, mock_range, mock_choice):
         mock_range.return_value = [0, ]
         mock_choice.return_value = 'a'
 
         i = GenerateDjangoSecretKey()
         key = i.generate()
+        out = self.mocked_facio_hook_django_secret_GenerateDjangoSecretKey_out
 
         self.assertEqual(key, 'a')
-        self.mocked_facio_hook_django_secret_key_GenerateDjangoSecretKey_out.assert_called_with('Generating Django Secret Key')  # NOQA
+        out.assert_called_with('Generating Django Secret Key')
 
-    @patch('facio.hook.django.secret_key.GenerateDjangoSecretKey.generate')
+    @patch('facio.hook.django.secret.GenerateDjangoSecretKey.generate')
     def test_run(self, mock_generate):
         mock_generate.return_value = 'foobarbaz'
 
         key = run()
 
         self.assertEqual(key, 'foobarbaz')
-        self.assertEqual(state.context_variables['DJANGO_SECRET_KEY'],
+        self.assertEqual(state.context_variables['DJANGO_secret'],
                          'foobarbaz')
