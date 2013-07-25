@@ -37,7 +37,7 @@ class Run(BaseFacio):
 
         pipeline = Pipeline()
         pipeline.load(os.path.join(
-            state.get_project_root(), '.facio.pipeline.yml'
+            state.get_project_root(), '.facio.hooks.yml'
         ))
 
         if pipeline.has_before():
