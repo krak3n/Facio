@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-.. module:: facio.pipeline
-   :synopsis: Pipeline detection and execution.
+.. module:: facio.hooks
+   :synopsis: Hook detection and execution.
 """
 
 import sys
@@ -14,36 +14,36 @@ from importlib import import_module
 from yaml.scanner import ScannerError
 
 
-class Pipeline(BaseFacio):
+class Hook(BaseFacio):
 
     def __init__(self):
-        """ Pipeline class instanctiation. """
+        """ Hook class instanctiation. """
 
         self.calls = []
 
     def load(self, path):
-        """ Parse the pipeline file.
+        """ Parse the hooks file.
 
-        :param path: Path to pipeline file, locally
+        :param path: Path to hooks file, locally
         :type path: str
         """
 
         try:
             with open(path) as f:
                 try:
-                    self.pipeline = yaml.load(f.read())
+                    self.hooks = yaml.load(f.read())
                 except ScannerError:
-                    self.warning('Error loading {0} pipeline - Is it '
+                    self.warning('Error loading {0} hooks - Is it '
                                  'correctly formatted?'.format(path))
                 else:
-                    self.out('Loading Pipeline')
+                    self.out('Loading hooks')
         except IOError:
             self.warning('{0} not found'.format(path))
 
     def _validate_before(self):
         try:
-            if 'before' in self.pipeline:
-                if not type(self.pipeline.get('before')) == list:
+            if 'before' in self.hooks:
+                if not type(self.hooks.get('before')) == list:
                     self.warning('Ignoring before: should be a list')
                     return False
                 else:
@@ -54,8 +54,8 @@ class Pipeline(BaseFacio):
 
     def _validate_after(self):
         try:
-            if 'after' in self.pipeline:
-                if not type(self.pipeline.get('after')) == list:
+            if 'after' in self.hooks:
+                if not type(self.hooks.get('after')) == list:
                     self.warning('Ignoring after: should be a list')
                     return False
                 else:
@@ -65,7 +65,7 @@ class Pipeline(BaseFacio):
             return False
 
     def has_before(self):
-        """ Does the pipeline contain a before module list.
+        """ Does the hooks file contain a before list.
 
         :returns: Bool
         """
@@ -76,7 +76,7 @@ class Pipeline(BaseFacio):
             return False
 
     def has_after(self):
-        """ Does the pipeline contain a after module list.
+        """ Does the hooks file contain a after list.
 
         :returns: Bool
         """
@@ -87,7 +87,7 @@ class Pipeline(BaseFacio):
             return False
 
     def import_module(self, path):
-        """ Import module to run in before or post pipeline.
+        """ Import module to run in before or post hooks.
 
         :param path: The python path to the module
         :type path: str
@@ -124,13 +124,13 @@ class Pipeline(BaseFacio):
                     e,
                     traceback.tb_lineno))
             self.calls.append({path: result})
-            state.pipeline_save_call(path, result)
+            state.hooks_save_call(path, result)
             return result
 
     def has_run(self, path):
-        """ Has a pipeline module run.
+        """ Has a hooks module run.
 
-        :param path: The pipeline python module path
+        :param path: The hooks python module path
         :type path: str
 
         :returns: False if not run else the modules returned data
@@ -146,11 +146,11 @@ class Pipeline(BaseFacio):
     def run_before(self):
         """ Run the before modules. """
 
-        for path in self.pipeline.get('before', []):
+        for path in self.hooks.get('before', []):
             self.run_module(path)
 
     def run_after(self):
         """ Run the after modules. """
 
-        for path in self.pipeline.get('after', []):
+        for path in self.hooks.get('after', []):
             self.run_module(path)

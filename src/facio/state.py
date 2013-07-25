@@ -121,9 +121,9 @@ class State(BaseFacio):
         variables = self.get_context_variables()
         return variables.get(name, None)
 
-    def pipeline_get_call_result(self, module_path):
-        """ Returns a pipeline call result, else returns false if the module
-        path is not in the pipeline call list.
+    def get_hook_call(self, module_path):
+        """ Returns a hook call result, else returns false if the module
+        path is not in the hook call list.
 
         :param module_path: The python dotted path to the module
         :type module_path: str
@@ -132,7 +132,7 @@ class State(BaseFacio):
         """
 
         try:
-            calls = self.state.pipeline_calls
+            calls = self.state.hook_calls
         except AttributeError:
             calls = []
 
@@ -143,8 +143,8 @@ class State(BaseFacio):
 
         return result
 
-    def pipeline_save_call(self, module_path, result):
-        """ Saves a pipeline call to state
+    def save_hook_call(self, module_path, result):
+        """ Saves a hook call to state
 
         :param module_path: The python dotted path to the module
         :type module_path: str
@@ -156,13 +156,13 @@ class State(BaseFacio):
         """
 
         try:
-            calls = self.state.pipeline_calls
+            calls = self.state.hook_calls
         except AttributeError:
             calls = []
 
-        if not self.pipeline_get_call_result(module_path):
+        if not self.hook_get_call_result(module_path):
             calls.append((module_path, result))
-            self.state.pipeline_calls = calls
+            self.state.hook_calls = calls
 
         return calls
 

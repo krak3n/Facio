@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-.. module:: facio.pipeline.django.secret_key
+.. module:: facio.hooks.django.secret_key
    :synopsis: Generates a Django Secret key and updates context_variables with
               a DJANGO_SECRET_KEY value.
 """
@@ -16,13 +16,18 @@ class GenerateDjangoSecretKey(BaseFacio):
     characters = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
 
     def generate(self):
+        """ Generate Django secret key
+
+        :returns: str -- The generated key
+        """
+
         self.out('Generating Django Secret Key')
         key = ''.join([choice(self.characters) for i in range(50)])
         return key
 
 
 def run():
-    """ Called by the ``facio.pipeline`` runner. """
+    """ Called by the ``facio.hooks`` runner. """
 
     generator = GenerateDjangoSecretKey()
     key = generator.generate()

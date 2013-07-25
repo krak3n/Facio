@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-.. module:: facio.pipeline.python.virtualenv
-   :synopsis: Bundled pipeline for creating python virtual environments.
+.. module:: facio.hooks.python.virtualenv
+   :synopsis: Bundled hooks for creating python virtual environments.
 """
 
 import os
@@ -52,7 +52,7 @@ class Virtualenv(BaseFacio):
             from sh import virtualenv as venv
         except ImportError:
             self.warning("Please install virtualenv to use the python "
-                         "virtualenv pipeline")
+                         "virtualenv hooks")
             return None
         else:
             path = self.get_path()
@@ -71,7 +71,7 @@ class Virtualenv(BaseFacio):
 
 
 def run():
-    """ Called from ``facio.pipeline`` runner.
+    """ Called from ``facio.hooks`` runner.
 
     :returns: str -- Path to the created virtual environment
     """
