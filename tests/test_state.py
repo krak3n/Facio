@@ -79,20 +79,20 @@ class TestState(BaseTestCase):
         self.assertEqual(state.get_context_variable('PROJECT_NAME'), 'foo')
         self.assertNotEqual(state.get_context_variable('not_created'), 'foo')
 
-    def test_pipeline_call_save(self):
+    def test_save_hook_call(self):
         state = State()
 
-        state.pipeline_save_call('foo.bar', 'baz')
-        state.pipeline_save_call('baz.foo', 'bar')
-        calls = state.pipeline_save_call('foo.bar', 'baz')
+        state.save_hook_call('foo.bar', 'baz')
+        state.save_hook_call('baz.foo', 'bar')
+        calls = state.save_hook_call('foo.bar', 'baz')
 
         self.assertEqual(calls, [('foo.bar', 'baz'), ('baz.foo', 'bar')])
 
-    def test_pipeline_get_call(self):
+    def test_get_hook_call(self):
         state = State()
 
-        state.pipeline_save_call('foo.bar', 'baz')
-        state.pipeline_save_call('baz.foo', 'bar')
+        state.save_hook_call('foo.bar', 'baz')
+        state.save_hook_call('baz.foo', 'bar')
 
-        self.assertEqual(state.pipeline_get_call_result('foo.bar'), 'baz')
-        self.assertEqual(state.pipeline_get_call_result('baz.foo'), 'bar')
+        self.assertEqual(state.get_hook_call('foo.bar'), 'baz')
+        self.assertEqual(state.get_hook_call('baz.foo'), 'bar')

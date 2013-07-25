@@ -160,7 +160,7 @@ class State(BaseFacio):
         except AttributeError:
             calls = []
 
-        if not self.hook_get_call_result(module_path):
+        if not self.get_hook_call(module_path):
             calls.append((module_path, result))
             self.state.hook_calls = calls
 
