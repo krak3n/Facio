@@ -175,7 +175,7 @@ class TestSetup(BaseTestCase):
         self.assertEqual(sys.executable, path)
 
     def test_get_default_path_virtualenv(self):
-        self.mock_state.hooks_calls = [(
+        self.mock_state.hook_calls = [(
             'facio.hooks.python.virtualenv', '/foo/bar'
         )]
 

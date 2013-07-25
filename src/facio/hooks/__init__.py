@@ -124,7 +124,7 @@ class Hook(BaseFacio):
                     e,
                     traceback.tb_lineno))
             self.calls.append({path: result})
-            state.hooks_save_call(path, result)
+            state.save_hook_call(path, result)
             return result
 
     def has_run(self, path):

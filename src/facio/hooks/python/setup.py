@@ -62,7 +62,7 @@ class Setup(BaseFacio):
         """
 
         # Returns path to virtualenv
-        call = state.hooks_get_call_result(
+        call = state.get_hook_call(
             'facio.hooks.python.virtualenv')
 
         if call:

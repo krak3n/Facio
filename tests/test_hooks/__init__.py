@@ -9,7 +9,7 @@ from facio.hooks import Hook
 from mock import MagicMock, mock_open, patch
 from random import choice
 
-from . import BaseTestCase
+from .. import BaseTestCase
 
 
 class HookTest(BaseTestCase):
@@ -18,9 +18,9 @@ class HookTest(BaseTestCase):
     def setUp(self):
         self._patch_clint([
             'facio.base.puts',
-            'facio.hooks.hooks.out',
-            'facio.hooks.hooks.warning',
-            'facio.hooks.hooks.error',
+            'facio.hooks.Hook.out',
+            'facio.hooks.Hook.warning',
+            'facio.hooks.Hook.error',
         ])
 
     def _mock_open(self, data):
@@ -57,9 +57,9 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        self.mocked_facio_hooks_hooks_out.assert_called_with(
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.mocked_facio_hooks_Hook_out.assert_called_with(
             'Loading hooks')
 
         open_mock.stop()
@@ -76,9 +76,9 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        self.mocked_facio_hooks_hooks_warning.assert_called_with(
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
             "Error loading /foo/bar.yml hooks - Is it correctly formatted?")
         open_mock.stop()
 
@@ -87,13 +87,13 @@ class HookTest(BaseTestCase):
         m = open_mock.start()
         m.side_effect = IOError
 
-        p = Hook()
-        p.load('/foo/bar.yml')
+        i = Hook()
+        i.load('/foo/bar.yml')
 
-        self.mocked_facio_hooks_hooks_warning.assert_called_with(
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
             "/foo/bar.yml not found")
-        self.assertFalse(p._validate_before())
-        self.assertFalse(p._validate_after())
+        self.assertFalse(i._validate_before())
+        self.assertFalse(i._validate_after())
 
         open_mock.stop()
 
@@ -106,10 +106,10 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        self.assertFalse(p.has_before())
-        self.mocked_facio_hooks_hooks_warning.assert_called_with(
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertFalse(i.has_before())
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
             'Ignoring before: should be a list')
 
         open_mock.stop()
@@ -123,10 +123,10 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        self.assertFalse(p.has_after())
-        self.mocked_facio_hooks_hooks_warning.assert_called_with(
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertFalse(i.has_after())
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
             'Ignoring after: should be a list')
 
         open_mock.stop()
@@ -136,11 +136,11 @@ class HookTest(BaseTestCase):
         """
         open_mock = self._mock_open(data)
         open_mock.start()
-        p = Hook()
-        p.load('/foo/bar.yml')
+        i = Hook()
+        i.load('/foo/bar.yml')
 
-        self.assertFalse(p.has_before())
-        self.assertFalse(p.has_after())
+        self.assertFalse(i.has_before())
+        self.assertFalse(i.has_after())
         open_mock.stop()
 
     def test_has_before_true(self):
@@ -151,9 +151,9 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        self.assertTrue(p.has_before())
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertTrue(i.has_before())
 
         open_mock.stop()
 
@@ -165,9 +165,9 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        self.assertFalse(p.has_before())
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertFalse(i.has_before())
 
         open_mock.stop()
 
@@ -179,9 +179,9 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        self.assertTrue(p.has_after())
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertTrue(i.has_after())
 
         open_mock.stop()
 
@@ -193,60 +193,61 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        self.assertFalse(p.has_after())
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertFalse(i.has_after())
 
         open_mock.stop()
 
-    @patch('facio.hooks.hooks.load', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
     @patch('facio.hooks.import_module', return_value=True)
     def test_import_success(self, mock_importlib, mockload):
-        p = Hook()
-        p.load('/foo/bar.yml')
-        p.import_module('path.to.module')
-        self.mocked_facio_hooks_hooks_out.assert_called_with(
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.import_module('path.to.module')
+        self.mocked_facio_hooks_Hook_out.assert_called_with(
             'Loaded module: path.to.module')
 
-    @patch('facio.hooks.hooks.load', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_import_module_failure(self, mockload):
-        p = Hook()
-        p.load('/foo/bar.yml')
-        p.import_module('hooks_test_module')
-        self.mocked_facio_hooks_hooks_error.assert_called_with(
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.import_module('hooks_test_module')
+
+        self.mocked_facio_hooks_Hook_error.assert_called_with(
             'Failed to Load module: hooks_test_module')
 
-    @patch('facio.hooks.hooks.load', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_run_module_success(self, mockload):
-        p = Hook()
-        p.load('/foo/bar.yml')
-        import_module_mock = patch('facio.hooks.import_module')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock = import_module_mock.start()
         module = MagicMock()
         module.run.return_value = True
         mock.return_value = module
-        rtn = p.run_module('foo.bar.baz')
+        rtn = i.run_module('foo.bar.baz')
+        mock = import_module_mock.stop()
         self.assertTrue(module.run.called)
         self.assertTrue(rtn)
-        mock = import_module_mock.stop()
 
-    @patch('facio.hooks.hooks.load', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_run_module_failure(self, mockload):
-        p = Hook()
-        p.load('/foo/bar.yml')
-        import_module_mock = patch('facio.hooks.import_module')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock = import_module_mock.start()
         module = MagicMock()
         module.run.side_effect = AttributeError
         mock.return_value = module
-        rtn = p.run_module('foo.bar.baz')
+        rtn = i.run_module('foo.bar.baz')
+        mock = import_module_mock.stop()
         self.assertTrue(module.run.called)
         self.assertFalse(rtn)
-        mock = import_module_mock.stop()
 
-    @patch('facio.hooks.hooks.load', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_module_exception_caught(self, mockload):
-        import_module_mock = patch('facio.hooks.import_module')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock = import_module_mock.start()
         module = MagicMock()
         module.foo.side_effect = KeyError('Failed lookup')
@@ -256,54 +257,55 @@ class HookTest(BaseTestCase):
             module.foo()
 
         module.run = fake_run
-        p = Hook()
-        p.load('/foo/bar.yml')
-        p.run_module('foo.bar.baz')
-        self.assertTrue(module.foo.called)
-        self.mocked_facio_hooks_hooks_warning.assert_called_with(
-            'Exeption caught in module: \'Failed lookup\' line: 117')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.run_module('foo.bar.baz')
         mock = import_module_mock.stop()
+        self.assertTrue(module.foo.called)
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
+            'Exeption caught in module: \'Failed lookup\' line: 117')
 
-    @patch('facio.hooks.hooks.load', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_store_hooks_states(self, return_value=True):
-        p = Hook()
-        p.load('/foo/bar.yml')
-        import_module_mock = patch('facio.hooks.import_module')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock_import = import_module_mock.start()
         mocked_modules = self._module_factory(3)
 
         for path, module in mocked_modules:
             mock_import.return_value = module
-            p.run_module(path)
+            i.run_module(path)
 
             self.assertTrue(module.run.called)
-            self.assertEqual(p.calls[-1:][0].get(path),
+            self.assertEqual(i.calls[-1:][0].get(path),
                              module.run.return_value)
-
-        self.assertEquals(len(p.calls), 3)
 
         mock_import = import_module_mock.stop()
 
-    @patch('facio.hooks.hooks.load', return_value=True)
+        self.assertEquals(len(i.calls), 3)
+
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_hooks_call_history_retrival(self, return_value=True):
-        p = Hook()
-        p.load('/foo/bar.yml')
-        import_module_mock = patch('facio.hooks.import_module')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock_import = import_module_mock.start()
         mocked_modules = self._module_factory(10)
         for path, module in mocked_modules:
             mock_import.return_value = module
-            p.run_module(path)
+            i.run_module(path)
+        import_module_mock.stop()
 
-        self.assertFalse(p.has_run('not.in.facked.modules'))
-        self.assertEqual(p.has_run('foo.bar.baz2'), mocked_modules[1][1].run())
+        self.assertFalse(i.has_run('not.in.facked.modules'))
+        self.assertEqual(i.has_run('foo.bar.baz2'), mocked_modules[1][1].run())
 
     def test_run_before(self):
         data = """
         before:
             - thing.foo.bar
         """
-        import_module_mock = patch('facio.hooks.import_module')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock_import = import_module_mock.start()
         mock_module = MagicMock()
         mock_module.run.return_value = True
@@ -311,14 +313,14 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        p.run_before()
-
-        self.assertTrue(mock_module.run.called)
-        self.assertTrue(p.has_run('thing.foo.bar'))
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.run_before()
 
         open_mock.stop()
+
+        self.assertTrue(mock_module.run.called)
+        self.assertTrue(i.has_run('thing.foo.bar'))
 
     def test_run_after(self):
         data = """
@@ -333,11 +335,11 @@ class HookTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Hook()
-        p.load('/foo/bar.yml')
-        p.run_after()
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.run_after()
 
         self.assertTrue(mock_module.run.called)
-        self.assertTrue(p.has_run('thing.foo.bar'))
+        self.assertTrue(i.has_run('thing.foo.bar'))
 
         open_mock.stop()
