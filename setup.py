@@ -43,7 +43,7 @@ if sys.version_info[0] == 2 and sys.version_info[1] == 6:
     ]
 
 dev_requires = test_requires + [
-    'ipdb==0.7',
+    'pdbpp==0.7',
     'ipython==0.13.2',
     'Sphinx==1.1.3',
     'flake8==2.0',

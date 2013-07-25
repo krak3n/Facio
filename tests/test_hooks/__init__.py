@@ -1,38 +1,36 @@
 # -*- coding: utf-8 -*-
 
 """
-.. module:: tests.test_pipeline
-   :synopsis: Tests for the facio pipeline module.
+.. module:: tests.test_hooks
+   :synopsis: Tests for the facio hooks module.
 """
 
-import six
-
-from facio.pipeline import Pipeline
+from facio.hooks import Hook
 from mock import MagicMock, mock_open, patch
 from random import choice
 
-from . import BaseTestCase
+from .. import BaseTestCase
 
 
-class PipelineTest(BaseTestCase):
-    """ Pipeline Tests """
+class HookTest(BaseTestCase):
+    """ hooks Tests """
 
     def setUp(self):
         self._patch_clint([
             'facio.base.puts',
-            'facio.pipeline.Pipeline.out',
-            'facio.pipeline.Pipeline.warning',
-            'facio.pipeline.Pipeline.error',
+            'facio.hooks.Hook.out',
+            'facio.hooks.Hook.warning',
+            'facio.hooks.Hook.error',
         ])
 
     def _mock_open(self, data):
-        patcher = patch('facio.pipeline.open',
+        patcher = patch('facio.hooks.open',
                         mock_open(read_data=data),
                         create=True)
         return patcher
 
     def _module_factory(self, n):
-        """ Generate n number of mocked pipeline modules.
+        """ Generate n number of mocked hooks modules.
 
         :param n: Number of modules to generate
         :type n: int
@@ -59,10 +57,10 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        self.mocked_facio_pipeline_Pipeline_out.assert_called_with(
-            'Loading Pipeline')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.mocked_facio_hooks_Hook_out.assert_called_with(
+            'Loading hooks')
 
         open_mock.stop()
 
@@ -78,10 +76,10 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
-            "Error loading /foo/bar.yml pipeline - Is it correctly formatted?")
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
+            "Error loading /foo/bar.yml hooks - Is it correctly formatted?")
         open_mock.stop()
 
     def test_load_ioerror(self):
@@ -89,13 +87,13 @@ class PipelineTest(BaseTestCase):
         m = open_mock.start()
         m.side_effect = IOError
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
+        i = Hook()
+        i.load('/foo/bar.yml')
 
-        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
             "/foo/bar.yml not found")
-        self.assertFalse(p._validate_before())
-        self.assertFalse(p._validate_after())
+        self.assertFalse(i._validate_before())
+        self.assertFalse(i._validate_after())
 
         open_mock.stop()
 
@@ -108,10 +106,10 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        self.assertFalse(p.has_before())
-        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertFalse(i.has_before())
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
             'Ignoring before: should be a list')
 
         open_mock.stop()
@@ -125,24 +123,24 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        self.assertFalse(p.has_after())
-        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertFalse(i.has_after())
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
             'Ignoring after: should be a list')
 
         open_mock.stop()
 
-    def test_empty_pipeline_always_retuns_false(self):
+    def test_empty_hooks_always_retuns_false(self):
         data = """
         """
         open_mock = self._mock_open(data)
         open_mock.start()
-        p = Pipeline()
-        p.load('/foo/bar.yml')
+        i = Hook()
+        i.load('/foo/bar.yml')
 
-        self.assertFalse(p.has_before())
-        self.assertFalse(p.has_after())
+        self.assertFalse(i.has_before())
+        self.assertFalse(i.has_after())
         open_mock.stop()
 
     def test_has_before_true(self):
@@ -153,9 +151,9 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        self.assertTrue(p.has_before())
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertTrue(i.has_before())
 
         open_mock.stop()
 
@@ -167,9 +165,9 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        self.assertFalse(p.has_before())
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertFalse(i.has_before())
 
         open_mock.stop()
 
@@ -181,9 +179,9 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        self.assertTrue(p.has_after())
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertTrue(i.has_after())
 
         open_mock.stop()
 
@@ -195,60 +193,61 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        self.assertFalse(p.has_after())
+        i = Hook()
+        i.load('/foo/bar.yml')
+        self.assertFalse(i.has_after())
 
         open_mock.stop()
 
-    @patch('facio.pipeline.Pipeline.load', return_value=True)
-    @patch('facio.pipeline.import_module', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
+    @patch('facio.hooks.import_module', return_value=True)
     def test_import_success(self, mock_importlib, mockload):
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        p.import_module('path.to.module')
-        self.mocked_facio_pipeline_Pipeline_out.assert_called_with(
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.import_module('path.to.module')
+        self.mocked_facio_hooks_Hook_out.assert_called_with(
             'Loaded module: path.to.module')
 
-    @patch('facio.pipeline.Pipeline.load', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_import_module_failure(self, mockload):
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        p.import_module('pipeline_test_module')
-        self.mocked_facio_pipeline_Pipeline_error.assert_called_with(
-            'Failed to Load module: pipeline_test_module')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.import_module('hooks_test_module')
 
-    @patch('facio.pipeline.Pipeline.load', return_value=True)
+        self.mocked_facio_hooks_Hook_error.assert_called_with(
+            'Failed to Load module: hooks_test_module')
+
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_run_module_success(self, mockload):
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        import_module_mock = patch('facio.pipeline.import_module')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock = import_module_mock.start()
         module = MagicMock()
         module.run.return_value = True
         mock.return_value = module
-        rtn = p.run_module('foo.bar.baz')
+        rtn = i.run_module('foo.bar.baz')
+        mock = import_module_mock.stop()
         self.assertTrue(module.run.called)
         self.assertTrue(rtn)
-        mock = import_module_mock.stop()
 
-    @patch('facio.pipeline.Pipeline.load', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_run_module_failure(self, mockload):
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        import_module_mock = patch('facio.pipeline.import_module')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock = import_module_mock.start()
         module = MagicMock()
         module.run.side_effect = AttributeError
         mock.return_value = module
-        rtn = p.run_module('foo.bar.baz')
+        rtn = i.run_module('foo.bar.baz')
+        mock = import_module_mock.stop()
         self.assertTrue(module.run.called)
         self.assertFalse(rtn)
-        mock = import_module_mock.stop()
 
-    @patch('facio.pipeline.Pipeline.load', return_value=True)
+    @patch('facio.hooks.Hook.load', return_value=True)
     def test_module_exception_caught(self, mockload):
-        import_module_mock = patch('facio.pipeline.import_module')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock = import_module_mock.start()
         module = MagicMock()
         module.foo.side_effect = KeyError('Failed lookup')
@@ -258,54 +257,55 @@ class PipelineTest(BaseTestCase):
             module.foo()
 
         module.run = fake_run
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        p.run_module('foo.bar.baz')
-        self.assertTrue(module.foo.called)
-        self.mocked_facio_pipeline_Pipeline_warning.assert_called_with(
-            'Exeption caught in module: \'Failed lookup\' line: 117')
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.run_module('foo.bar.baz')
         mock = import_module_mock.stop()
+        self.assertTrue(module.foo.called)
+        self.mocked_facio_hooks_Hook_warning.assert_called_with(
+            'Exeption caught in module: \'Failed lookup\' line: 117')
 
-    @patch('facio.pipeline.Pipeline.load', return_value=True)
-    def test_store_pipeline_states(self, return_value=True):
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        import_module_mock = patch('facio.pipeline.import_module')
+    @patch('facio.hooks.Hook.load', return_value=True)
+    def test_store_hooks_states(self, return_value=True):
+        i = Hook()
+        i.load('/foo/bar.yml')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock_import = import_module_mock.start()
         mocked_modules = self._module_factory(3)
 
         for path, module in mocked_modules:
             mock_import.return_value = module
-            p.run_module(path)
+            i.run_module(path)
 
             self.assertTrue(module.run.called)
-            self.assertEqual(p.calls[-1:][0].get(path),
+            self.assertEqual(i.calls[-1:][0].get(path),
                              module.run.return_value)
-
-        self.assertEquals(len(p.calls), 3)
 
         mock_import = import_module_mock.stop()
 
-    @patch('facio.pipeline.Pipeline.load', return_value=True)
-    def test_pipeline_call_history_retrival(self, return_value=True):
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        import_module_mock = patch('facio.pipeline.import_module')
+        self.assertEquals(len(i.calls), 3)
+
+    @patch('facio.hooks.Hook.load', return_value=True)
+    def test_hooks_call_history_retrival(self, return_value=True):
+        i = Hook()
+        i.load('/foo/bar.yml')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock_import = import_module_mock.start()
         mocked_modules = self._module_factory(10)
         for path, module in mocked_modules:
             mock_import.return_value = module
-            p.run_module(path)
+            i.run_module(path)
+        import_module_mock.stop()
 
-        self.assertFalse(p.has_run('not.in.facked.modules'))
-        self.assertEqual(p.has_run('foo.bar.baz2'), mocked_modules[1][1].run())
+        self.assertFalse(i.has_run('not.in.facked.modules'))
+        self.assertEqual(i.has_run('foo.bar.baz2'), mocked_modules[1][1].run())
 
     def test_run_before(self):
         data = """
         before:
             - thing.foo.bar
         """
-        import_module_mock = patch('facio.pipeline.import_module')
+        import_module_mock = patch('facio.hooks.Hook.import_module')
         mock_import = import_module_mock.start()
         mock_module = MagicMock()
         mock_module.run.return_value = True
@@ -313,21 +313,21 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        p.run_before()
-
-        self.assertTrue(mock_module.run.called)
-        self.assertTrue(p.has_run('thing.foo.bar'))
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.run_before()
 
         open_mock.stop()
+
+        self.assertTrue(mock_module.run.called)
+        self.assertTrue(i.has_run('thing.foo.bar'))
 
     def test_run_after(self):
         data = """
         after:
             - thing.foo.bar
         """
-        import_module_mock = patch('facio.pipeline.import_module')
+        import_module_mock = patch('facio.hooks.import_module')
         mock_import = import_module_mock.start()
         mock_module = MagicMock()
         mock_module.run.return_value = True
@@ -335,11 +335,11 @@ class PipelineTest(BaseTestCase):
         open_mock = self._mock_open(data)
         open_mock.start()
 
-        p = Pipeline()
-        p.load('/foo/bar.yml')
-        p.run_after()
+        i = Hook()
+        i.load('/foo/bar.yml')
+        i.run_after()
 
         self.assertTrue(mock_module.run.called)
-        self.assertTrue(p.has_run('thing.foo.bar'))
+        self.assertTrue(i.has_run('thing.foo.bar'))
 
         open_mock.stop()

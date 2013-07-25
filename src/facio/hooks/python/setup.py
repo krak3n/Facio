@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-.. module:: facio.pipeline.python.setup
-   :synopsis: Bundled pipeline for running python setup.py
+.. module:: facio.hooks.python.setup
+   :synopsis: Bundled hooks for running python setup.py
 """
 
 import os
@@ -54,7 +54,7 @@ class Setup(BaseFacio):
         return arg
 
     def get_default_path_to_python(self):
-        """ Returns the default path to python, if virtualenv pipeline
+        """ Returns the default path to python, if virtualenv hooks
         has been called use that path, else use the current executing
         python, this should be the systems python in most cases.
 
@@ -62,8 +62,8 @@ class Setup(BaseFacio):
         """
 
         # Returns path to virtualenv
-        call = state.pipeline_get_call_result(
-            'facio.pipeline.python.virtualenv')
+        call = state.get_hook_call(
+            'facio.hooks.python.virtualenv')
 
         if call:
             return os.path.join(call, 'bin', 'python')
@@ -72,7 +72,7 @@ class Setup(BaseFacio):
 
     def get_path_to_python(self):
         """ Gets the path to python to run setup.py against.
-        Detect if the virtualenv pipeline has run, if so the default
+        Detect if the virtualenv hooks has run, if so the default
         path to python should come from the path to this virtual environment,
         else it should be the system default python path.
 
@@ -120,7 +120,7 @@ class Setup(BaseFacio):
 
 
 def run():
-    """ Called by pipeline runner, runs the setup class and returns Bool on
+    """ Called by hooks runner, runs the setup class and returns Bool on
     status of the run command.
 
     :returns: bool -- The state of running setup.py

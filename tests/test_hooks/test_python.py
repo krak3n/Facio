@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
-.. module:: tests.test_pipeline.test_python
-   :synopsis: Tests for bundled python pipelines
+.. module:: tests.test_hooks.test_python
+   :synopsis: Tests for bundled python hooks
 """
 
 import os
 import sys
 
-from facio.pipeline.python.setup import Setup, run as setup_run
-from facio.pipeline.python.virtualenv import Virtualenv, run as venv_run
+from facio.hooks.python.setup import Setup, run as setup_run
+from facio.hooks.python.virtualenv import Virtualenv, run as venv_run
 from mock import MagicMock, mock_open, patch, PropertyMock
 
 from .. import BaseTestCase
@@ -20,8 +20,8 @@ class TestPythonVirtualenv(BaseTestCase):
     def setUp(self):
         self._patch_clint([
             'facio.base.puts',
-            'facio.pipeline.python.virtualenv.Virtualenv.warning',
-            'facio.pipeline.python.virtualenv.Virtualenv.error',
+            'facio.hooks.python.virtualenv.Virtualenv.warning',
+            'facio.hooks.python.virtualenv.Virtualenv.error',
         ])
 
         # Mocking State
@@ -53,7 +53,7 @@ class TestPythonVirtualenv(BaseTestCase):
         self.assertEqual(name, 'foo')
 
     @patch('facio.base.input')
-    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_name', create=True)
+    @patch('facio.hooks.python.virtualenv.Virtualenv.get_name', create=True)
     def test_get_path(self, mock_get_name, mock_input):
         mock_get_name.return_value = 'baz'
         mock_input.return_value = '/foo/bar'
@@ -64,7 +64,7 @@ class TestPythonVirtualenv(BaseTestCase):
         self.assertEqual(path, '/foo/bar/baz')
 
     @patch('facio.base.input')
-    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_name', create=True)
+    @patch('facio.hooks.python.virtualenv.Virtualenv.get_name', create=True)
     def test_get_path_default(self, mock_get_name, mock_input):
         mock_get_name.return_value = 'baz'
         mock_input.return_value = ''
@@ -77,7 +77,7 @@ class TestPythonVirtualenv(BaseTestCase):
 
     @patch('sh.virtualenv')
     @patch('facio.base.input')
-    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_path', create=True)
+    @patch('facio.hooks.python.virtualenv.Virtualenv.get_path', create=True)
     def test_create(self, mock_get_path, mock_input, mock_virtualenv):
         mock_get_path.return_value = '/foo/bar/baz'
         mock_input.return_value = ''
@@ -95,15 +95,15 @@ class TestPythonVirtualenv(BaseTestCase):
 
         i = Virtualenv()
         path = i.create()
-        warn = self.mocked_facio_pipeline_python_virtualenv_Virtualenv_warning
+        warn = self.mocked_facio_hooks_python_virtualenv_Virtualenv_warning
 
         self.assertEqual(path, None)
         warn.assert_called_with("Please install virtualenv to use the "
-                                "python virtualenv pipeline")
+                                "python virtualenv hooks")
 
     @patch('sh.virtualenv')
     @patch('facio.base.input')
-    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_path', create=True)
+    @patch('facio.hooks.python.virtualenv.Virtualenv.get_path', create=True)
     def test_create_venv_exception(self, mock_get_path, mock_input,
                                    mock_virtualenv):
         mock_get_path.return_value = '/foo/bar/baz'
@@ -111,7 +111,7 @@ class TestPythonVirtualenv(BaseTestCase):
 
         i = Virtualenv()
         path = i.create()
-        err = self.mocked_facio_pipeline_python_virtualenv_Virtualenv_error
+        err = self.mocked_facio_hooks_python_virtualenv_Virtualenv_error
 
         self.assertEqual(path, None)
         err.assert_called_with("Failed to create virtual "
@@ -119,7 +119,7 @@ class TestPythonVirtualenv(BaseTestCase):
 
     @patch('sh.virtualenv')
     @patch('facio.base.input')
-    @patch('facio.pipeline.python.virtualenv.Virtualenv.get_path', create=True)
+    @patch('facio.hooks.python.virtualenv.Virtualenv.get_path', create=True)
     def test_run(self, mock_get_path, mock_input, mock_virtualenv):
         mock_get_path.return_value = '/foo/bar/baz'
         mock_input.return_value = 'n'
@@ -134,8 +134,8 @@ class TestSetup(BaseTestCase):
     def setUp(self):
         self._patch_clint([
             'facio.base.puts',
-            'facio.pipeline.python.setup.Setup.warning',
-            'facio.pipeline.python.setup.Setup.error',
+            'facio.hooks.python.setup.Setup.warning',
+            'facio.hooks.python.setup.Setup.error',
         ])
 
         # Mocking State
@@ -163,7 +163,7 @@ class TestSetup(BaseTestCase):
 
         i = Setup()
         arg = i.get_install_arg()
-        e = self.mocked_facio_pipeline_python_setup_Setup_error
+        e = self.mocked_facio_hooks_python_setup_Setup_error
 
         self.assertEqual(arg, None)
         e.assert_called_with("You did not enter a valid setup.py arg")
@@ -175,8 +175,8 @@ class TestSetup(BaseTestCase):
         self.assertEqual(sys.executable, path)
 
     def test_get_default_path_virtualenv(self):
-        self.mock_state.pipeline_calls = [(
-            'facio.pipeline.python.virtualenv', '/foo/bar'
+        self.mock_state.hook_calls = [(
+            'facio.hooks.python.virtualenv', '/foo/bar'
         )]
 
         i = Setup()
@@ -184,7 +184,7 @@ class TestSetup(BaseTestCase):
 
         self.assertEqual('/foo/bar/bin/python', path)
 
-    @patch('facio.pipeline.python.setup.Setup.get_default_path_to_python')
+    @patch('facio.hooks.python.setup.Setup.get_default_path_to_python')
     @patch('facio.base.input')
     def test_get_python_path_default(self, mock_input, mock_default):
         mock_input.return_value = ''
@@ -205,7 +205,7 @@ class TestSetup(BaseTestCase):
         self.assertEqual(path, '/foo/bar/python')
 
     def test_log_errors(self):
-        patcher = patch('facio.pipeline.python.setup.open',
+        patcher = patch('facio.hooks.python.setup.open',
                         mock_open(),
                         create=True)
         m = patcher.start()
@@ -218,10 +218,10 @@ class TestSetup(BaseTestCase):
 
         patcher.stop()
 
-    @patch('facio.pipeline.python.setup.os.chdir')
+    @patch('facio.hooks.python.setup.os.chdir')
     @patch('facio.base.input')
-    @patch('facio.pipeline.python.setup.Setup.get_path_to_python')
-    @patch('facio.pipeline.python.setup.subprocess.Popen')
+    @patch('facio.hooks.python.setup.Setup.get_path_to_python')
+    @patch('facio.hooks.python.setup.subprocess.Popen')
     @patch('facio.state.pwd')
     def test_run_zero_exit_code(
             self,
@@ -250,11 +250,11 @@ class TestSetup(BaseTestCase):
             stderr=-1,
             stdout=-1)
 
-    @patch('facio.pipeline.python.setup.Setup.log_errors')
-    @patch('facio.pipeline.python.setup.os.chdir')
+    @patch('facio.hooks.python.setup.Setup.log_errors')
+    @patch('facio.hooks.python.setup.os.chdir')
     @patch('facio.base.input')
-    @patch('facio.pipeline.python.setup.Setup.get_path_to_python')
-    @patch('facio.pipeline.python.setup.subprocess.Popen')
+    @patch('facio.hooks.python.setup.Setup.get_path_to_python')
+    @patch('facio.hooks.python.setup.subprocess.Popen')
     @patch('facio.state.pwd')
     def test_run_non_zero_exit_code(
             self,
@@ -284,10 +284,10 @@ class TestSetup(BaseTestCase):
             stderr=-1,
             stdout=-1)
 
-    @patch('facio.pipeline.python.setup.os.chdir')
+    @patch('facio.hooks.python.setup.os.chdir')
     @patch('facio.base.input')
-    @patch('facio.pipeline.python.setup.Setup.get_path_to_python')
-    @patch('facio.pipeline.python.setup.subprocess.Popen')
+    @patch('facio.hooks.python.setup.Setup.get_path_to_python')
+    @patch('facio.hooks.python.setup.subprocess.Popen')
     @patch('facio.state.pwd')
     def test_run(
             self,
