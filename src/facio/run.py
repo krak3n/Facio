@@ -9,7 +9,7 @@ import os
 
 from facio.base import BaseFacio
 from facio.config import Settings, CommandLineInterface, ConfigurationFile
-from facio.pipeline import Pipeline
+from facio.hooks import Hook
 from facio.template import Template
 from facio.state import state
 
@@ -35,7 +35,7 @@ class Run(BaseFacio):
         template.update_ignore_globs(settings.get_ignore_globs())
         template.copy()
 
-        pipeline = Pipeline()
+        pipeline = Hook()
         pipeline.load(os.path.join(
             state.get_project_root(), '.facio.hooks.yml'
         ))
