@@ -143,9 +143,9 @@ class Template(BaseFacio):
         except AttributeError:
             return []
 
-    def get_ignore_files(self, files):
-        """ Returns a list of files to ignore based on
-        ``get_copy_ignore_globs`` patterns.
+    def get_render_ignore_files(self, files):
+        """ Returns a list of files to ignore for rendering based on
+        ``get_render_ignore_globs`` patterns.
 
         :param files: List of files to check against
         :type files: list
@@ -154,7 +154,7 @@ class Template(BaseFacio):
         """
 
         ignores = []
-        for pattern in self.get_copy_ignore_globs():
+        for pattern in self.get_render_ignore_globs():
             for filename in fnmatch.filter(files, pattern):
                 ignores.append(filename)
 
@@ -163,7 +163,8 @@ class Template(BaseFacio):
     def copy(self, callback=None):
         """ Copy template from origin path to ``state.get_project_root()``.
 
-        :param callback: A callback function to be called after copy is comlete
+        :param callback: A callback function to be called after
+                         copy is complete
         :type callback: function -- default None
 
         :returns: bool
@@ -286,7 +287,7 @@ class Template(BaseFacio):
         for root, dirs, files in os.walk(state.get_project_root()):
             jinja_loader = FileSystemLoader(root)
             jinja_environment = Environment(loader=jinja_loader)
-            ignores = self.get_ignore_files(files)
+            ignores = self.get_render_ignore_files(files)
             for filename in files:
                 if filename not in ignores:
                     path = os.path.join(root, filename)

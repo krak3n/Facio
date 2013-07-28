@@ -87,14 +87,14 @@ class TemplateTests(BaseTestCase):
             '*.gif'
         ])
 
-    def test_get_ignore_files(self):
+    def test_get_render_ignore_files(self):
         instance = Template('/foo/bar')
-        instance.update_copy_ignore_globs(['*.png', '*.gif'])
-        files = ['setup.py', 'setup.pyc', 'foo.png', '.git', 'index.html']
+        instance.update_copy_ignore_globs(['*.ico', ])
+        files = ['setup.py', 'foo.png', 'bar.jpeg', 'index.html']
 
-        ignores = instance.get_ignore_files(files)
+        ignores = instance.get_render_ignore_files(files)
 
-        self.assertEqual(ignores, ['.git', 'setup.pyc', 'foo.png'])
+        self.assertEqual(ignores, ['foo.png', 'bar.jpeg'])
 
     def test_get_render_ignore_globs_empty_list(self):
         instance = Template('/foo/bar')
@@ -299,7 +299,7 @@ class TemplateTests(BaseTestCase):
         # Mock Setups - Fake file contents and open renderer
         files_map = {
             'bar.py': '{{PROJECT_NAME}}',
-            'foo.png': 'PNGIHDRÄIDATxÚcøûýhúÌIEND®B`',
+            'foo.bah': 'PNGIHDRÄIDATxÚcøûýhúÌIEND®B`',
             'baz.html': '<h1>{{UNKNOWN|default(\'Hello World\')}}</h1>',
             'baz.gif': 'I am a gif'
         }
@@ -308,7 +308,7 @@ class TemplateTests(BaseTestCase):
             """ Overriding Jinja2 FileSystemLoader get_source
             function so we can return our own source. """
 
-            if template == 'foo.png':
+            if template == 'foo.bah':
                 raise Exception('\'utf8\' codec can\'t decode byte '
                                 '0x89 in position 0: invalid start '
                                 'byte')
@@ -327,7 +327,7 @@ class TemplateTests(BaseTestCase):
 
         # Call the renderer method on facio.Template
         instance = Template('/foo/bar')
-        instance.update_copy_ignore_globs(['*.gif', ])
+        instance.update_render_ignore_globs(['*.gif', ])
         instance.render()
 
         # Assertions
@@ -336,7 +336,7 @@ class TemplateTests(BaseTestCase):
         handle.write.assert_any_call('foo')
         handle.write.assert_any_call('<h1>Hello World</h1>')
         self.mocked_facio_template_Template_warning.assert_called_with(
-            'Failed to render /foo/foo.png: \'utf8\' codec can\'t '
+            'Failed to render /foo/foo.bah: \'utf8\' codec can\'t '
             'decode byte 0x89 in position 0: invalid start byte')
 
         # Stop the open patch
