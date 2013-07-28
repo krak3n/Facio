@@ -81,6 +81,8 @@ class TemplateTests(BaseTestCase):
             '.hg',
             '.svn',
             '*.pyc',
+            '.DS_Store',
+            'Thumbs.db',
             '*.png',
             '*.gif'
         ])
@@ -93,6 +95,25 @@ class TemplateTests(BaseTestCase):
         ignores = instance.get_ignore_files(files)
 
         self.assertEqual(ignores, ['.git', 'setup.pyc', 'foo.png'])
+
+    def test_get_render_ignore_globs_empty_list(self):
+        instance = Template('/foo/bar')
+        del(instance.render_ignore_globs)
+
+        self.assertEqual(instance.get_render_ignore_globs(), [])
+
+    def test_get_render_ignore_globs(self):
+        instance = Template('/foo/bar')
+        instance.update_render_ignore_globs(['*.psd', '*.ico'])
+
+        self.assertEqual(instance.get_render_ignore_globs(), [
+            '*.png',
+            '*.gif',
+            '*.jpeg',
+            '*.jpg',
+            '*.psd',
+            '*.ico',
+        ])
 
     @patch('sys.exit')
     @patch('facio.state.pwd', return_value='/tmp')
