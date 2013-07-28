@@ -43,14 +43,14 @@ class Template(BaseFacio):
         self.origin = origin
 
         # Update ignore globs with standard ignore patterns
-        self.update_ignore_globs([
+        self.update_copy_ignore_globs([
             '.git',
             '.hg',
             '.svn',
             '*.pyc',
         ])
 
-    def update_ignore_globs(self, ignore_list):
+    def update_copy_ignore_globs(self, ignore_list):
         """ Update the ignore glob patterns to include the list provided.
 
         ** Usage: **
@@ -63,37 +63,37 @@ class Template(BaseFacio):
                 '*.png',
                 '*.gif',
             ]
-            t.update_ignore_globs(globs)
+            t.update_copy_ignore_globs(globs)
 
         :param ignore_list: A list of globs
         :type ignore_list: list
         """
 
         try:
-            self.ignore_globs += ignore_list
+            self.copy_ignore_globs += ignore_list
         except AttributeError:
             if not isinstance(ignore_list, list):
-                self.ignore_globs = []
+                self.copy_ignore_globs = []
             else:
-                self.ignore_globs = ignore_list
+                self.copy_ignore_globs = ignore_list
         except TypeError:
             raise FacioException('Failed to add {0} to ignore globs '
                                  'list'.format(ignore_list))
 
-    def get_ignore_globs(self):
+    def get_copy_ignore_globs(self):
         """ Returns ignore globs list at time of call.
 
         :returns: list
         """
 
         try:
-            return self.ignore_globs
+            return self.copy_ignore_globs
         except AttributeError:
             return []
 
     def get_ignore_files(self, files):
-        """ Returns a list of files to ignore based on ``get_ignore_globs``
-        patterns.
+        """ Returns a list of files to ignore based on
+        ``get_copy_ignore_globs`` patterns.
 
         :param files: List of files to check against
         :type files: list
@@ -102,7 +102,7 @@ class Template(BaseFacio):
         """
 
         ignores = []
-        for pattern in self.get_ignore_globs():
+        for pattern in self.get_copy_ignore_globs():
             for filename in fnmatch.filter(files, pattern):
                 ignores.append(filename)
 
@@ -121,7 +121,7 @@ class Template(BaseFacio):
             self.origin,
             state.get_project_root()))
 
-        ignore = shutil.ignore_patterns(*self.get_ignore_globs())
+        ignore = shutil.ignore_patterns(*self.get_copy_ignore_globs())
         try:
             shutil.copytree(self.origin, state.get_project_root(),
                             ignore=ignore)

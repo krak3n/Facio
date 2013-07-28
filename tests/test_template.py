@@ -47,35 +47,36 @@ class TemplateTests(BaseTestCase):
 
         self.assertEqual(instance.origin, '/foo/bar')
 
-    def test_update_ignore_globs_empty_wrong_type(self):
+    def test_update_copy_ignore_globs_empty_wrong_type(self):
         instance = Template('/foo/bar')
-        del(instance.ignore_globs)
+        del(instance.copy_ignore_globs)
 
-        instance.update_ignore_globs({'foo': 'bar'})
+        instance.update_copy_ignore_globs({'foo': 'bar'})
 
-        self.assertEqual(instance.ignore_globs, [])
+        self.assertEqual(instance.copy_ignore_globs, [])
 
     @patch('sys.exit')
-    def test_exception_setting_ignore_globs_not_iterable(self, mock_exit):
+    def test_exception_setting_copy_ignore_globs_not_iterable(self, mock_exit):
+
         instance = Template('/foo/bar')
 
         with self.assertRaises(FacioException):
-            instance.update_ignore_globs(1)
+            instance.update_copy_ignore_globs(1)
         self.mocked_facio_exceptions_puts.assert_any_call(
             'Error: Failed to add 1 to ignore globs list')
         self.assertTrue(mock_exit.called)
 
-    def test_get_ignore_globs_empty_list(self):
+    def test_get_copy_ignore_globs_empty_list(self):
         instance = Template('/foo/bar')
-        del(instance.ignore_globs)
+        del(instance.copy_ignore_globs)
 
-        self.assertEqual(instance.get_ignore_globs(), [])
+        self.assertEqual(instance.get_copy_ignore_globs(), [])
 
-    def test_get_ignore_globs(self):
+    def test_get_copy_ignore_globs(self):
         instance = Template('/foo/bar')
-        instance.update_ignore_globs(['*.png', '*.gif'])
+        instance.update_copy_ignore_globs(['*.png', '*.gif'])
 
-        self.assertEqual(instance.get_ignore_globs(), [
+        self.assertEqual(instance.get_copy_ignore_globs(), [
             '.git',
             '.hg',
             '.svn',
@@ -86,7 +87,7 @@ class TemplateTests(BaseTestCase):
 
     def test_get_ignore_files(self):
         instance = Template('/foo/bar')
-        instance.update_ignore_globs(['*.png', '*.gif'])
+        instance.update_copy_ignore_globs(['*.png', '*.gif'])
         files = ['setup.py', 'setup.pyc', 'foo.png', '.git', 'index.html']
 
         ignores = instance.get_ignore_files(files)
@@ -305,7 +306,7 @@ class TemplateTests(BaseTestCase):
 
         # Call the renderer method on facio.Template
         instance = Template('/foo/bar')
-        instance.update_ignore_globs(['*.gif', ])
+        instance.update_copy_ignore_globs(['*.gif', ])
         instance.render()
 
         # Assertions
