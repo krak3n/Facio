@@ -80,7 +80,6 @@ class TemplateTests(BaseTestCase):
             '.git',
             '.hg',
             '.svn',
-            '*.pyc',
             '.DS_Store',
             'Thumbs.db',
             '*.png',

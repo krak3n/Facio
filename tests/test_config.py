@@ -100,7 +100,10 @@ class TestConfigurationFile(BaseTestCase):
         self.addCleanup(patcher.stop)
         return patcher
 
-    def test_warning_no_config_file(self):
+    @patch('facio.config.ConfigParser.ConfigParser.readfp')
+    def test_warning_no_config_file(self, mock_readfp):
+        mock_readfp.side_effect = IOError
+
         c = ConfigurationFile()
         c.read()
 
