@@ -2,11 +2,19 @@
 # Sphinx Documentation Config
 #
 
+import os
+import sys
+
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
+import facio
+
 project = u'Facio'
 copyright = u'2013, Christopher Reeves'
 
-version = '1.1'
-release = '1.1.1'
+version = '{0}.{1}'.format(*facio.__VERSION__[:2])
+release = facio.get_version()
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
 templates_path = ['_templates']
