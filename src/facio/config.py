@@ -171,14 +171,28 @@ class Settings(BaseFacio):
                 variable_dict[key] = value
         return variable_dict
 
-    def get_ignore_globs(self):
-        """ Returns list of of file ignore globs from configuration file.
+    def get_ignore_copy_globs(self):
+        """ Returns list of of file copy ignore globs from configuration file.
 
         :returns: list
         """
 
         try:
-            globs = self.config.get('misc', 'ignore')
+            globs = self.config.get('files', 'copy_ignore')
+        except ConfigParser.NoSectionError:
+            return []
+        else:
+            return globs.split(',')
+
+    def get_ignore_render_globs(self):
+        """ Returns list of of file render ignore globs from configuration
+        file.
+
+        :returns: list
+        """
+
+        try:
+            globs = self.config.get('files', 'render_ignore')
         except ConfigParser.NoSectionError:
             return []
         else:
