@@ -272,9 +272,9 @@ class TemplateTests(BaseTestCase):
 
     @patch('os.walk')
     @patch('facio.template.FileSystemLoader.get_source')
-    def test_write(self, mock_get_source, mock_walk):
+    def test_render(self, mock_get_source, mock_walk):
 
-        # Mock Setups - Fake file contents and open writer
+        # Mock Setups - Fake file contents and open renderer
         files_map = {
             'bar.py': '{{PROJECT_NAME}}',
             'foo.png': 'PNGIHDRÄIDATxÚcøûýhúÌIEND®B`',
@@ -303,10 +303,10 @@ class TemplateTests(BaseTestCase):
         open_patcher = patch('facio.template.open', open_mock, create=True)
         open_patcher.start()
 
-        # Call the write method on facio.Template
+        # Call the renderer method on facio.Template
         instance = Template('/foo/bar')
         instance.update_ignore_globs(['*.gif', ])
-        instance.write()
+        instance.render()
 
         # Assertions
         handle = open_mock()

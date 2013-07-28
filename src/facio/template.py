@@ -225,7 +225,7 @@ class Template(BaseFacio):
         for old, new in self.rename_files():
             self.out('Renaming {0} to {1}'.format(old, new))
 
-    def write(self):
+    def render(self):
         """ Reads the template and uses Jinja 2 to replace context variables
         with their real values.
         """
