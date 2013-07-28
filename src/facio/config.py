@@ -171,7 +171,7 @@ class Settings(BaseFacio):
                 variable_dict[key] = value
         return variable_dict
 
-    def get_ignore_copy_globs(self):
+    def copy_ignore_globs(self):
         """ Returns list of of file copy ignore globs from configuration file.
 
         :returns: list
@@ -184,7 +184,7 @@ class Settings(BaseFacio):
         else:
             return globs.split(',')
 
-    def get_ignore_render_globs(self):
+    def render_ignore_globs(self):
         """ Returns list of of file render ignore globs from configuration
         file.
 

@@ -267,25 +267,25 @@ class TestSettings(BaseTestCase):
 
         s = Settings(self.interface, self.config)
 
-        self.assertEqual(s.get_ignore_copy_globs(), [])
+        self.assertEqual(s.copy_ignore_globs(), [])
 
     def test_copy_ignore_returned_as_list(self):
         self.config.get.return_value = 'foo=bar,baz=foo'
 
         s = Settings(self.interface, self.config)
 
-        self.assertEqual(s.get_ignore_copy_globs(), ['foo=bar', 'baz=foo'])
+        self.assertEqual(s.copy_ignore_globs(), ['foo=bar', 'baz=foo'])
 
     def test_empty_render_ignore_not_configured(self):
         self.config.get.side_effect = ConfigParser.NoSectionError('files')
 
         s = Settings(self.interface, self.config)
 
-        self.assertEqual(s.get_ignore_render_globs(), [])
+        self.assertEqual(s.render_ignore_globs(), [])
 
     def test_render_ignore_returned_as_list(self):
         self.config.get.return_value = 'foo=bar,baz=foo'
 
         s = Settings(self.interface, self.config)
 
-        self.assertEqual(s.get_ignore_render_globs(), ['foo=bar', 'baz=foo'])
+        self.assertEqual(s.render_ignore_globs(), ['foo=bar', 'baz=foo'])
