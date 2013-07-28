@@ -47,7 +47,6 @@ class Template(BaseFacio):
             '.git',
             '.hg',
             '.svn',
-            '*.pyc',
             '.DS_Store',
             'Thumbs.db',
         ])

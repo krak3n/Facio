@@ -181,6 +181,8 @@ class Settings(BaseFacio):
             globs = self.config.get('files', 'copy_ignore')
         except ConfigParser.NoSectionError:
             return []
+        except ConfigParser.NoOptionError:
+            return []
         else:
             return globs.split(',')
 
@@ -194,6 +196,8 @@ class Settings(BaseFacio):
         try:
             globs = self.config.get('files', 'render_ignore')
         except ConfigParser.NoSectionError:
+            return []
+        except ConfigParser.NoOptionError:
             return []
         else:
             return globs.split(',')

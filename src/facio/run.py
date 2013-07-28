@@ -28,11 +28,9 @@ class Run(BaseFacio):
         settings = Settings(interface, parsed)
         state.update_context_variables(settings.get_variables())
 
-        template = Template(
-            settings.get_template_path()
-        )
-
-        template.update_ignore_globs(settings.get_ignore_globs())
+        template = Template(settings.get_template_path())
+        template.update_copy_ignore_globs(settings.copy_ignore_globs())
+        template.update_render_ignore_globs(settings.render_ignore_globs())
         template.copy()
 
         pipeline = Hook()
@@ -44,7 +42,7 @@ class Run(BaseFacio):
             pipeline.run_before()
 
         template.rename()
-        template.write()
+        template.render()
 
         if pipeline.has_after():
             pipeline.run_after()
