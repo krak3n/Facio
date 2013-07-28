@@ -42,15 +42,25 @@ class Template(BaseFacio):
 
         self.origin = origin
 
-        # Update ignore globs with standard ignore patterns
+        # Update copy ignore globs with standard ignore patterns
         self.update_copy_ignore_globs([
             '.git',
             '.hg',
             '.svn',
             '*.pyc',
+            '.DS_Store',
+            'Thumbs.db',
         ])
 
-    def update_copy_ignore_globs(self, ignore_list):
+        # Update render ignore globs
+        self.update_render_ignore_globs([
+            '*.png',
+            '*.gif',
+            '*.jpeg',
+            '*.jpg',
+        ])
+
+    def update_copy_ignore_globs(self, globs):
         """ Update the ignore glob patterns to include the list provided.
 
         ** Usage: **
@@ -65,20 +75,20 @@ class Template(BaseFacio):
             ]
             t.update_copy_ignore_globs(globs)
 
-        :param ignore_list: A list of globs
-        :type ignore_list: list
+        :param globs: A list of globs
+        :type globs: list
         """
 
         try:
-            self.copy_ignore_globs += ignore_list
+            self.copy_ignore_globs += globs
         except AttributeError:
-            if not isinstance(ignore_list, list):
+            if not isinstance(globs, list):
                 self.copy_ignore_globs = []
             else:
-                self.copy_ignore_globs = ignore_list
+                self.copy_ignore_globs = globs
         except TypeError:
             raise FacioException('Failed to add {0} to ignore globs '
-                                 'list'.format(ignore_list))
+                                 'list'.format(globs))
 
     def get_copy_ignore_globs(self):
         """ Returns ignore globs list at time of call.
@@ -88,6 +98,48 @@ class Template(BaseFacio):
 
         try:
             return self.copy_ignore_globs
+        except AttributeError:
+            return []
+
+    def update_render_ignore_globs(self, globs):
+        """ Update the render ignore glob patterns to include the
+        list provided.
+
+        ** Usage: **
+
+        .. code-block:: python
+
+            from facio.template import Template
+            t = Template('foo', '/path/to/foo')
+            globs = [
+                '*.png',
+                '*.gif',
+            ]
+            t.update_render_ignore_globs(globs)
+
+        :param globs: A list of globs
+        :type globs: list
+        """
+
+        try:
+            self.render_ignore_globs += globs
+        except AttributeError:
+            if not isinstance(globs, list):
+                self.render_ignore_globs = []
+            else:
+                self.render_ignore_globs = globs
+        except TypeError:
+            raise FacioException('Failed to add {0} to ignore globs '
+                                 'list'.format(globs))
+
+    def get_render_ignore_globs(self):
+        """ Returns ignore globs list at time of call.
+
+        :returns: list
+        """
+
+        try:
+            return self.render_ignore_globs
         except AttributeError:
             return []
 
