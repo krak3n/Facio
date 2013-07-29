@@ -130,3 +130,78 @@ so you can just press ``enter`` to skip.
   * Install the package onto the python path or install it as an editable
     module
   * Default: ``develop``
+
+Wite your own Hook
+------------------
+
+You can write your own hook if you need to. Your hook will need to meet the
+following criteria:
+
+* Be available on your python path so it can imported
+* Contain a ``run`` function.
+
+Hello World
+~~~~~~~~~~~
+
+.. warning::
+
+    This is a bit hacky, there are much better ways to install python code onto the
+    main python path, see http://www.scotttorborg.com/python-packaging/ for a very
+    helpful guide on python packaging.
+
+Lets make a simple hook that prints ``hello world``. Create a file in your home
+directory a new directory called ``my_hooks`` and inside create 2 files:
+
+* ``__init__.py``
+* ``hello.py``
+
+And add the following content into ``hello.py``.
+
+.. code-block:: python
+
+    def run():
+        print 'hello world'
+
+This has created a new python module called ``my_hooks`` and inside we have a
+``hello.py`` python file that can be imported containing our ``run`` function.
+
+Thats it, now all we need to do is get it on the python path. There are many
+ways to do this but for simplicities sake we will create a ``.pth`` pointing
+python to our new module, this will need to live in the ``site-packages``
+directory, to find where this is located jump into the python shell and enter
+the following commands:
+
+.. code-block:: none
+
+    $ python
+    > import sys, pprint
+    > pprint.pprint(sys.path)
+
+You will be presented with a list of directories that python is currently
+scanning for modules, find one which looks something like this:
+
+.. code-block:: none
+
+    ..
+    '/Library/Python/2.7/site-packages'
+    ..
+
+This is the location of the ``site-packages`` directory on OSX for example.
+
+Now create a new file called ``my_hooks.pth`` (you may need to root privileges
+to do this) in the ``site-packages`` directory, it should contain the
+following:
+
+.. code-block:: none
+
+    /absolute/path/to/home/my_hooks
+
+Now check its working jump back into the python shell and make sure you can
+import it:
+
+.. code-block:: none
+
+    $ python
+    > from my_hooks.hello import run
+    > run()
+    > 'hello world'
