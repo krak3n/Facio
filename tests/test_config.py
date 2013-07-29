@@ -265,8 +265,17 @@ class TestSettings(BaseTestCase):
 
         self.assertEqual(s.get_variables(), {'foo': 'bar'})
 
-    def test_empty_copy_ignore_not_configured(self):
+    def test_empty_copy_ignore_no_files_section(self):
         self.config.get.side_effect = ConfigParser.NoSectionError('files')
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.copy_ignore_globs(), [])
+
+    def test_empty_copy_ignore_no_option(self):
+        self.config.get.side_effect = ConfigParser.NoOptionError(
+            'files',
+            'copy_ignore')
 
         s = Settings(self.interface, self.config)
 
@@ -279,8 +288,17 @@ class TestSettings(BaseTestCase):
 
         self.assertEqual(s.copy_ignore_globs(), ['foo=bar', 'baz=foo'])
 
-    def test_empty_render_ignore_not_configured(self):
+    def test_empty_render_ignore_no_section(self):
         self.config.get.side_effect = ConfigParser.NoSectionError('files')
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.render_ignore_globs(), [])
+
+    def test_empty_render_ignore_no_option(self):
+        self.config.get.side_effect = ConfigParser.NoOptionError(
+            'files',
+            'render_ignore')
 
         s = Settings(self.interface, self.config)
 
