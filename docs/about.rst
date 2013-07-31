@@ -29,10 +29,10 @@ Features
 * Support for multiple templates
 * Store templates in ``git`` or ``mercurial`` repositories
 * Add template logic using ``Jinja2``
-* Ability to add before and after hooks or pipelines called before or after the
+* Ability to add before and after hooks called before or after the
   project is created.
 * Add extra context-variables to your templates
-* Bundled pipelines include:
+* Bundled hooks include:
 
   * Create python virtual environments
   * Run python ``setup.py install | develop``

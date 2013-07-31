@@ -131,8 +131,8 @@ so you can just press ``enter`` to skip.
     module
   * Default: ``develop``
 
-Wite your own Hook
-------------------
+Custom Hooks
+------------
 
 You can write your own hook if you need to. Your hook will need to meet the
 following criteria:
@@ -145,8 +145,9 @@ Hello World
 
 .. warning::
 
-    This is a bit hacky, there are much better ways to install python code onto the
-    main python path, see http://www.scotttorborg.com/python-packaging/ for a very
+    How to add your custom hook onto the python path is beyond the scope of
+    this documentation. If your hook is not importable it will not work.
+    See http://www.scotttorborg.com/python-packaging/ for a very
     helpful guide on python packaging.
 
 Lets make a simple hook that prints ``hello world``. Create a file in your home
@@ -165,43 +166,101 @@ And add the following content into ``hello.py``.
 This has created a new python module called ``my_hooks`` and inside we have a
 ``hello.py`` python file that can be imported containing our ``run`` function.
 
-Thats it, now all we need to do is get it on the python path. There are many
-ways to do this but for simplicities sake we will create a ``.pth`` pointing
-python to our new module, this will need to live in the ``site-packages``
-directory, to find where this is located jump into the python shell and enter
-the following commands:
+Thats it, now all we need to do is get it on the python path. How to add your
+custom hooks onto the python path is beyond the scope of this document, see
+http://www.scotttorborg.com/python-packaging/ for a very helpful guide on python
+packaging.
 
-.. code-block:: none
+Accessing State
+~~~~~~~~~~~~~~~
 
-    $ python
-    > import sys, pprint
-    > pprint.pprint(sys.path)
-
-You will be presented with a list of directories that python is currently
-scanning for modules, find one which looks something like this:
-
-.. code-block:: none
-
-    ..
-    '/Library/Python/2.7/site-packages'
-    ..
-
-This is the location of the ``site-packages`` directory on OSX for example.
-
-Now create a new file called ``my_hooks.pth`` (you may need to root privileges
-to do this) in the ``site-packages`` directory, it should contain the
-following:
-
-.. code-block:: none
-
-    /absolute/path/to/home/my_hooks
-
-Now check its working jump back into the python shell and make sure you can
+Facio has a ``state`` module where the current state of Facio is stored. Simply
 import it:
 
-.. code-block:: none
+.. code-block:: python
 
-    $ python
-    > from my_hooks.hello import run
-    > run()
-    > 'hello world'
+    from facio.state import state
+
+Updating Context
+~~~~~~~~~~~~~~~~
+
+You can also add extra context variables in hooks for use in your template.
+
+.. code-block:: python
+
+    # my_hooks.foo
+
+    from facio.state import state
+
+    def run():
+        state.update_context_variables({'FOO': 'bar'})
+
+The hook above adds a new ``FOO`` context variable with the value of ``bar`` so
+you can use ``{{ FOO }}`` in your templates.
+
+Accessing other hook data
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can also access returned values from other hooks that have run. This can be
+useful to provide sensible defaults in prompts or even to not run the currently
+executing hook unless another in the chain has run.
+
+.. code-blocK:: python
+
+    # my_hooks.bar
+
+    from facio.state import state
+
+    def run():
+        call = state.get_hook_call('my_hooks.foo')
+        if call:
+            print 'my_hooks.foo has run'
+
+Saving hook data
+~~~~~~~~~~~~~~~~
+
+As described above hook data can be stored for use by other hooks later in the
+chain. To save data all you need to do is have your ``run`` function return
+something.
+
+.. code-block:: python
+
+    # my_hooks.baz
+
+    def run():
+        return "foobar"
+
+When ``baz`` is called the value ``foobar`` will be stored so later hooks can
+use it:
+
+.. code-block:: python
+
+    # my_hooks.faff
+
+    def run():
+        print state.get_hook_call('my_hooks.baz')
+
+This will print ``"foobar"``.
+
+Output and Prompting
+~~~~~~~~~~~~~~~~~~~~
+
+If you want your hook to prompt a user for information or print out helpful
+colored messages you can extend from the ``FacioBase`` class. You can find
+more information about this in the ``API`` documentation.
+
+.. code-block:: python
+
+    # my_hooks.flop
+
+    from facio.base import FacioBase
+
+    class Flop(FacioBase):
+
+        def __init__(self):
+            val = self.gather('Enter a number: ')
+            self.out('You entered: {0}'.format(val))
+
+    def run():
+        flop = Flop()
+        return flop
