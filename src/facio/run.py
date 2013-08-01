@@ -8,7 +8,10 @@
 import os
 
 from facio.base import BaseFacio
-from facio.config import Settings, CommandLineInterface, ConfigurationFile
+from facio.config import (HOOKS_FILE_NAME,
+                          Settings,
+                          CommandLineInterface,
+                          ConfigurationFile)
 from facio.hooks import Hook
 from facio.template import Template
 from facio.state import state
@@ -35,8 +38,8 @@ class Run(BaseFacio):
 
         pipeline = Hook()
         pipeline.load(os.path.join(
-            state.get_project_root(), '.facio.hooks.yml'
-        ))
+            state.get_project_root(),
+            HOOKS_FILE_NAME))
 
         if pipeline.has_before():
             pipeline.run_before()

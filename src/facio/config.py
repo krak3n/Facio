@@ -17,6 +17,10 @@ from six.moves import configparser as ConfigParser
 from textwrap import dedent
 
 
+HOOKS_FILE_NAME = '.facio.hooks.yml'
+CONFIG_FILE_NAME = '.facio.cfg'
+
+
 class CommandLineInterface(object):
     """
     Facio
@@ -64,7 +68,7 @@ class ConfigurationFile(BaseFacio):
     """ Load the ~/.facio.cfg ini style configuration file, providing an
     easily queryable dict representation of the config attributes. """
 
-    def read(self, name='.facio.cfg'):
+    def read(self, name=CONFIG_FILE_NAME):
         """ Parse the config file using ConfigParser module.
 
         :param name: The file name to read in the users home dir -- optional
