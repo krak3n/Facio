@@ -1,0 +1,2 @@
+before:
+  - facio.hooks.django.secret
