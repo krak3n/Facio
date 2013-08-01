@@ -24,6 +24,7 @@ Documentation
     templates
     hooks
     developing
+    api
     changelog
 
 Indices and tables

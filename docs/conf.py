@@ -5,13 +5,17 @@
 import os
 import sys
 
+from datetime import datetime
+
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
 import facio
 
+now = datetime.now()
+
 project = u'Facio'
-copyright = u'2013, Christopher Reeves'
+copyright = u'{0}, Christopher Reeves'.format(now.year)
 
 version = '{0}.{1}'.format(*facio.__VERSION__[:2])
 release = facio.get_version()
@@ -24,14 +28,6 @@ exclude_patterns = ['_build']
 pygments_style = 'sphinx'
 html_theme = 'default'
 html_static_path = ['_static']
-
-latex_elements = {
-}
-
-latex_documents = [
-    ('index', 'Facio.tex', u'Facio Documentation',
-     u'Christopher Reeves', 'manual'),
-]
 
 man_pages = [
     ('index', 'facio', u'Facio Documentation',
