@@ -5,7 +5,7 @@
    :synopsis: Provides version number and exposes base facio class.
 """
 
-__VERSION__ = (2, 0, 0, 'dev', 0)
+__VERSION__ = (2, 0, 0)
 
 
 def get_version(*args, **kwagrs):
