@@ -21,8 +21,8 @@ Documentation
     install
     start
     configuration
-    hooks
     templates
+    hooks
     developing
     changelog
 
