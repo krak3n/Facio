@@ -264,3 +264,9 @@ more information about this in the ``API`` documentation.
     def run():
         flop = Flop()
         return flop
+
+Examples
+~~~~~~~~
+
+As mentioned Facio has several bundled hooks, you can use these as templates to
+writting your own.

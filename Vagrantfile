@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/home/vagrant/facio", :nfs => true
 
     # Salt States
-    config.vm.synced_folder "./salt", "/srv/salt"
+    config.vm.synced_folder "./provisioner", "/srv/salt"
 
     # Local Developer States - Not in version control, this is for the developer to manage, e.g Git / Vim Configs
     # Developers should symlink this locally to ~/.salt-dev

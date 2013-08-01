@@ -1,12 +1,13 @@
-Project Templates
-=================
+Templates
+=========
 
-Project templates are simple the bare bones of your project with key parts
+Templates are simple the bare bones of your project with key parts
 where you would put things like the project name replaced wit **Jinja2**
 template syntax.
 
 These templates can live locally on your file system or they can live on a
-remote ``git`` repository. See :doc:`Usage </usage>` for more on this.
+remote ``git`` repository. See :doc:`Configuration & Command Line </configuration>`
+for more on this.
 
 Basic Example
 -------------
@@ -34,14 +35,16 @@ gets copied over and processed.
 Custom Variables
 ----------------
 
-Of course project name is not always enough and in these situations you can send extra variables to ``facio`` to use in the template processing. To do this run ``facio`` with the ``--vars`` flag passing a comma separated list, for example:
+Of course project name is not always enough and in these situations you can send
+extra variables to ``facio`` to use in the template processing. To do this run
+``facio`` with the ``--vars`` flag passing a comma separated list, for example:
 
 .. code-block:: none
 
-     facio -n hello_world --vars foo=bar,something=else
+     facio hello_world --vars foo=bar,something=else
 
-Templates
-^^^^^^^^^
+Basic Logic
+^^^^^^^^^^^
 
 Accessing these variables in templates is easy:
 
@@ -66,7 +69,14 @@ See the `Jinja2`_ Documentation.
 Renaming Files / Directories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can even rename a directory and/or file by using double underscores around the variable name, for example:
+You can even rename a directory and/or file by using double curly braces around the variable name, for example:
+
+.. warning::
+
+    Do not include spaces, use {{var_name}}.ext and not {{ var_name }}.ext
+
+Below is a file structure of a raw template with 1 directory to be renamed and
+1 file to be renamed with what ever the content of ``foo`` is.
 
 .. code-block:: none
 
@@ -77,6 +87,8 @@ You can even rename a directory and/or file by using double underscores around t
       - some_file.txt
       - some_other_file.txt
 
+Below is the rendered content.
+
 .. code-block:: none
 
     - /path/to/template/
@@ -85,7 +97,6 @@ You can even rename a directory and/or file by using double underscores around t
       - bar.txt
       - some_file.txt
       - some_other_file.txt
-
 
 .. Links
 .. _Jinja2: http://jinja.pocoo.org/docs/
