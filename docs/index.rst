@@ -23,13 +23,13 @@ Documentation
     configuration
     templates
     hooks
-    developing
     api
+    developing
     changelog
 
 Indices and tables
 ==================
-Images
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
