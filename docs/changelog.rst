@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+Version 2.0 - 1/8/2013
+---------------------------------
+* Added Hook Support
+* Refactored large parts of the codebase
+* Updated configuration file section for a new ``[files]`` section
+* Python 3 Support
+* Mercurial Support
+* Cleaned up command line interface
+
 Version 1.1.1 (hotfix) - 5/4/2013
 ---------------------------------
 * Fixed Manifest file so bundled template is properly included.
