@@ -33,7 +33,6 @@ test_requires = [
     'mock==1.0.1',
     'tox==1.4.3',
     'nose==1.3',
-    'spec==0.11.1',
     'coverage==3.6',
     'coveralls == 0.2',
 ]
