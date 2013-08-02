@@ -1,30 +1,34 @@
 #
-# Generic Methods
+# Generic functions
 #
 
-install_facio:
-	pip install -q -e . --use-mirrors
+clean_pyc:
+	find . -name \*.pyc -delete
+
+documentation:
+	make -C docs clean
+	make -C docs html
 
 #
-# Development methods
+# Install for development
 #
 
 # Install Development Requirements
-install_develop_reqs:
-	pip install -q "file://`pwd`#egg=facio[develop]"
+install_develop:
+	./install.sh develop
 
-develop: install_develop_reqs install_facio
+develop: install_develop
 
 #
-# Testing methods
+# Install for test running
 #
 
 # Install Test Requirements
-install_test_reqs:
-	pip install -q "file://`pwd`#egg=facio[tests]"
+install_test:
+	./install.sh test
 
 # Test Command
 run_tests:
 	python setup.py test
 
-test: install_test_reqs run_tests
+test: install_test run_tests

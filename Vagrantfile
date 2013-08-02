@@ -9,7 +9,7 @@
 Vagrant.configure("2") do |config|
 
     # Base Box - http://www.vagrantbox.es/
-    config.vm.box = "ubuntu_precise64_vagrant"
+    config.vm.box = "precise64"
     config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
     #
@@ -33,13 +33,13 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/home/vagrant/facio", :nfs => true
 
     # Salt States
-    config.vm.synced_folder "./salt", "/srv/salt"
+    config.vm.synced_folder "./provisioner", "/srv/salt"
 
     # Local Developer States - Not in version control, this is for the developer to manage, e.g Git / Vim Configs
     # Developers should symlink this locally to ~/.salt-dev
-    local_developer_states = File.join(File.expand_path('~'), '.salt-dev')
+    local_developer_states = File.join(File.expand_path('~'), '.salt')
     if File.directory?(local_developer_states)
-        config.vm.synced_folder local_developer_states, "/home/vagrant/.salt-dev"
+        config.vm.synced_folder local_developer_states, "/home/vagrant/.salt"
     else
         $stdout.write "Vagrant: Warning: You do not have any local states\n"
     end
@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
     #
 
     config.vm.provision :salt do |s|
-        s.run_highstate = true                           # Always run the Salt Proviosining System
+        s.run_highstate = true                           # Always run the Salt provisioning system
         s.minion_config = "salt/config/minion.conf"      # Where the minion config lives
         s.install_type = "stable"
     end

@@ -1,314 +1,207 @@
-"""
-facio.config
-------------
+# -*- coding: utf-8 -*-
 
-Sets up variables and configuration for Facio from command line and / or
-a configuration file.
+"""
+.. module:: facio.config
+   :synopsis: Facio configuration classes
 """
 
 import os
-import sys
+import re
 
-from clint.textui import puts, indent
-from clint.textui.colored import blue
-from random import choice
+from docopt import docopt
+from facio import get_version
+from facio.base import BaseFacio
+from facio.exceptions import FacioException
+from facio.state import state
 from six.moves import configparser as ConfigParser
-from six.moves import input
-
-from .cli import CLIOptions
+from textwrap import dedent
 
 
-class ConfigFile(object):
+HOOKS_FILE_NAME = '.facio.hooks.yml'
+CONFIG_FILE_NAME = '.facio.cfg'
 
-    templates = []
 
-    sections = {
-        'misc': ['install', ],
-        'template': [],
-        'virtualenv': ['venv_create', 'venv_path', 'venv_use_site_packages'],
-    }
+class CommandLineInterface(object):
+    """
+    Facio
 
-    path = os.path.join(os.path.expanduser('~'), '.facio.cfg')
+    Facio is a project scaffolding tool originally developed for Django and
+    expanded to be framework agnostic. You can use Facio to bootstrap any sort
+    of project.
 
-    def __init__(self):
-        if os.path.isfile(self.path):
-            self._parse_config()
+    Documentation:
+        https://facio.readthedocs.org
+
+    Usage:
+        facio <project_name> [--template <path>|--select] [--vars <variables>]
+
+    Options:
+        -h --help              Show this help text.
+        --version              Show version.
+        -t --template <path>   Template path, can be repository link
+                               (git+ / hg+) or a template name defined in
+                               ~/.facio.cfg.
+        -s --select            Lists templates in ~/.facio.cfg prompting you
+                               to select a template from this list.
+        --vars <variables>     Comma separated key=value pairs of values to be
+                               used in processing templates.
+
+    Example:
+        facio hello_world -t git+git@github.com:you/django.git --vars foo=bar
+    """
+
+    def start(self):
+        self.arguments = docopt(
+            dedent(self.__doc__),
+            version='Facio {0}'.format(get_version()))
+        self.validate_project_name(self.arguments.get('<project_name>'))
+
+    def validate_project_name(self, name):
+        if not re.match('^\w+$', name):
+            raise FacioException('Project names can only contain numbers '
+                                 'letters and underscores')
         else:
-            self.cfg_loaded = False
+            state.set_project_name(name)
 
-    def _parse_config(self):
-        self.parser = ConfigParser.ConfigParser()
+
+class ConfigurationFile(BaseFacio):
+    """ Load the ~/.facio.cfg ini style configuration file, providing an
+    easily queryable dict representation of the config attributes. """
+
+    def read(self, name=CONFIG_FILE_NAME):
+        """ Parse the config file using ConfigParser module.
+
+        :param name: The file name to read in the users home dir -- optional
+        :type name: str
+
+        :returns: ConfirgParser or bool
+        """
+
+        path = os.path.expanduser('~/{0}'.format(name))
+        parser = ConfigParser.ConfigParser()
         try:
-            self.parser.read(self.path)
-        except ConfigParser.MissingSectionHeaderError:
-            self.cfg_loaded = False
-            # TODO: print warning to user
-        except ConfigParser.ParsingError:
-            # TODO: print warning to user
-            self.cfg_loaded = False
+            parser.readfp(open(path))
+        except IOError:
+            self.warning('{0} Not found'.format(path))
+        except ConfigParser.Error:
+            raise FacioException('Unable to parse {0}'.format(path))
         else:
-            self.cfg_loaded = True
-            with indent(4, quote=' >'):
-                puts(blue('Loaded ~/.facio.cfg'))
-            for section in self.sections:
-                try:
-                    items = self.parser.items(section)
-                except ConfigParser.NoSectionError:
-                    pass
-                else:
-                    if section == 'template':
-                        self._add_templates(items)
-                    else:
-                        self._set_attributes(section, items)
+            self.out('Loaded {0}'.format(path))
+        return parser
 
-    def _add_templates(self, items):
-        for item in items:
-            name, value = item
-            self.templates.append((name, value))
 
-    def _set_attributes(self, section, items):
-        opts = self.sections[section]
-        for opt in opts:
+class Settings(BaseFacio):
+
+    default_template_path = os.path.join(os.path.dirname(
+        os.path.realpath(__file__)), 'default')
+
+    def __init__(self, interface, config):
+        """ Facio settings class. Taking aguments passed into the cli
+        interface and configurable options into a single callable
+        class.
+
+        :param interface: The docopt command line interface
+        :type interface: dict
+
+        :param config: Parsed config file
+        :type config: False or ConfigParser object
+        """
+
+        self.interface = interface
+        self.config = config
+
+    def get_template_path(self):
+        """ Obtain the template with from the command line interface or from
+        prompting the user to choose a template from the config file.
+
+        :returns: str or bool
+        """
+
+        templates = []
+        template = self.interface.arguments.get('--template', False)
+        select = self.interface.arguments.get('--select', False)
+
+        try:
+            templates = self.config.items('template')
+        except ConfigParser.NoSectionError:
+            if select:
+                raise FacioException('Missing [template] section '
+                                     'in Facio configuration file.')
+
+        # Path or template name alias
+        if template:
             try:
-                opt, val = [(x, y) for x, y in items if x == opt][0]
+                path = [p for n, p in templates if n == template][0]
             except IndexError:
-                pass
-            else:
-                if val == '0' or val == '1':
-                    val = False if val == '0' else True
-                setattr(self, opt, val)
-
-
-class Config(object):
-
-    default_template = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), 'default_template')
-
-    def __init__(self):
-        self.cli_args = CLIOptions()
-        self.file_args = ConfigFile()
-        self.django_secret_key
-
-    def _error(self, msg):
-        self.cli_args._parser.error(msg)
-
-    #
-    # Project Properties
-    #
-
-    @property
-    def project_name(self):
-        return self.cli_args.project_name
-
-    #
-    # Template Properties
-    #
-
-    def _validate_template_options(self):
-        templates = self.file_args.templates
-        try:
-            self._tpl = [t for n, t in templates if n == self._tpl][0]
-        except IndexError:
-            pass  # We don't care if this fails, assume it's a path
-        if (not self._tpl.startswith('git+') and
-                not os.path.isdir(self._tpl)):
-            self._error('The path to your template does not exist.')
-
-    def _template_choice_prompt(self):
-        templates = self.file_args.templates
-        max_tries = 5
-        i = 0
-        sys.stdout.write("Please choose a template:\n\n")
-        for name, template in templates:
-            sys.stdout.write("{0}) {1}: {2}\n".format((i + 1), name, template))
-            i += 1
-        i = 1
-        while True:
-            if i > max_tries:
-                self._error('You failed to enter a valid template number.')
-            try:
-                num = int(input(
-                    '\nEnter the number for the template '
-                    '({0} of {1} tries): '.format(i, max_tries)))
-                if num == 0:
-                    raise ValueError
-                name, template = templates[num - 1]
-            except (ValueError, IndexError):
-                sys.stdout.write('\nPlease choose a number between 1 and '
-                                 '{0}\n'.format(len(templates)))
-                i += 1
-            else:
                 return template
-
-    @property
-    def _cli_template(self):
-        try:
-            return self.cli_args.template
-        except AttributeError:
-            return False
-
-    @property
-    def _cli_choose_template(self):
-        try:
-            return self.cli_args.choose_template
-        except AttributeError:
-            return False
-
-    @property
-    def template(self):
-        if not getattr(self, '_tpl', None):
-            if self._cli_template:
-                self._tpl = self._cli_template
-            elif self._cli_choose_template:
-                self._tpl = self._template_choice_prompt()
             else:
+                return path
+
+        # Select template from configuration file
+        if select:
+            tries = 5
+            self.out('Please select a template:')
+            for i, item in enumerate(templates, start=1):
+                name, path = item
+                self.out('{0}) {1}: {2}'.format(i, name, path))
+            for n in range(1, (tries + 1)):
                 try:
-                    self._tpl = [t for n, t
-                                 in self.file_args.templates
-                                 if n == 'default'][0]
-                except IndexError:
-                    self._tpl = self.default_template
-        self._validate_template_options()
-        return self._tpl
+                    prompt = 'Please enter the number of '\
+                             'the template ({0} of {1} tries'\
+                             '): '.format(n, tries)
+                    num = int(self.gather(prompt))
+                    if num == 0:
+                        raise ValueError
+                    name, path = templates[(num - 1)]
+                    return path
+                except (ValueError, TypeError, IndexError):
+                    self.error('Please enter a valid number')
+            raise FacioException('A template was not selected')
 
-    @property
-    def template_settings_dir(self):
-        try:
-            return self.cli_args.template_settings_dir
-        except AssertionError:
-            return False
+        # Default template
+        return Settings.default_template_path
 
-    @property
-    def variables(self):
-        try:
-            return self.cli_args.variables
-        except AssertionError:
-            return False
+    def get_variables(self):
+        """ Returns dict of variables passed into command line interface.
 
-    @property
-    def ignore(self):
+        :returns: dict
+        """
+
+        variable_dict = {}
+        variables = self.interface.arguments.get('--vars')
+        if variables:
+            for pair in variables.split(','):
+                key, value = pair.split('=')
+                variable_dict[key] = value
+        return variable_dict
+
+    def copy_ignore_globs(self):
+        """ Returns list of of file copy ignore globs from configuration file.
+
+        :returns: list
+        """
+
         try:
-            globs = self.file_args.ignore
-        except AttributeError:
+            globs = self.config.get('files', 'copy_ignore')
+        except ConfigParser.NoSectionError:
+            return []
+        except ConfigParser.NoOptionError:
             return []
         else:
             return globs.split(',')
 
-    #
-    # Python Properties (Experimental)
-    #
+    def render_ignore_globs(self):
+        """ Returns list of of file render ignore globs from configuration
+        file.
 
-    @property
-    def _file_args_install(self):
+        :returns: list
+        """
+
         try:
-            return self.file_args.install
-        except AttributeError:
-            return False
-
-    @property
-    def _cli_args_install(self):
-        try:
-            return self.cli_args.install
-        except AttributeError:
-            return False
-
-    @property
-    def install(self):
-        if self._cli_args_install or self._file_args_install:
-            return True
-        return False
-    #
-    # Virtual Environment Properties (Experimental)
-    #
-
-    def _validate_virtualenv_options(self):
-        if not self.venv_path:
-            self._error('You need to provide a virtualenv path where the '
-                        'venv will be created')
-
-    @property
-    def _file_args_venv_create(self):
-        try:
-            return self.file_args.venv_create
-        except AttributeError:
-            return False
-
-    @property
-    def _cli_args_venv_create(self):
-        try:
-            return self.cli_args.venv_create
-        except AttributeError:
-            return False
-
-    @property
-    def _file_args_venv_path(self):
-        try:
-            return self.file_args.venv_path
-        except AttributeError:
-            return False
-
-    @property
-    def _cli_args_venv_path(self):
-        try:
-            return self.cli_args.venv_path
-        except AttributeError:
-            return False
-
-    @property
-    def _file_args_venv_use_site_packages(self):
-        try:
-            return self.file_args.venv_use_site_packages
-        except AttributeError:
-            return False
-
-    @property
-    def _cli_args_venv_use_site_packages(self):
-        try:
-            return self.cli_args.venv_use_site_packages
-        except AttributeError:
-            return False
-
-    @property
-    def venv_create(self):
-        if self._cli_args_venv_create or self._file_args_venv_create:
-            self._validate_virtualenv_options()
-            return True
-        return False
-
-    @property
-    def venv_path(self):
-        if self._file_args_venv_path and not self._cli_args_venv_path:
-            return self._file_args_venv_path
-        elif self._cli_args_venv_path:
-            return self.cli_args.venv_path
-        return False
-
-    @property
-    def venv_use_site_packages(self):
-        if (self._cli_args_venv_use_site_packages
-                or self._file_args_venv_use_site_packages):
-            return True
-        return False
-
-    @property
-    def venv_prefix(self):
-        try:
-            return self.cli_args.venv_prefix
-        except AttributeError:
-            return False
-
-    #
-    # Django Secret Key Generation
-    #
-
-    @property
-    def django_secret_key(self):
-        '''Generate a secret key for Django Projects.'''
-
-        if hasattr(self, 'generated_django_secret_key'):
-            return self.generated_django_secret_key
+            globs = self.config.get('files', 'render_ignore')
+        except ConfigParser.NoSectionError:
+            return []
+        except ConfigParser.NoOptionError:
+            return []
         else:
-            choice_str = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-            key = ''.join([choice(choice_str) for i in range(50)])
-            self.generated_django_secret_key = key
-            return key
+            return globs.split(',')

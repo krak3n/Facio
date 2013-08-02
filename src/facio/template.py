@@ -1,242 +1,303 @@
-"""
-facio.template
---------------
+# -*- coding: utf-8 -*-
 
-Process the users template using Jninja2 rendering it out into the current
-working directory.
+"""
+.. module:: facio.start
+   :synopsis: Process the users template using Jninja2 rendering it
+              out into the current working directory.
 """
 
-import glob
+import fnmatch
 import os
 import re
+import shutil
 
-from clint.textui import puts, indent
-from clint.textui.colored import blue, yellow
 from codecs import open
-from shutil import copytree, move, rmtree, copy
+from facio.base import BaseFacio
+from facio.exceptions import FacioException
+from facio.state import state
+from facio.vcs import GitVCS, MercurialVCS
 
-from .vcs.git import Git
+try:
+    from jinja2 import Environment, FileSystemLoader
+except ImportError:  # pragma: no cover
+    raise FacioException('Jinja2 must be installed to use Facio')
 
 
-class Template(object):
+# Regex for extracting context variable name from file or directory name
+get_var_name_pattern = re.compile(r'\{\{(\w+)\}\}')
 
-    def __init__(self, config):
-        # Setting defults
-        self.is_vcs_template = False
-        self.complete = False
-        self.exclude_dirs = ['.git', '.hg']
-        self.place_holders = {
-            'PROJECT_NAME': 'project_name',
-            'SETTINGS_DIR': 'template_settings_dir',
-            'DJANGO_SECRET_KEY': 'django_secret_key'}
 
-        # Load Config
-        self.config = config
-        # Set place holder vars from config
-        self.set_template_variables()
-        # Add custom varibles if provided
-        if hasattr(self.config, 'variables'):
-            self.add_custom_vars()
-        # Set the project root
-        self.set_project_root()
-        # VCS detection
-        self.vcs()
+class Template(BaseFacio):
 
-    @property
-    def working_dir(self):
+    COPY_ATTEMPT_LIMIT = 5
+    COPY_ATTEMPT = 1
+
+    def __init__(self, origin):
+        """ Constructor for Template Class sets the project template origin.
+        It also sets the default ignore globs.
+
+        :param origin: The origin path to the template
+        :type origin: str
+        """
+
+        self.origin = origin
+
+        # Update copy ignore globs with standard ignore patterns
+        self.update_copy_ignore_globs([
+            '.git',
+            '.hg',
+            '.svn',
+            '.DS_Store',
+            'Thumbs.db',
+        ])
+
+        # Update render ignore globs
+        self.update_render_ignore_globs([
+            '*.png',
+            '*.gif',
+            '*.jpeg',
+            '*.jpg',
+        ])
+
+    def update_copy_ignore_globs(self, globs):
+        """ Update the ignore glob patterns to include the list provided.
+
+        ** Usage: **
+
+        .. code-block:: python
+
+            from facio.template import Template
+            t = Template('foo', '/path/to/foo')
+            globs = [
+                '*.png',
+                '*.gif',
+            ]
+            t.update_copy_ignore_globs(globs)
+
+        :param globs: A list of globs
+        :type globs: list
+        """
+
         try:
-            return self._working_dir
+            self.copy_ignore_globs += globs
         except AttributeError:
-            self._working_dir = os.popen('pwd').read().split()[0]
-            return self._working_dir
+            if not isinstance(globs, list):
+                self.copy_ignore_globs = []
+            else:
+                self.copy_ignore_globs = globs
+        except TypeError:
+            raise FacioException('Failed to add {0} to ignore globs '
+                                 'list'.format(globs))
 
-    def add_custom_vars(self):
-        ''' Add custom variables to place holders. '''
+    def get_copy_ignore_globs(self):
+        """ Returns ignore globs list at time of call.
 
-        # TODO: Needs validation
-        if self.config.variables:
-            pairs = self.config.variables.split(',')
-            for pair in pairs:
-                try:
-                    place_holder, value = pair.split('=')
-                except ValueError:
-                    pass  # If its not formatted correctly, we ignore it
+        :returns: list
+        """
+
+        try:
+            return self.copy_ignore_globs
+        except AttributeError:
+            return []
+
+    def update_render_ignore_globs(self, globs):
+        """ Update the render ignore glob patterns to include the
+        list provided.
+
+        ** Usage: **
+
+        .. code-block:: python
+
+            from facio.template import Template
+            t = Template('foo', '/path/to/foo')
+            globs = [
+                '*.png',
+                '*.gif',
+            ]
+            t.update_render_ignore_globs(globs)
+
+        :param globs: A list of globs
+        :type globs: list
+        """
+
+        try:
+            self.render_ignore_globs += globs
+        except AttributeError:
+            if not isinstance(globs, list):
+                self.render_ignore_globs = []
+            else:
+                self.render_ignore_globs = globs
+        except TypeError:
+            raise FacioException('Failed to add {0} to ignore globs '
+                                 'list'.format(globs))
+
+    def get_render_ignore_globs(self):
+        """ Returns ignore globs list at time of call.
+
+        :returns: list
+        """
+
+        try:
+            return self.render_ignore_globs
+        except AttributeError:
+            return []
+
+    def get_render_ignore_files(self, files):
+        """ Returns a list of files to ignore for rendering based on
+        ``get_render_ignore_globs`` patterns.
+
+        :param files: List of files to check against
+        :type files: list
+
+        :returns: list -- list of filenames
+        """
+
+        ignores = []
+        for pattern in self.get_render_ignore_globs():
+            for filename in fnmatch.filter(files, pattern):
+                ignores.append(filename)
+
+        return ignores
+
+    def copy(self, callback=None):
+        """ Copy template from origin path to ``state.get_project_root()``.
+
+        :param callback: A callback function to be called after
+                         copy is complete
+        :type callback: function -- default None
+
+        :returns: bool
+        """
+
+        self.out('Copying {0} to {1}'.format(
+            self.origin,
+            state.get_project_root()))
+
+        ignore = shutil.ignore_patterns(*self.get_copy_ignore_globs())
+        try:
+            shutil.copytree(self.origin, state.get_project_root(),
+                            ignore=ignore)
+        except shutil.Error:
+            raise FacioException('Failed to copy {0} to {1}'.format(
+                self.origin,
+                state.get_project_root()))
+        except OSError:
+            # If we get an OSError either the template path does not exist or
+            # the project root already exists. Check the later first and then
+            # check if the template path is git+ or hg+ and clone, finally
+            # raising exceptions
+
+            if not os.path.isdir(state.get_project_root()):
+
+                supported_vcs = [
+                    ('git+', GitVCS),
+                    ('hg+', MercurialVCS),
+                ]
+
+                for prefix, cls in supported_vcs:
+                    if self.origin.startswith(prefix):
+                        vcs = cls(self.origin)
+                        new_path = vcs.clone()
+                        if not new_path:
+                            raise FacioException(
+                                'New path to template not returned by '
+                                '{0}.clone()'.format(vcs.__class__.__name__))
+                        self.origin = new_path
+                        break
                 else:
-                    self.place_holders[place_holder] = value
+                    # Loop feel through so path is not prefixed with git+ or
+                    # +hg so it must be a path that does not exist
+                    raise FacioException('{0} does not exist'.format(
+                        self.origin))
 
-    def set_project_root(self):
-        '''Set project root, based on working dir and project name.'''
+                # The loop broke so we can call self.copy again
+                if self.COPY_ATTEMPT <= self.COPY_ATTEMPT_LIMIT:
+                    self.COPY_ATTEMPT += 1
+                    self.copy(callback=vcs.remove_tmp_dir)
+                else:
+                    raise FacioException('Failed to copy template after '
+                                         '{0} attempts'.format(
+                                             self.COPY_ATTEMPT))
 
-        self.project_root = os.path.join(self.working_dir,
-                                         self.config.project_name)
-        with indent(4, quote=' >'):
-            puts(blue('Project path: {0}'.format(self.project_root)))
+            else:
+                # project root exists, raise exception
+                raise FacioException('{0} already exists'.format(
+                    state.get_project_root()))
 
-    def make_project_dir(self):
-        '''Make the project director in current working directory.'''
+        # Call callback if callable
+        if callable(callback):
+            callback(
+                origin=self.origin,
+                destination=state.get_project_root())
 
-        if not os.path.isdir(self.project_root):
-            os.mkdir(self.project_root)
-            if not os.path.isdir(self.project_root):
-                self.config._error('Error creating project directory')
-                return False
-        else:
-            self.config._error('%s already exists' % (
-                self.project_root))
-            return False
         return True
 
-    def set_template_variables(self):
-        ''' Replace self.place_holders defaults w/ config values. '''
+    def rename_direcories(self):
+        """ Renames directories that are named after context variables, for
+        example: ``{{PROJECT_NAME}}``.
 
-        for place_holder in self.place_holders:
-            config_value = getattr(self.config,
-                                   self.place_holders[place_holder], None)
-            if config_value:
-                self.place_holders[place_holder] = config_value
+        :returns: generator
+        """
 
-    def vcs(self):
-        '''Detect VCS template, if True clone into temp dir.'''
-
-        self.vcs_cls = None
-        supported_vcs = ['git', ]
-        for vcs in supported_vcs:
-            if self.config.template.startswith('%s+' % vcs):
-                self.vcs_cls = {
-                    'git': Git(self.config.template),
-                }[vcs]
-
-        if self.vcs_cls:
-            self.vcs_cls.clone()
-            self.is_vcs_template = True
-            self.config._tpl = self.vcs_cls.tmp_dir
-
-    def copy_template(self):
-        '''Moves template into current working dir.'''
-
-        with indent(4, quote=' >'):
-            puts(blue('Copying template to Project Path'))
-
-        if os.path.isdir(self.config._tpl):
-            if self.make_project_dir():
-                for file in os.listdir(self.config._tpl):
-                    path = os.path.join(self.config._tpl, file)
-                    dirs = path.split('/')
-                    exclude = False
-                    for dir in dirs:
-                        if dir in self.exclude_dirs:
-                            exclude = True
-                    if not exclude:
-                        if os.path.isdir(path):
-                            copytree(path, os.path.join(self.project_root,
-                                                        file))
-                        else:
-                            copy(path, self.project_root)
-            self.swap_placeholders()
-        else:
-            self.config._error('Unable to copy template, directory does not '
-                               'exist')
-
-        if self.is_vcs_template:
-            rmtree(self.config._tpl)
-
-    def rename(self, root, name):
-        '''Rename a file or directory.'''
-
-        e = re.compile(r'\{\{(.*?)\}\}')
-        try:
-            plain = e.findall(name)[0]
-            if plain in self.place_holders:
-                place_holder_val = self.place_holders[plain]
-                origin = os.path.join(root, name)
-                new_name = name.replace('{{{{{0}}}}}'.format(plain),
-                                        place_holder_val)
-                new = os.path.join(root, new_name)
-                move(origin, new)
-                return True
-            else:
-                return False
-        except IndexError:
-            pass
-
-    def rename_directories(self):
-        '''Move directories with placeholder names.'''
-
-        for root, dirs, files in os.walk(self.project_root):
-            for d in dirs:
-                filepath = os.path.join(root, d)
-                if os.path.isdir(filepath):
-                    if self.rename(root, d):
-                        self.rename_directories()
-        return False
+        for root, dirs, files in os.walk(state.get_project_root()):
+            for directory in fnmatch.filter(dirs, '*{{*}}*'):
+                var_name = get_var_name_pattern.findall(directory)[0]
+                var_value = state.get_context_variable(var_name)
+                if var_value:
+                    old_path = os.path.join(root, directory)
+                    new_path = os.path.join(root, var_value)
+                    shutil.move(old_path, new_path)
+                    yield (old_path, new_path)
 
     def rename_files(self):
-        '''Move files with placeholder names.'''
+        """ Rename files that are named after context variables, for example:
+        ``{{PROJECT_NAME}}.py``
 
-        for root, dirs, files in os.walk(self.project_root):
-            for f in files:
-                filepath = os.path.join(root, f)
-                if os.path.isfile(filepath):
-                    if self.rename(root, f):
-                        self.rename_files()
-        return False
+        :returns: generator
+        """
 
-    def _ignore_list(self):
-        globs = self.config.ignore
-        ignore_list = []
-        for g in globs:
-            [ignore_list.append(f) for f in glob.glob(g)]
-        return ignore_list
+        for root, dirs, files in os.walk(state.get_project_root()):
+            for filename in fnmatch.filter(files, '*{{*}}*'):
+                var_name = get_var_name_pattern.findall(filename)[0]
+                var_value = state.get_context_variable(var_name)
+                if var_value:
+                    name, ext = os.path.splitext(filename)
+                    old_path = os.path.join(root, filename)
+                    new_path = os.path.join(root, '{0}{1}'.format(
+                        var_value, ext))
+                    shutil.move(old_path, new_path)
+                    yield (old_path, new_path)
 
-    def swap_placeholders(self):
-        '''Swap placeholders for real values.'''
+    def rename(self):
+        """ Runs the two rename files and rename directories methods. """
 
-        try:
-            from jinja2 import Environment, FileSystemLoader
-        except ImportError:  # pragma: no cover
-            self.config._error('Jinja2 is required for tempalte processing, '
-                               'please install it.')
+        for old, new in self.rename_direcories():
+            self.out('Renaming {0} to {1}'.format(old, new))
 
-        with indent(4, quote=' >'):
-            puts(blue('Renaming directories'))
+        for old, new in self.rename_files():
+            self.out('Renaming {0} to {1}'.format(old, new))
 
-        while self.rename_directories():
-            continue  # pragma: no cover
+    def render(self):
+        """ Reads the template and uses Jinja 2 to replace context variables
+        with their real values.
+        """
 
-        with indent(4, quote=' >'):
-            puts(blue('Renaming files'))
-
-        while self.rename_files():
-            continue  # pragma: no cover
-
-        with indent(4, quote=' >'):
-            puts(blue('Replacing placeholders with variables'))
-
-        cwd = os.getcwd()
-
-        for root, dirs, files in os.walk(self.project_root):
-            jinja_tpl_loader = FileSystemLoader(root)
-            jinja_env = Environment(loader=jinja_tpl_loader)
-            os.chdir(root)
-            ignore_list = self._ignore_list()
-            for f in files:
-                filepath = os.path.join(root, f)
-                exclude = False
-                dirs = filepath.split('/')
-                for d in dirs:
-                    if d in self.exclude_dirs:
-                        exclude = True  # pragma: no cover
-                if not exclude and f not in ignore_list:
+        variables = state.get_context_variables()
+        for root, dirs, files in os.walk(state.get_project_root()):
+            jinja_loader = FileSystemLoader(root)
+            jinja_environment = Environment(loader=jinja_loader)
+            ignores = self.get_render_ignore_files(files)
+            for filename in files:
+                if filename not in ignores:
+                    path = os.path.join(root, filename)
                     try:
-                        tpl = jinja_env.get_template(f)
-                        file_contents = tpl.render(self.place_holders)
-                        with open(filepath, 'w', encoding='utf8') as f:
-                            f.write(file_contents)
-                    except Exception:
+                        template = jinja_environment.get_template(filename)
+                        rendered = template.render(variables)
+                    except:
                         import sys
                         e = sys.exc_info()[1]
-                        with indent(4, quote=' >'):
-                            puts(yellow(
-                                'Warning: Failed to process '
-                                '{0}: {1}'.format(f, e)))
-        os.chdir(cwd)
+                        self.warning('Failed to render {0}: {1}'.format(
+                            path, e))
+                    else:
+                        with open(path, 'w', encoding='utf8') as handler:
+                            handler.write(rendered)

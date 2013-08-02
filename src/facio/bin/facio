@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-# encoding: utf-8
 
-from facio import Facio
+# -*- coding: utf-8 -*-
+
+
+from facio.run import Run
 
 if __name__ == "__main__":
-    facio = Facio()
+    run = Run()
+    run.run()

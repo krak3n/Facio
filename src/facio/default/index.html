@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Facio</title>
+        <!-- CSS -->
+        <link rel="stylesheet" href="css/bootstrap.css" />
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACBklEQVQ4T3WTzUtUYRTGz6vjzPiVH7WIFtImhAgiUKRtQYtcRBDUImjRtpXrCEKDMivSUfwDKgjaFC3bSBD+L1p+NKPOOHp6fvfci1PQhWfODHOf33ve85HOPXOv9pj1oXLEasmsp8usK1n2HLnZ4ZFZs222h1rSodm+lM6/cO+XaUDmwYqi1Kvf5W6zbgHktfaxWUsADA2ZfzfN6op8T+ML7phOScNVRal2S3/E4dkDhA/i/Y9mOwchIOnSG/chmdBIb0AA/O+5+8Fsa99sW4BdKV1ZDMCozAjI/M2wv/qu++fpc+9dpY7x515AyCJN1tw5dbTP7LQEZPZGAGo/4v4Ur6H7Y8AIAGWAqWV3TsV8BoD05HoAVtdVfQEOACgDDL9k3OwEXF05AQBBj68FYKMehTvWB5pfE0AZbDY6MgDAFQpzZwb/FvLR5wCQPplQj+wKALgG5s4aUEQGiP7TsqIGmLeKLkwsudP7EWk4b+PCdJz99NvfA1R0YTtvY11dSZffCpAPEiC+r94OwMzXABRFJAt6vyMjkXFOF19rEjXGTOOgYr/0/l4AHn46AfAynQDCycRsFy68dGf2MWYLJX15EIA77wLQJAu9DKQAEZmPNPZc26jtA5JFqaRFYhdoHUUsIBg4lSshwOnsnHtZpopMFUW2sKRVTiIAYBILCKBWbsTclv4AD2ApO9Hat24AAAAASUVORK5CYII=" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="page-header">
+                <h1>Facio <small>Default Template</small></h1>
+            </div>
+            <p class="lead">Facio is a project scaffolding tool originally developed for Django and expanded to be framework agnostic. You can use Facio to bootstrap any sort of project.</p>
+            <div class="alert alert-info">If you are seeing this template this means you did not provide a template for Facio to use. See below for how to use your own template.</div>
+            <h2>Using a custom Template</h2>
+            <p>You can specify a custom template either via the command line or in a configuration file.</p>
+            <h3>Via the command line</h3>
+            <p>Simply provide Facio with the <code>-t</code> or <code>--template</code> argument followed by the path to the template. For example:</p>
+            <pre>$ facio my_new_project -t /path/to/my/template</pre>
+            <p>You can also provide a Git repository by adding <code>git+</code> to the start of the template, for example:</p>
+            <pre>$ facio my_new_project -t git+git@github.com/user/template.git</pre>
+            <h3>Via configuration file</h3>
+            <p>Create a <code>.facio.cfg</code> file in your home directory, and enter the following:</p>
+            <pre>[template]<br />default=/path/to/my/template</pre>
+            <p>By default Facio will now use this template path, you can also add git repositories like in the command line example:</p>
+            <pre>[template]<br />default=git+git@github.com/user/template.git</pre>
+            <h4>Multiple Templates</h4>
+            <p>You can add more than one template to the config file:</p>
+            <pre>[template]<br />default=git+git@github.com/user/template.git<br />experimental=/path/to/other/template</pre>
+            <p>To use this template provide the <code>-s</code> or <code>--select</code> flag to facio and it will ask you to choose a template:</p>
+            <pre>$ facio new_project -c<br />Please choose a template:<br /><br />1) default: git+git@github.com/user/template.git<br />2) experimental: /path/to/other/template<br /><br />Please choose a number between 1 and 2: </pre>
+        </div>
+    </body>
+</html>

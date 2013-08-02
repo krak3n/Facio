@@ -4,8 +4,6 @@ python:
     - "2.7"
     - "3.2"
     - "3.3"
-before_script:
-    - python setup.py develop
 script:
     - make test
 branches:

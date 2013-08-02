@@ -1,175 +1,312 @@
-import sys
+# -*- coding: utf-8 -*-
 
-from facio import config
-from facio.config import Config
-from mock import PropertyMock, patch
+"""
+.. module:: tests.test_config
+   :synopsis: Tests for the Facio config module.
+"""
+
+import os
+import six
+
+from mock import MagicMock, patch, PropertyMock
+from facio.config import ConfigurationFile, CommandLineInterface, Settings
+from facio.exceptions import FacioException
 from six import StringIO
+from six.moves import configparser as ConfigParser
+from textwrap import dedent
 
-from .base import BaseTestCase
+from . import BaseTestCase
 
 
-class ConfigTests(BaseTestCase):
-    """ Argument Passing & Config Tests. """
-
-    base_args = ['-n', 'test_skeleton']
+class TestCommandLintInterface(BaseTestCase):
 
     def setUp(self):
-        """ Config Test Setup
-        Mocking stdout / stdin / stderr """
+        self._patch_clint([
+            'facio.exceptions.puts',
+        ])
 
-        self.puts_patch = patch('facio.config.puts',
-                                stream=StringIO)
-        self.stdout_patch = patch('sys.stdout', new_callable=StringIO)
-        self.stderr_patch = patch('sys.stderr', new_callable=StringIO)
-        self.stdin_patch = patch('sys.stdout', new_callable=StringIO)
+        patcher = patch('facio.config.state.state',
+                        new_callable=PropertyMock,
+                        create=True)
+        self.mock_state = patcher.start()
+        self.mock_state.context_variables = {}
+        self.addCleanup(patcher.stop)
 
-        self.puts = self.puts_patch.start()
-        self.stdout = self.stdout_patch.start()
-        self.stderr = self.stderr_patch.start()
-        self.stdin = self.stdin_patch.start()
+    @patch('facio.config.docopt')
+    @patch('facio.config.CommandLineInterface.validate_project_name')
+    def test_project_name_should_be_validated(
+            self,
+            mock_validate,
+            mock_docopt):
+        mock_docopt.return_value = {
+            '<project_name>': 'foo'
+        }
 
-        self._old_sys_argv = sys.argv
-        sys.argv = [self._old_sys_argv[0].replace('nosetests', 'facio')]
+        i = CommandLineInterface()
+        i.start()
 
-    def tearDown(self):
-        sys.argv = self._old_sys_argv
-
-    def _set_cli_args(self, args):
-        sys.argv = sys.argv + args
-        self.config = Config()
-
-    def test_exit_with_no_arguments(self):
-        try:
-            Config()
-        except SystemExit:
-            assert True
-
-    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    def test_cfg_is_not_loaded(self, mock_path):
-        mock_path.return_value = '/this/does/not/exist.cfg'
-        sys.argv = sys.argv + self.base_args
-        c = Config()
-
-        self.assertFalse(c.file_args.cfg_loaded)
-
-    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    @patch('facio.config.blue')
-    def test_cfg_is_loaded(self, mock_blue, mock_path):
-        sys.argv = sys.argv + self.base_args
-        mock_path.return_value = self.empty_cfg
-        c = Config()
-
-        mock_blue.assert_called_with('Loaded ~/.facio.cfg')
-        self.assertTrue(c.file_args.cfg_loaded)
+        mock_validate.assert_called_with('foo')
 
     def test_valid_project_name(self):
-        valid_names = ['this_is_valid', 'this1is_valid', 'Thisisvalid']
-        for valid_name in valid_names:
-            self._set_cli_args(['-n', valid_name])
-            self.assertEquals(self.config.project_name, valid_name)
+        valid_names = [
+            'this_is_valid',
+            'this1is_valid',
+            'Thisisvalid']
 
-    def test_exit_on_invalid_name(self):
-        invalid_names = ['this_is_not-valid', 'this_is not_valid',
-                         '*this_is_not_valid']
-        for invalid_name in invalid_names:
-            try:
-                self._set_cli_args(['-n', invalid_name])
-            except SystemExit:
-                self.stderr.truncate(0)
-            else:
-                assert False
+        i = CommandLineInterface()
 
-    def test_template_var_is_set_from_cli(self):
-        self._set_cli_args(self.base_args + ['--template',
-                                             self.test_tpl_path])
-        self.assertEquals(self.config.template, self.test_tpl_path)
+        for name in valid_names:
+            i.validate_project_name(name)
+            self.assertEqual(name, self.mock_state.project_name)
+            self.assertEqual({'PROJECT_NAME': name},
+                             self.mock_state.context_variables)
 
-    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    def test_exit_if_facio_cfg_is_miss_configured(self, mock_path):
-        cfgs = ['malformed_config1.cfg', 'malformed_config2.cfg']
-        for cfg in cfgs:
-            mock_path.return_value = self._test_cfg_path(cfg)
-            self._set_cli_args(self.base_args)
-            self.assertFalse(self.config.file_args.cfg_loaded)
+    @patch('sys.exit')
+    def test_invalid_project_name(self, mock_exit):
+        invalid_names = [
+            'this_is_not-valid',
+            'this_is not_valid',
+            '*this_is_not_valid']
 
-    def test_exit_when_venv_create_set_no_venv_path_set(self):
-        try:
-            self._set_cli_args(self.base_args + ['--venv_create', ])
-            self.assertTrue(self.config.venv_create)
-        except SystemExit:
-            assert True
+        i = CommandLineInterface()
+
+        for name in invalid_names:
+            with self.assertRaises(FacioException):
+                i.validate_project_name(name)
+            self.mocked_facio_exceptions_puts.assert_any_call(
+                'Error: Project names can only contain numbers letters and '
+                'underscores')
+
+
+class TestConfigurationFile(BaseTestCase):
+    """ Tests for facio.config.ConfigurationFile. """
+
+    config_path = os.path.expanduser('~/.facio.cfg')
+
+    def setUp(self):
+        self._patch_clint([
+            'facio.exceptions.puts',
+            'facio.config.ConfigurationFile.out',
+            'facio.config.ConfigurationFile.warning',
+        ])
+
+    def _patch_open(self, data):
+        if six.PY3:
+            func = 'builtins.open'
         else:
-            assert False
+            func = '__builtin__.open'
+        patcher = patch(func, return_value=StringIO(
+            data))
+        self.addCleanup(patcher.stop)
+        return patcher
 
-    def test_not_exit_when_venv_create_set_venv_path_set(self):
-        try:
-            self._set_cli_args(self.base_args + ['--venv_create',
-                                                 '--venv_path',
-                                                 '/some/path'])
-            self.assertTrue(self.config.venv_create)
-        except SystemExit:
-            assert False
-        else:
-            assert True
+    @patch('facio.config.ConfigParser.ConfigParser.readfp')
+    def test_warning_no_config_file(self, mock_readfp):
+        mock_readfp.side_effect = IOError
 
-    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    def test_valid_template_is_chosen_from_config(self, mock_path):
-        mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
-        config.input = lambda _: '2'
-        try:
-            self._set_cli_args(self.base_args + ['-c', ])
-            self.config = Config()
-            self.assertEquals(self.config.template, '/path/to/template')
-        except SystemExit:
-            pass  # We allow a pass here because the template path is invalid
+        c = ConfigurationFile()
+        c.read()
 
-    def test_fail_if_invalid_template_choice(self):
-        config.input = lambda _: '8'
-        try:
-            self._set_cli_args(self.base_args + ['-c', ])
-            self.config = Config()
-        except SystemExit:
-            assert True
+        self.mocked_facio_config_ConfigurationFile_warning.assert_any_call(
+            "{0} Not found".format(self.config_path))
 
-    def test_value_error_raised_on_zero_template_choice(self):
-        config.input = lambda _: '0'
-        try:
-            self._set_cli_args(self.base_args + ['-c', ])
-            self.config = Config()
-        except SystemExit:
-            assert True
+    @patch('sys.exit')
+    def test_config_read_parse_error(self, exit_mock):
+        config = dedent("""\
+        [this_is
+        not = formatted
+        correctly
+        """)
 
-    @patch('os.path.isdir', return_value=True)
-    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    def test_can_refernce_template_by_name_from_cli(
-            self,
-            mock_path,
-            mock_isdir):
-        mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
-        try:
-            self._set_cli_args(self.base_args + ['-t', 'foo'])
-            self.config = Config()
-            self.assertEquals(self.config.template, '/path/to/template/foo')
-        except SystemExit:
-            assert False
+        patch_open = self._patch_open(config)
+        patch_open.start()
 
-    @patch('facio.config.ConfigFile.path', new_callable=PropertyMock)
-    def test_can_refernce_template_by_name_from_cli_invalid(self, mock_path):
-        mock_path.return_value = self._test_cfg_path('multiple_templates.cfg')
-        try:
-            self._set_cli_args(self.base_args + ['-t', 'not_valid_name'])
-            Config()
-        except SystemExit:
-            assert True
+        with self.assertRaises(FacioException):
+            c = ConfigurationFile()
+            c.read()
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            "Error: Unable to parse {0}".format(self.config_path))
+        self.assertTrue(exit_mock.called)
 
-    def test_cache_django_secret_key(self):
-        sys.argv = sys.argv + self.base_args
-        self.config = Config()
-        key = self.config.django_secret_key
-        self.assertEquals(key, self.config.generated_django_secret_key)
+    def test_config_read_success(self):
+        config = dedent("""\
+        [template]
+        template1 = /foo/bar/baz
+        template2 = /baz/bar/foo
+        """)
 
-    def test_return_cached_version_of_secret_key(self):
-        sys.argv = sys.argv + self.base_args
-        self.config = Config()
-        self.config.generated_django_secret_key = 'this_is_cached'
-        self.assertEquals(self.config.django_secret_key, 'this_is_cached')
+        patch_open = self._patch_open(config)
+        patch_open.start()
+
+        c = ConfigurationFile()
+        c.read()
+
+        self.mocked_facio_config_ConfigurationFile_out.assert_any_call(
+            "Loaded {0}".format(self.config_path))
+
+
+class TestSettings(BaseTestCase):
+
+    def setUp(self):
+        self._patch_clint([
+            'facio.exceptions.puts',
+            'facio.config.Settings.out',
+            'facio.config.Settings.warning',
+            'facio.config.Settings.error',
+        ])
+        # Mocks for ConfigFile and CommandLineInterface classes
+        self.mock_interface()
+        self.config = MagicMock()
+
+    def mock_interface(self):
+        self.interface = MagicMock()
+        arguments = PropertyMock(return_value={
+            '<project_name>': 'foo'
+        })
+        type(self.interface).arguments = arguments
+
+    def test_attrs_set_on_init(self):
+        s = Settings(self.interface, self.config)
+
+        self.assertIsInstance(s.config, MagicMock)
+        self.assertIsInstance(s.interface, MagicMock)
+
+    @patch('sys.exit')
+    def test_exception_raised_select_template_no_config(self, mock_exit):
+        arguments = PropertyMock(return_value={
+            '--select': True})
+        type(self.interface).arguments = arguments
+        self.config.items.side_effect = ConfigParser.NoSectionError('template')
+
+        s = Settings(self.interface, self.config)
+
+        with self.assertRaises(FacioException):
+            with self.assertRaises(ConfigParser.NoSectionError):
+                s.get_template_path()
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: Missing [template] section in Facio configuration file.')
+        self.assertTrue(mock_exit.called)
+
+    @patch('sys.exit')
+    def test_default_template_returned_none_defined(self, mock_exit):
+        arguments = PropertyMock(return_value={
+            '--select': False})
+        type(self.interface).arguments = arguments
+
+        s = Settings(self.interface, self.config)
+        path = s.get_template_path()
+
+        self.assertEqual(Settings.default_template_path, path)
+
+    def test_path_returned_if_not_alias(self):
+        arguments = PropertyMock(return_value={
+            '--template': '/foo/bar/baz'})
+        type(self.interface).arguments = arguments
+
+        s = Settings(self.interface, self.config)
+        path = s.get_template_path()
+
+        self.assertEqual(path, '/foo/bar/baz')
+
+    def test_path_retuend_from_alias(self):
+        arguments = PropertyMock(return_value={
+            '--template': 'foobar'})
+        type(self.interface).arguments = arguments
+        self.config.items.return_value = [('foobar', '/foo/bar/baz')]
+
+        s = Settings(self.interface, self.config)
+        path = s.get_template_path()
+
+        self.assertEqual(path, '/foo/bar/baz')
+
+    @patch('facio.base.input')
+    def test_template_selection_input_success(self, mock_input):
+        arguments = PropertyMock(return_value={
+            '--select': True})
+        type(self.interface).arguments = arguments
+        self.config.items.return_value = [
+            ('foo', '/foo'),
+            ('bar', '/bar'),
+            ('baz', '/baz'),
+        ]
+        mock_input.return_value = 1
+
+        s = Settings(self.interface, self.config)
+        path = s.get_template_path()
+
+        self.assertEqual(path, '/foo')
+
+    @patch('sys.exit')
+    @patch('facio.base.input')
+    def test_template_selection_input_error(self, mock_input, mock_exit):
+        arguments = PropertyMock(return_value={
+            '--select': True})
+        type(self.interface).arguments = arguments
+        self.config.items.return_value = [
+            ('foo', '/foo'),
+        ]
+        mock_input.return_value = 0
+
+        s = Settings(self.interface, self.config)
+
+        with self.assertRaises(FacioException):
+            with self.assertRaises(ValueError):
+                s.get_template_path()
+        self.mocked_facio_exceptions_puts.assert_any_call(
+            'Error: A template was not selected')
+        self.assertTrue(mock_exit.called)
+
+    def test_get_variables_from_cli(self):
+        arguments = PropertyMock(return_value={
+            '--vars': 'foo=bar'})
+        type(self.interface).arguments = arguments
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.get_variables(), {'foo': 'bar'})
+
+    def test_empty_copy_ignore_no_files_section(self):
+        self.config.get.side_effect = ConfigParser.NoSectionError('files')
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.copy_ignore_globs(), [])
+
+    def test_empty_copy_ignore_no_option(self):
+        self.config.get.side_effect = ConfigParser.NoOptionError(
+            'files',
+            'copy_ignore')
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.copy_ignore_globs(), [])
+
+    def test_copy_ignore_returned_as_list(self):
+        self.config.get.return_value = 'foo=bar,baz=foo'
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.copy_ignore_globs(), ['foo=bar', 'baz=foo'])
+
+    def test_empty_render_ignore_no_section(self):
+        self.config.get.side_effect = ConfigParser.NoSectionError('files')
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.render_ignore_globs(), [])
+
+    def test_empty_render_ignore_no_option(self):
+        self.config.get.side_effect = ConfigParser.NoOptionError(
+            'files',
+            'render_ignore')
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.render_ignore_globs(), [])
+
+    def test_render_ignore_returned_as_list(self):
+        self.config.get.return_value = 'foo=bar,baz=foo'
+
+        s = Settings(self.interface, self.config)
+
+        self.assertEqual(s.render_ignore_globs(), ['foo=bar', 'baz=foo'])

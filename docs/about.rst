@@ -1,9 +1,7 @@
-Facio
+About
 =====
 
 Facio: /ˈfa.ki.oː/ - Latin, meaning to make, do, act, perform, cause, bring about.
-
-|PyPi_version| |PyPi_downloads| |travis_master| |coveralls_master|
 
 What is it?
 -----------
@@ -25,49 +23,38 @@ Facio aims to hopefully fix your standard project skeleton woes.
 
     facio my_new_project -t django_skeleton
 
-Supports
---------
-
-* Python 2.6, 2.7, 3.2, 3.3
-
 Features
 --------
 
 * Support for multiple templates
 * Store templates in ``git`` or ``mercurial`` repositories
 * Add template logic using ``Jinja2``
-* Add extra context-variables to your templates
-* Ability to add before and after hooks that are called before or after the
+* Ability to add before and after hooks called before or after the
   project is created.
+* Add extra context-variables to your templates
 * Bundled hooks include:
 
   * Create python virtual environments
   * Run python ``setup.py install | develop``
   * Generate Django Secret key for usage in Django settings modules
 
-Documentation
--------------
+License
+-------
 
-Documentation for ``Facio`` can be found on here on `Read the Docs`_.
+See LICENSE file in the `Git Repository`_.
+
+Authors
+-------
+
+See AUTHORS file in the `Git Repository`_.
+
+Special Thanks
+--------------
+
+To the amazing Tech Team at `Poke London`_.
+And thanks to Jack for helping me name it (and pointing out grammatical errors). <3.
 
 .. Links
 
-.. _Read the Docs: https://facio.readthedocs.org
-
-.. Images
-
-.. |PyPi_version| image:: https://pypip.in/v/facio/badge.png
-    :target: https://crate.io/packages/facio/
-    :alt: Latest PyPI version
-
-.. |PyPi_downloads| image:: https://pypip.in/d/facio/badge.png
-    :target: https://crate.io/packages/facio/
-    :alt: Number of PyPI downloads
-
-.. |coveralls_master| image:: https://coveralls.io/repos/krak3n/Facio/badge.png?branch=master
-    :target: https://coveralls.io/r/krak3n/Facio?branch=master
-    :alt: Latest PyPI version
-
-.. |travis_master| image:: https://travis-ci.org/krak3n/Facio.png?branch=master
-    :target: https://travis-ci.org/krak3n/Facio
-    :alt: Travis build status on Master Branch
+.. _Git Repository: https://github.com/krak3n/facio
+.. _Poke London: http://pokelondon.com
