@@ -6,6 +6,12 @@ import multiprocessing  # NOQA
 
 from setuptools import setup, find_packages
 
+major, minor, micro, release, serial = sys.version_info
+
+IS_PY26 = False
+if major == 2 and minor == 6:
+    IS_PY26 = True
+
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
@@ -14,7 +20,7 @@ version = facio.get_version()
 
 
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    return open(fname).read()
 
 
 install_requires = [
@@ -24,7 +30,7 @@ install_requires = [
     'six==1.3.0',
     'docopt==0.6.1'
 ]
-if sys.version_info[0] == 2 and sys.version_info[1] == 6:
+if IS_PY26:
     install_requires = install_requires + [
         'importlib',
     ]
@@ -33,11 +39,10 @@ test_requires = [
     'mock==1.0.1',
     'tox==1.4.3',
     'nose==1.3',
-    'spec==0.11.1',
     'coverage==3.6',
     'coveralls == 0.2',
 ]
-if sys.version_info[0] == 2 and sys.version_info[1] == 6:
+if IS_PY26:
     test_requires = test_requires + [
         'unittest2',
     ]
@@ -54,7 +59,7 @@ setup(
     version=version,
     author='Christopher John Reeves',
     author_email='hello@chris.reeves.io',
-    url='https://github.com/krak3n/facio',
+    url='http://facio.readthedocs.org',
     description='Project scaffolding using custom templates.',
     long_description=read('README.rst'),
     package_dir={'': 'src'},

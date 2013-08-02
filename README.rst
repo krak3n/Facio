@@ -3,39 +3,55 @@ Facio
 
 Facio: /ˈfa.ki.oː/ - Latin, meaning to make, do, act, perform, cause, bring about.
 
-|PyPi_version| |PyPi_downloads|
-
-Stable State
-------------
-|travis_master| |coveralls_master|
-
-Development State
------------------
-|travis_develop| |coveralls_develop|
+|PyPi_version| |PyPi_downloads| |travis_master| |coveralls_master|
 
 What is it?
 -----------
 
-If you work on quick turn around projects either at work or in your free time you might end up doing a lot of boiler plate cruft for your projects over and over, creating the same basic template. You might copy and paste this around, it might fall out of date, you might make improvements in a project but forget about them for the next.
+Are you forever creating new projects, re creating the same standard cruft over
+and over? Then Facio maybe for you, it allows you to create your standard
+project skeleton once and create new projects from that standard skeleton over
+and over, easily.
 
-``Facio`` gives you the ability to create a standard template (or templates) for your projects so you can bootstrap in one single command.
+It can be as simple or as complicated as you need it to be. You can write logic
+into your skeleton, store it in a ``git`` or ``mercurial`` repository, you can
+even write hooks to be run before or after your skeletons been built. Did I
+mention you can have as many templates as you like and quickly reference them
+by name or pick from a list.
 
-Originally developed with `Django`_ in mind you can use ``Facio`` for any type of project.
+Facio aims to hopefully fix your standard project skeleton woes.
+
+.. code-block:: none
+
+    facio my_new_project -t django_skeleton
 
 Supports
 --------
 
 * Python 2.6, 2.7, 3.2, 3.3
 
+Features
+--------
+
+* Support for multiple templates
+* Store templates in ``git`` or ``mercurial`` repositories
+* Add template logic using ``Jinja2``
+* Add extra context-variables to your templates
+* Ability to add before and after hooks that are called before or after the
+  project is created.
+* Bundled hooks include:
+
+  * Create python virtual environments
+  * Run python ``setup.py install | develop``
+  * Generate Django Secret key for usage in Django settings modules
+
 Documentation
 -------------
 
-Documentation for ``Facio`` can be found on `Read the Docs`_.
+Documentation for ``Facio`` can be found on here on `Read the Docs`_.
 
 .. Links
 
-.. _Django: https://www.djangoproject.com/
-.. _Travis CI: https://travis-ci.org/krak3n/Facio
 .. _Read the Docs: https://facio.readthedocs.org
 
 .. Images
@@ -55,11 +71,3 @@ Documentation for ``Facio`` can be found on `Read the Docs`_.
 .. |travis_master| image:: https://travis-ci.org/krak3n/Facio.png?branch=master
     :target: https://travis-ci.org/krak3n/Facio
     :alt: Travis build status on Master Branch
-
-.. |coveralls_develop| image:: https://coveralls.io/repos/krak3n/Facio/badge.png?branch=develop
-    :target: https://coveralls.io/r/krak3n/Facio?branch=develop
-    :alt: Coder Coverage on Develop Branch
-
-.. |travis_develop| image:: https://travis-ci.org/krak3n/Facio.png?branch=develop
-    :target: https://travis-ci.org/krak3n/Facio
-    :alt: Travis build status on Develop Branch
