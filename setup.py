@@ -12,6 +12,12 @@ IS_PY26 = False
 if major == 2 and minor == 6:
     IS_PY26 = True
 
+INSTALL_YAML = False
+try:
+    import yaml  # NOQA
+except ImportError:
+    INSTALL_YAML = True
+
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
@@ -33,6 +39,10 @@ install_requires = [
 if IS_PY26:
     install_requires = install_requires + [
         'importlib',
+    ]
+if INSTALL_YAML:
+    install_requires = install_requires + [
+        'PyYAML',
     ]
 
 test_requires = [
