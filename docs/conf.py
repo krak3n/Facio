@@ -3,6 +3,7 @@
 #
 
 import os
+import sphinx_bootstrap_theme
 import sys
 
 from datetime import datetime
@@ -26,7 +27,10 @@ source_suffix = '.rst'
 master_doc = 'index'
 exclude_patterns = ['_build']
 pygments_style = 'sphinx'
-html_theme = 'default'
+
+# Theme
+html_theme = 'bootstrap'
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 html_static_path = ['_static']
 
 man_pages = [

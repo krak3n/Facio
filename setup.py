@@ -44,6 +44,11 @@ if INSTALL_YAML:
     install_requires = install_requires + [
         'PyYAML',
     ]
+# For readthedocs.org we need sphinx-bootstrap-theme
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+    install_requires = install_requires + [
+        'sphinx-bootstrap-theme',
+    ]
 
 test_requires = [
     'mock==1.0.1',
@@ -62,6 +67,7 @@ dev_requires = test_requires + [
     'ipython==0.13.2',
     'Sphinx==1.1.3',
     'flake8==2.0',
+    'sphinx-bootstrap-theme',
 ]
 
 setup(
