@@ -45,7 +45,6 @@ if INSTALL_YAML:
         'PyYAML',
     ]
 # For readthedocs.org we need sphinx-bootstrap-theme
-print os.environ.get('READTHEDOCS', 'moo')
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
     install_requires = install_requires + [
