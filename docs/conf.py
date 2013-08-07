@@ -3,7 +3,6 @@
 #
 
 import os
-import sphinx_bootstrap_theme
 import sys
 
 from datetime import datetime
@@ -29,12 +28,10 @@ exclude_patterns = ['_build']
 pygments_style = 'sphinx'
 
 # Theme
-html_theme = 'bootstrap'
-html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+sys.path.append(os.path.abspath('_themes'))
 html_static_path = ['_static']
-html_theme_options = {
-    'bootswatch_theme': "flatly",
-}
+html_theme_path = ['_themes']
+html_theme = 'flask'
 
 man_pages = [
     ('index', 'facio', u'Facio Documentation',
