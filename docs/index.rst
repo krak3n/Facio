@@ -3,9 +3,9 @@ Welcome to Facio
 
 |PyPi_version| |PyPi_downloads| |travis_master| |coveralls_master|
 
-Facio is a project skeleton generation tool written in python. It's designed to
+Facio is a project skeleton generation tool written in Python. It's designed to
 make it easy for you to build a single project template, or as many templates
-as you like and with one command bootstrap a new project.
+as you like, with one command to bootstrap a new project.
 
 .. code-block:: none
 

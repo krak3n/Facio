@@ -2,7 +2,7 @@ Installing
 ==========
 
 Facio can be installed on system using the standard python package installers
-``pip`` and ``easy_install``.
+``pip`` or ``easy_install``.
 
 .. note::
 

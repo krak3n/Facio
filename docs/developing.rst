@@ -1,15 +1,15 @@
 Contributing
 ============
 
-Fancy helping out? Fork, commit, issue pull request :)
+Fancy helping out? Fork, commit and issue a pull request :)
 
-I can't guarantee I will accept your pull request but here some things to to
-help:
+I can't guarantee I will accept your pull request, but here some things which
+will help:
 
-* Ensure your code is to PEP8 standards
-* Your pull requests adds a useful feature or fixes a bug
-* Your code has unittests to ensure it works as it should
-* Your code is documented so documentation can be auto generated us sphinx
+* Your code is to PEP8 standards
+* Your pull request adds a useful feature or fixes a bug
+* Your code has unit tests to ensure it works as it should
+* Your code is documented so documentation can be auto generated
 
 I use `Git Flow`_ to develop this project, as such the branch structure is as
 follows:
@@ -28,7 +28,7 @@ Installing the Code
 .. note::
 
     This section assumes familiarity with python virtual environments and
-    pythons virtual environment wrapper.
+    ``virtualenvwrapper``.
 
 First create a fork of ``http://github.com/krak3n/facio`` so it's in your own
 github account, then clone:
@@ -37,7 +37,7 @@ github account, then clone:
 
     $ git clone git@github.com:you/facio.git
 
-Once cloned switch to the develop branchL
+Once cloned switch to the develop branch:
 
 .. code-block:: none
 
@@ -58,26 +58,26 @@ dependencies, this includes everything you need to run tests and debug code.
 
     $ make develop
 
-Facio and it's dependencies will not be installed into your virtual
+Facio and it's dependencies will now be installed into your virtual
 environment.
 
 Vagrant
 -------
 
-I use `Vagrant`_ for my personal development so I have bundled the facio
+I use `Vagrant`_ for development so I have bundled the facio
 repository with a ``Vagrantfile``.
 
 There are the following dependencies:
 
 * Vagrant 1.1+
-* VirtualBox (what ever the latest is)
+* Latest VirtualBox
 * Vagrant Guest Additions Plugin: ``vagrant plugin install vagrant-vbguest``
 * Vagrant Salt Provisioner: ``vagrant plugin install vagrant-salt``
 
 Once you have all the dependencies installed it should be a simple case of
 running ``vagrant up`` at the root of the repository. Once it's finished you
 should have a development environment with all of the ``facio`` dependencies
-installed into python virtual environment. All you have to do is run:
+installed into a python virtual environment. All you have to do is run:
 
 .. code-block:: none
 
