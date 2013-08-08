@@ -33,7 +33,6 @@ html_static_path = ['_static']
 html_theme_path = ['_themes']
 html_theme = 'flask'
 html_theme_options = {
-    'github_fork': 'https://github.com/krak3n/Facio',
     'index_logo': 'facio.jpeg'
 }
 
