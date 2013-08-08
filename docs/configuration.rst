@@ -1,18 +1,18 @@
 Configuration & Command Line
 ============================
 
-Facio can be configured using a file called ``.facio.cfg`` and how Facio runs
+Facio can be configured using a file called ``~/.facio.cfg`` and how Facio runs
 can also be defined by the command line interface, we will take a look at the
 command line first.
 
 Command Line Options
 --------------------
 
-Facio is a simple command line application, and here is how you use it.
+Facio is a command line application. Here is how you use it:
 
 .. note::
 
-    Through out this document ``$`` represents a terminal prompt.
+    Throughout this document ``$`` represents a terminal prompt.
 
 Required Arguments
 ~~~~~~~~~~~~~~~~~~
@@ -24,7 +24,7 @@ name. For example:
 
     $ facio hello_world
 
-If no additional optional arguments are supplied then Facio will use it's
+If no additional optional arguments are supplied then Facio will use its
 default template to create the project.
 
 Optional Arguments
@@ -33,21 +33,21 @@ Optional Arguments
 Template
 ********
 
-For Facio to use a different template than it's default you must pass either
-following arguments:
+For Facio to use a different template than its default you must pass either
+of the following arguments:
 
 * ``--template | -t`` or ``--select | -s``
 
 ``--template``
 ^^^^^^^^^^^^^^
 
-The ``--template`` or it's short hand equivalent ``-t`` takes a string which
+The ``--template`` or its short hand equivalent ``-t`` takes a string which
 can be either of the following:
 
 * A file system path the template, for example ``/home/me/template/template1``
 * A ``git`` or ``mercurial`` repository, for examople:
 
-  * ``git+git@hithub.com:me/template.git``
+  * ``git+git@github.com:me/template.git``
   * ``git+/path/to/local/template``
   * ``hg+user@someremote.com:me/template``
   * ``hg+/path/to/local/template``
@@ -67,7 +67,7 @@ For example:
 ^^^^^^^^^^^^
 
 The ``--select`` or it's ``-s`` short hand is used for selecting a template
-thats defined in the ``'.facio.cfg`` configuration file, see
+which is defined in the ``'.facio.cfg`` configuration file, see the
 :ref:`configuration-file-label` section for more information on how to define
 multiple templates.
 
@@ -132,8 +132,8 @@ Other
 ``--help``
 ^^^^^^^^^^
 
-The ``--help`` or ``-h`` will trigger the ``facio`` help message describing
-briefly all the options available to you.
+The ``--help`` or ``-h`` will trigger the ``facio`` help message briefly
+describing all the options available to you.
 
 ``--version``
 ^^^^^^^^^^^^^
@@ -179,14 +179,14 @@ For example:
 ``[files]`` Section
 ~~~~~~~~~~~~~~~~~~~
 
-The ``[files]`` section allows you to customise what files from your get
-template get copied and which files do not get rendered by ``jinja2``.
+The ``[files]`` section allows you to specify files from your
+template to skip when copying or skip rendering by ``jinja2``.
 
 The ``files`` section takes 2 options:
 
 * ``copy_ignore``: A comma separated list of glob patterns of files **not** to
-  copy, for example you might not want to copy ``pyc`` files or ``.git`` etc
-  files that maybe on the file system or in the repository. The default values
+  copy, for example you might not want to copy ``pyc`` files or ``.git``
+  files that may be on the file system or in the repository. The default values
   for this are:
 
   * ``.git``
@@ -196,8 +196,8 @@ The ``files`` section takes 2 options:
   * ``Thumbs.db``
 
 * ``render_ignore``: A comma separated list of glob patterns of files **not**
-  to render in the template engine, for example images such as ``jpeg``,
-  ``gif`` and ``png`` files.
+  to render with the template engine, for example images such as ``jpeg``,
+  ``gif`` and ``png`` files. The default values for this are:
 
   * ``*.png``
   * ``*.gif``
@@ -213,6 +213,6 @@ For example:
     render_ignore = .coverage,*.ico
 
 In addition to the defaults ``facio`` would not copy over any file named
-``.env`` or any file name ending in ``.pyc``. It would also not render in the
-template engine in addition to the defau;lts any file names ``.coverage`` or
+``.env`` or any file name ending in ``.pyc``. It would also not render with the
+template engine, in addition to the defaults, any file named ``.coverage`` or
 any file name ending in ``.ico``.

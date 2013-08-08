@@ -1,8 +1,8 @@
 Templates
 =========
 
-Templates are simple the bare bones of your project with key parts
-where you would put things like the project name replaced wit **Jinja2**
+Templates are the bare bones of your project with key parts
+where you would put things like the project name replaced with **Jinja2**
 template syntax.
 
 These templates can live locally on your file system or they can live on a
@@ -21,22 +21,23 @@ This is a basic ``HTML`` project template:
             <title>{{ PROJECT_NAME }}</title>
         </head>
         <body>
-            <h1>Hello world, I am {{ PROJECT_NAEME }}</h1>
+            <h1>Hello world, I am {{ PROJECT_NAME }}</h1>
         </body>
     </html>
 
-In the above example ``{{ PROJECT_NAME }}`` will be replaced with what ever you
-set the project name to be in the command, so for example: ``$ facio -n foo``
-would result in ``{{ PROJECT_NAME }}`` being replaced by ``foo``.
+In the above example ``{{ PROJECT_NAME }}`` will be replaced with whatever you
+set the project name to be on the command line, so for example:
+``$ facio -n foo`` would result in ``{{ PROJECT_NAME }}`` being replaced
+by ``foo``.
 
-Your project can be made up of any file types, any directory structure, it all
-gets copied over and processed.
+Your project can be made up of any file types, any directory structure, it will
+all be copied and processed.
 
 Custom Variables
 ----------------
 
-Of course project name is not always enough and in these situations you can send
-extra variables to ``facio`` to use in the template processing. To do this run
+Of course project name is not always enough so for these situations you can send
+extra variables to ``facio`` for use in the template processing. To do this run
 ``facio`` with the ``--vars`` flag passing a comma separated list, for example:
 
 .. code-block:: none
@@ -58,7 +59,7 @@ As Jinja2 is used to render the templates, you can use conditions, and other Jin
 
 .. code-block:: none
 
-    {% if foo=='bar' %}
+    {% if foo == 'bar' %}
     Foo is bar
     {% else %}
     Foo is not bar
@@ -69,14 +70,14 @@ See the `Jinja2`_ Documentation.
 Renaming Files / Directories
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can even rename a directory and/or file by using double curly braces around the variable name, for example:
+You can rename a directory and/or file by using double curly braces around the variable name, for example:
 
 .. warning::
 
     Do not include spaces, use {{var_name}}.ext and not {{ var_name }}.ext
 
 Below is a file structure of a raw template with 1 directory to be renamed and
-1 file to be renamed with what ever the content of ``foo`` is.
+1 file to be renamed to the content of ``foo``.
 
 .. code-block:: none
 

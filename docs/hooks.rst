@@ -1,7 +1,7 @@
 Hooks
 =====
 
-Facio has the ability for you to write hooks which are pieces of code that are
+Facio has the ability to run hooks. Hooks are pieces of code that are
 run either before or after the project template is rendered.
 
 Hooks are defined on a per project basis and are set in a file which resides
@@ -16,9 +16,6 @@ python dotted paths to code to run. For example:
 
     after:
       - path.to.bar
-
-We will go into more detail about how to write your own later however for now
-we will show you how to use the bundled hooks that come with Facio.
 
 Bundled Hooks
 -------------
@@ -53,7 +50,7 @@ example the secret key would normally go in ``settings.py``:
 .. code-block:: python
 
     ...
-    SECRET_KEY = 'DJANGO_SECRET_KEY'
+    SECRET_KEY = '{{ DJANGO_SECRET_KEY }}'
     ..
 
 .. _python-virtualenv-hook-label:
@@ -76,7 +73,7 @@ Add this hook in either the ``before`` or ``after`` list.
 Prompts
 ^^^^^^^
 
-This hook will ask for the following information with sensible defaults set so
+This hook will ask for the following information with sensible defaults set, so
 you can just press ``enter`` to skip.
 
 * **Virtual environment name**
@@ -102,8 +99,8 @@ directory.
 
 .. note::
 
-    Since your template is required to have been processed before this can be run
-    you should only define this hook in the ``after`` list of
+    Since your template is required to have been processed before this hook
+    can be run you should only define this hook in the ``after`` list of
     ``~/.facio.hooks.yml``.
 
 .. code-block:: yaml
@@ -146,11 +143,11 @@ Hello World
 .. warning::
 
     How to add your custom hook onto the python path is beyond the scope of
-    this documentation. If your hook is not importable it will not work.
+    this documentation. If your hook cannot be imported it will not work.
     See http://www.scotttorborg.com/python-packaging/ for a very
     helpful guide on python packaging.
 
-Lets make a simple hook that prints ``hello world``. Create a file in your home
+Let's make a simple hook that prints "hello world". Create a file in your home
 directory a new directory called ``my_hooks`` and inside create 2 files:
 
 * ``__init__.py``
@@ -166,8 +163,8 @@ And add the following content into ``hello.py``.
 This has created a new python module called ``my_hooks`` and inside we have a
 ``hello.py`` python file that can be imported containing our ``run`` function.
 
-Thats it, now all we need to do is get it on the python path. How to add your
-custom hooks onto the python path is beyond the scope of this document, see
+That's it, now all we need to do is get it on the python path. How to add your
+custom hook onto the python path is beyond the scope of this document, see
 http://www.scotttorborg.com/python-packaging/ for a very helpful guide on python
 packaging.
 
