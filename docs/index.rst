@@ -11,6 +11,11 @@ as you like, with one command to bootstrap a new project.
 
     facio my_new_project -t my_remote_template
 
+Existing Templates
+------------------
+
+* Mike Waites Flask Template: https://github.com/mikeywaites/flask-skeleton
+
 Documentation
 -------------
 
